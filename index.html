@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MC Shop — Parts Recon Register</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+:root{--bg:#fff;--border:#dde2f0;--border2:#c8cfe0;--accent:#4f7cff;--accent2:#00a884;--warn:#e03e3e;--text:#1a1d27;--muted:#7a8099;--faint:#f0f2f8;--h-series:#5b52e0;--p15-series:#d4870a;--ok-col:#00a884;--notok-col:#e03e3e;--rec-col:#4f7cff;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:#fff;color:var(--text);min-height:100vh;display:flex;flex-direction:column;font-size:14px;}
+.header{background:#fff;border-bottom:1.5px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+.header h1{font-size:1.15rem;font-weight:700;}
+.header h1 span{color:var(--accent);}
+.header-right{display:flex;align-items:center;gap:12px;}
+.sync-status{font-size:0.74rem;padding:4px 12px;border-radius:20px;font-weight:600;cursor:pointer;white-space:nowrap;}
+.sync-ok{background:#d8f5ed;color:var(--accent2);}
+.sync-err{background:#fde8e8;color:var(--warn);}
+.sync-ing{background:#fef0d6;color:var(--p15-series);}
+.toolbar{background:#fafbff;border-bottom:1.5px solid var(--border);padding:12px 24px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.series-switch{display:flex;background:var(--faint);border:1.5px solid var(--border);border-radius:8px;padding:3px;gap:3px;}
+.series-btn{padding:8px 22px;border-radius:6px;border:none;background:transparent;font-size:0.86rem;font-weight:700;color:var(--muted);cursor:pointer;transition:all .15s;}
+.series-btn.active[data-s="H-Series"]{background:var(--h-series);color:#fff;}
+.series-btn.active[data-s="P15-Series"]{background:var(--p15-series);color:#fff;}
+.view-switch{display:flex;background:var(--faint);border:1.5px solid var(--border);border-radius:8px;padding:3px;gap:3px;}
+.view-btn{padding:8px 18px;border-radius:6px;border:none;background:transparent;font-size:0.84rem;font-weight:600;color:var(--muted);cursor:pointer;transition:all .15s;}
+.view-btn.active{background:#fff;color:var(--accent);box-shadow:0 1px 4px rgba(79,124,255,.15);border:1px solid var(--border);}
+.month-nav{display:flex;align-items:center;gap:8px;margin-left:auto;}
+.month-nav-btn{background:var(--faint);border:1.5px solid var(--border);width:30px;height:30px;border-radius:6px;cursor:pointer;font-size:1rem;display:flex;align-items:center;justify-content:center;}
+.month-nav-btn:hover{background:var(--border);}
+.month-label{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent);min-width:120px;text-align:center;font-size:0.9rem;}
+.btn-excel{display:inline-flex;align-items:center;gap:6px;background:#1d6f42;color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:0.84rem;font-weight:700;cursor:pointer;white-space:nowrap;}
+.btn-excel:hover{opacity:.88;}
+.btn-add{display:inline-flex;align-items:center;gap:6px;background:var(--accent);color:#fff;border:none;border-radius:8px;padding:9px 16px;font-size:0.84rem;font-weight:700;cursor:pointer;white-space:nowrap;}
+.btn-add:hover{opacity:.88;}
+.main{flex:1;overflow:auto;padding:0;background:#fff;}
+.stats-bar{display:flex;gap:14px;padding:16px 24px;flex-wrap:wrap;background:#fafbff;border-bottom:1.5px solid var(--border);}
+.stat-card{background:#fff;border:1.5px solid var(--border);border-radius:10px;padding:12px 18px;min-width:140px;}
+.stat-card .stat-label{font-size:0.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;margin-bottom:5px;}
+.stat-card .stat-val{font-family:'JetBrains Mono',monospace;font-size:1.3rem;font-weight:700;}
+.stat-card.rec .stat-val{color:var(--rec-col);}
+.stat-card.ok .stat-val{color:var(--ok-col);}
+.stat-card.notok .stat-val{color:var(--notok-col);}
+.stat-card.parts .stat-val{color:var(--text);}
+.table-scroll{overflow:auto;max-height:calc(100vh - 280px);border:1px solid var(--border);margin:0 24px 24px;border-radius:10px;}
+table.reg-table{border-collapse:separate;border-spacing:0;font-size:0.78rem;white-space:nowrap;width:max-content;min-width:100%;}
+table.reg-table thead th{position:sticky;top:0;background:var(--faint);z-index:5;border-bottom:1.5px solid var(--border);border-right:1px solid var(--border);padding:8px 10px;font-weight:700;color:var(--muted);text-transform:uppercase;font-size:0.65rem;letter-spacing:.04em;}
+table.reg-table thead tr.date-row th{background:#fff;color:var(--text);font-size:0.72rem;text-align:center;border-bottom:none;}
+table.reg-table thead tr.sub-row th{font-size:0.62rem;padding:5px 8px;text-align:center;}
+table.reg-table thead tr.sub-row th.rec-h{color:var(--rec-col);background:#eef2ff;}
+table.reg-table thead tr.sub-row th.ok-h{color:var(--ok-col);background:#e8faf5;}
+table.reg-table thead tr.sub-row th.notok-h{color:var(--notok-col);background:#fdeaea;}
+table.reg-table th.sticky-col, table.reg-table td.sticky-col{position:sticky;left:0;background:#fff;z-index:3;border-right:2px solid var(--border2);}
+table.reg-table th.sticky-col2, table.reg-table td.sticky-col2{position:sticky;background:#fff;z-index:3;}
+table.reg-table thead th.sticky-col{z-index:6;}
+table.reg-table thead th.sticky-col2{z-index:6;}
+table.reg-table td{padding:4px 6px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);text-align:center;}
+table.reg-table tbody tr:hover td{background:#fafbff;}
+table.reg-table tbody tr:hover td.sticky-col,table.reg-table tbody tr:hover td.sticky-col2{background:#f5f7ff;}
+.part-no{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:0.74rem;}
+.part-model{font-size:0.68rem;color:var(--muted);}
+.part-name{font-weight:600;font-size:0.76rem;}
+.cell-input{width:38px;border:1px solid transparent;border-radius:4px;padding:3px 2px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.74rem;background:transparent;}
+.cell-input:hover{border-color:var(--border2);}
+.cell-input:focus{outline:none;border-color:var(--accent);background:#fff;box-shadow:0 0 0 2px rgba(79,124,255,.15);}
+.cell-input.rec-input{color:var(--rec-col);}
+.cell-input.ok-input{color:var(--ok-col);}
+.cell-input.notok-input{color:var(--notok-col);}
+td.cum-cell{font-weight:700;background:var(--faint);}
+td.cum-cell.rec{color:var(--rec-col);}
+td.cum-cell.ok{color:var(--ok-col);}
+td.cum-cell.notok{color:var(--notok-col);}
+.col-num{width:32px;color:var(--muted);font-weight:600;}
+.col-partno{min-width:90px;text-align:left;}
+.col-model{min-width:90px;text-align:left;}
+.col-name{min-width:140px;text-align:left;}
+.del-row-btn{background:none;border:none;color:var(--muted);cursor:pointer;font-size:0.9rem;padding:2px 6px;border-radius:4px;}
+.del-row-btn:hover{background:#fde8e8;color:var(--warn);}
+.add-row-bar{padding:14px 24px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;background:#fafbff;border-top:1.5px solid var(--border);}
+.add-row-bar input{border:1.5px solid var(--border2);border-radius:7px;padding:8px 12px;font-size:0.82rem;font-family:'Inter',sans-serif;}
+.add-row-bar input.partno-in{width:130px;}
+.add-row-bar input.model-in{width:140px;}
+.add-row-bar input.name-in{width:200px;}
+.loading-overlay{position:fixed;inset:0;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:14px;}
+.spinner{width:36px;height:36px;border:4px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;}
+.loading-text{font-size:.92rem;color:var(--muted);font-weight:600;}
+.mini-spinner{width:16px;height:16px;border:2.5px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;display:inline-block;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.debug-bar{background:#1a1d27;color:#7a8099;font-family:'JetBrains Mono',monospace;font-size:0.7rem;padding:6px 16px;display:flex;align-items:center;gap:10px;}
+.debug-bar span{color:#4f7cff;}
+#debugMsg{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted);}
+.year-cum-toggle{display:flex;align-items:center;gap:6px;font-size:0.8rem;color:var(--muted);}
+.year-cum-toggle input{width:16px;height:16px;cursor:pointer;}
+.section-note{font-size:0.74rem;color:var(--muted);padding:0 24px 10px;}
+.hidden{display:none!important;}
+@media(max-width:680px){.toolbar{padding:10px 14px;}.stats-bar{padding:12px 14px;}.table-scroll{margin:0 12px 16px;}}
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loadingText">Connecting to Firebase…</div>
+</div>
+
+<div class="header">
+  <h1>MC Shop — <span>Parts Recon</span> Register</h1>
+  <div class="header-right">
+    <div class="sync-status sync-ing" id="syncStatus" title="Click to retry" onclick="retryLoad()">⟳ Connecting</div>
+  </div>
+</div>
+
+<div class="toolbar">
+  <div class="series-switch">
+    <button class="series-btn active" data-s="H-Series" onclick="switchSeries('H-Series')">H-Series</button>
+    <button class="series-btn" data-s="P15-Series" onclick="switchSeries('P15-Series')">P15-Series</button>
+  </div>
+  <div class="view-switch">
+    <button class="view-btn active" id="viewMonthBtn" onclick="switchView('month')">📅 Month</button>
+    <button class="view-btn" id="viewYearBtn" onclick="switchView('year')">📊 Year Cumulative</button>
+  </div>
+  <div class="month-nav" id="monthNav">
+    <button class="month-nav-btn" onclick="changeMonth(-1)">&#8249;</button>
+    <span class="month-label" id="monthLabel">—</span>
+    <button class="month-nav-btn" onclick="changeMonth(1)">&#8250;</button>
+  </div>
+  <div class="month-nav hidden" id="yearNav">
+    <button class="month-nav-btn" onclick="changeYear(-1)">&#8249;</button>
+    <span class="month-label" id="yearLabel">—</span>
+    <button class="month-nav-btn" onclick="changeYear(1)">&#8250;</button>
+  </div>
+  <button class="btn-excel" onclick="downloadExcel()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 2v6h6" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/></svg>
+    Download Excel
+  </button>
+  <button class="btn-excel" style="background:var(--accent);" onclick="document.getElementById('importFileInput').click()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    Import Excel
+  </button>
+  <input type="file" id="importFileInput" accept=".xlsx,.xls" style="display:none;" onchange="handleImportFile(event)">
+</div>
+
+<div class="stats-bar" id="statsBar"></div>
+
+<div class="main">
+  <div id="tableContainer"></div>
+
+  <div class="add-row-bar" id="addRowBar">
+    <strong style="font-size:0.82rem;color:var(--muted);">Add Part:</strong>
+    <input class="partno-in" id="newPartNo" placeholder="Part No">
+    <input class="model-in" id="newModel" placeholder="Model" />
+    <input class="name-in" id="newPartName" placeholder="Part Name">
+    <button class="btn-add" onclick="addPart()">+ Add Part</button>
+  </div>
+</div>
+
+<div class="debug-bar">
+  <span>Firebase:</span>
+  <span id="debugMsg">Initializing…</span>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import {
+  getFirestore, doc, setDoc, deleteDoc, collection, query, where, getDocs
+} from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+const firebaseConfig = {
+  apiKey: "AIzaSyA_Ux13nkl7QiIbe5wQI5tOtHgQ2ZsslW8",
+  authDomain: "recon-store-16d08.firebaseapp.com",
+  projectId: "recon-store-16d08",
+  storageBucket: "recon-store-16d08.firebasestorage.app",
+  messagingSenderId: "278030259283",
+  appId: "1:278030259283:web:7416d4ead00f2cdb62a2a6"
+};
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+const SHARED_UID = 'recon-store-shared-user-001';
+
+// ── Constants ─────────────────────────────────────────────────────────────
+const MONTH_FULL = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const MONTH_SHORT= ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+
+// ── State ─────────────────────────────────────────────────────────────────
+let currentSeries = 'H-Series';   // 'H-Series' | 'P15-Series'
+let currentView   = 'month';      // 'month' | 'year'
+let calYear, calMonth, viewYear;
+
+// parts[series] = [{id, partNo, model, partName, order}]
+let parts = { 'H-Series': [], 'P15-Series': [] };
+
+// entries[series][partId][dateStr] = {rec, ok, notok}
+let entries = { 'H-Series': {}, 'P15-Series': {} };
+// yearEntries[series][partId][dateStr] = {...}  (full year, used for year view)
+let yearEntries = { 'H-Series': {}, 'P15-Series': {} };
+
+const today = new Date();
+calYear  = today.getFullYear();
+calMonth = today.getMonth();
+viewYear = calYear;
+
+function dbg(msg){ const el=document.getElementById('debugMsg'); if(el) el.textContent=msg; }
+function setSync(state){
+  const el=document.getElementById('syncStatus');
+  if(state==='ok'){el.className='sync-status sync-ok';el.textContent='✓ Firebase Synced';}
+  else if(state==='err'){el.className='sync-status sync-err';el.textContent='✗ Offline — click to retry';}
+  else{el.className='sync-status sync-ing';el.textContent='⟳ Syncing…';}
+}
+function toDateStr(y,m,d){ return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`; }
+function daysInMonth(y,m){ return new Date(y, m+1, 0).getDate(); }
+function ddmmyyyy(y,m,d){ return `${String(d).padStart(2,'0')}.${String(m+1).padStart(2,'0')}.${y}`; }
+
+// ═════════════════════════════════════════════════════════════════════════
+// FIRESTORE: PARTS (master list, one doc per part)
+// ═════════════════════════════════════════════════════════════════════════
+async function loadParts(series){
+  try{
+    dbg(`Loading parts for ${series}…`);
+    const q = query(collection(db,'parts'), where('uid','==',SHARED_UID), where('series','==',series));
+    const snap = await getDocs(q);
+    const list=[];
+    snap.forEach(d=>{ const v=d.data(); list.push({id:d.id, partNo:v.partNo||'', model:v.model||'', partName:v.partName||'', order:v.order||0}); });
+    list.sort((a,b)=>a.order-b.order);
+    parts[series]=list;
+    dbg(`Loaded ${list.length} parts for ${series}`);
+    setSync('ok');
+  }catch(err){
+    dbg(`❌ Parts load failed: ${err.code||err.message}`);
+    console.error(err); setSync('err');
+    loadPartsLocal(series);
+  }
+}
+function loadPartsLocal(series){
+  const local = JSON.parse(localStorage.getItem('mcShopParts')||'{}');
+  parts[series] = local[series] || [];
+}
+function savePartsLocal(){
+  localStorage.setItem('mcShopParts', JSON.stringify(parts));
+}
+
+async function addPartToFirestore(series, partNo, model, partName, order){
+  const docId = `${SHARED_UID}_${series}_${partNo||'noPN'}_${Date.now()}`;
+  const docRef = doc(db,'parts',docId);
+  await setDoc(docRef, { uid:SHARED_UID, series, partNo, model, partName, order, createdAt:new Date().toISOString() });
+  return docId;
+}
+async function deletePartFromFirestore(partId){
+  await deleteDoc(doc(db,'parts',partId));
+}
+
+// ═════════════════════════════════════════════════════════════════════════
+// FIRESTORE: ENTRIES (one doc per part+date)
+// ═════════════════════════════════════════════════════════════════════════
+async function loadMonthEntries(series, yr, mo){
+  const mk = `${yr}-${String(mo+1).padStart(2,'0')}`;
+  entries[series] = {};
+  try{
+    dbg(`Loading entries: ${series} ${mk}…`);
+    const q = query(collection(db,'partEntries'), where('uid','==',SHARED_UID), where('series','==',series), where('month','==',mk));
+    const snap = await getDocs(q);
+    snap.forEach(d=>{
+      const v=d.data();
+      if(!entries[series][v.partId]) entries[series][v.partId]={};
+      entries[series][v.partId][v.date] = {rec:v.rec||0, ok:v.ok||0, notok:v.notok||0};
+    });
+    dbg(`Loaded ${snap.size} entries for ${series} ${mk}`);
+    setSync('ok');
+  }catch(err){
+    dbg(`❌ Entries load failed: ${err.code||err.message}`);
+    console.error(err); setSync('err');
+  }
+}
+
+async function loadYearEntries(series, yr){
+  yearEntries[series] = {};
+  try{
+    dbg(`Loading full-year entries: ${series} ${yr}…`);
+    const q = query(collection(db,'partEntries'), where('uid','==',SHARED_UID), where('series','==',series), where('year','==',String(yr)));
+    const snap = await getDocs(q);
+    if(snap.size>0){
+      snap.forEach(d=>{
+        const v=d.data();
+        if(!yearEntries[series][v.partId]) yearEntries[series][v.partId]={};
+        yearEntries[series][v.partId][v.date]={rec:v.rec||0, ok:v.ok||0, notok:v.notok||0};
+      });
+    } else {
+      // fallback: 12 months individually
+      const fetches=[];
+      for(let m=1;m<=12;m++){
+        const mk=`${yr}-${String(m).padStart(2,'0')}`;
+        fetches.push(getDocs(query(collection(db,'partEntries'),where('uid','==',SHARED_UID),where('series','==',series),where('month','==',mk))));
+      }
+      const results = await Promise.all(fetches);
+      results.forEach(snap=>{
+        snap.forEach(d=>{
+          const v=d.data();
+          if(!yearEntries[series][v.partId]) yearEntries[series][v.partId]={};
+          yearEntries[series][v.partId][v.date]={rec:v.rec||0, ok:v.ok||0, notok:v.notok||0};
+        });
+      });
+    }
+    dbg(`Year ${yr} entries loaded for ${series}`);
+    setSync('ok');
+  }catch(err){
+    dbg(`❌ Year entries load failed: ${err.code||err.message}`);
+    console.error(err); setSync('err');
+  }
+}
+
+let saveTimers = {};
+async function saveEntryDebounced(series, partId, dateStr, field, value){
+  // update local memory immediately
+  if(!entries[series][partId]) entries[series][partId]={};
+  if(!entries[series][partId][dateStr]) entries[series][partId][dateStr]={rec:0,ok:0,notok:0};
+  entries[series][partId][dateStr][field] = value;
+
+  const key = `${series}_${partId}_${dateStr}`;
+  clearTimeout(saveTimers[key]);
+  saveTimers[key] = setTimeout(async ()=>{
+    const e = entries[series][partId][dateStr];
+    try{
+      setSync('ing');
+      const docId = `${SHARED_UID}_${series}_${partId}_${dateStr}`;
+      await setDoc(doc(db,'partEntries',docId), {
+        uid:SHARED_UID, series, partId, date:dateStr,
+        month:dateStr.substring(0,7), year:dateStr.substring(0,4),
+        rec:e.rec||0, ok:e.ok||0, notok:e.notok||0,
+        updatedAt:new Date().toISOString()
+      });
+      setSync('ok');
+      dbg(`Saved ${series} ${partId} ${dateStr}`);
+      refreshCumulativeCellsOnly();
+    }catch(err){
+      dbg(`❌ Save failed: ${err.code||err.message}`);
+      console.error(err); setSync('err');
+    }
+  }, 500);
+}
+
+// ═════════════════════════════════════════════════════════════════════════
+// BOOT
+// ═════════════════════════════════════════════════════════════════════════
+async function init(){
+  setSync('ing');
+  await loadParts(currentSeries);
+  await loadMonthEntries(currentSeries, calYear, calMonth);
+  renderAll();
+  document.getElementById('loadingOverlay').style.display='none';
+}
+init();
+
+window.retryLoad = async function(){
+  setSync('ing');
+  await loadParts(currentSeries);
+  if(currentView==='month'){
+    await loadMonthEntries(currentSeries, calYear, calMonth);
+  } else {
+    await loadYearEntries(currentSeries, viewYear);
+  }
+  renderAll();
+};
+
+// ═════════════════════════════════════════════════════════════════════════
+// VIEW / SERIES SWITCHING
+// ═════════════════════════════════════════════════════════════════════════
+window.switchSeries = async function(series){
+  currentSeries = series;
+  document.querySelectorAll('.series-btn').forEach(b=>b.classList.toggle('active', b.dataset.s===series));
+  document.getElementById('loadingOverlay').style.display='flex';
+  document.getElementById('loadingText').textContent=`Loading ${series}…`;
+  setSync('ing');
+  await loadParts(series);
+  if(currentView==='month'){
+    await loadMonthEntries(series, calYear, calMonth);
+  } else {
+    await loadYearEntries(series, viewYear);
+  }
+  renderAll();
+  document.getElementById('loadingOverlay').style.display='none';
+};
+
+window.switchView = async function(view){
+  currentView = view;
+  document.getElementById('viewMonthBtn').classList.toggle('active', view==='month');
+  document.getElementById('viewYearBtn').classList.toggle('active', view==='year');
+  document.getElementById('monthNav').classList.toggle('hidden', view!=='month');
+  document.getElementById('yearNav').classList.toggle('hidden', view!=='year');
+  document.getElementById('addRowBar').classList.toggle('hidden', view!=='month');
+  if(view==='year'){
+    document.getElementById('loadingText').textContent=`Loading ${viewYear} data…`;
+    setSync('ing');
+    await loadYearEntries(currentSeries, viewYear);
+  }
+  renderAll();
+};
+
+window.changeMonth = async function(delta){
+  calMonth += delta;
+  if(calMonth<0){calMonth=11;calYear--;}
+  if(calMonth>11){calMonth=0;calYear++;}
+  setSync('ing');
+  await loadMonthEntries(currentSeries, calYear, calMonth);
+  renderAll();
+};
+
+window.changeYear = async function(delta){
+  viewYear += delta;
+  setSync('ing');
+  await loadYearEntries(currentSeries, viewYear);
+  renderAll();
+};
+
+// ═════════════════════════════════════════════════════════════════════════
+// ADD / DELETE PART
+// ═════════════════════════════════════════════════════════════════════════
+window.addPart = async function(){
+  const pno = document.getElementById('newPartNo').value.trim();
+  const model = document.getElementById('newModel').value.trim();
+  const pname = document.getElementById('newPartName').value.trim();
+  if(!pname){ alert('Part Name venum'); return; }
+  const order = parts[currentSeries].length;
+  try{
+    setSync('ing');
+    const id = await addPartToFirestore(currentSeries, pno, model, pname, order);
+    parts[currentSeries].push({id, partNo:pno, model, partName:pname, order});
+    setSync('ok');
+    document.getElementById('newPartNo').value='';
+    document.getElementById('newModel').value='';
+    document.getElementById('newPartName').value='';
+    renderAll();
+  }catch(err){
+    console.error(err);
+    setSync('err');
+    alert('Add failed: '+(err.code||err.message));
+  }
+};
+
+window.deletePart = async function(partId, partName){
+  if(!confirm(`Delete part "${partName}"? Athoda entries-um delete aagum.`)) return;
+  try{
+    setSync('ing');
+    await deletePartFromFirestore(partId);
+    parts[currentSeries] = parts[currentSeries].filter(p=>p.id!==partId);
+    delete entries[currentSeries][partId];
+    delete yearEntries[currentSeries][partId];
+    setSync('ok');
+    renderAll();
+  }catch(err){
+    console.error(err); setSync('err');
+    alert('Delete failed: '+(err.code||err.message));
+  }
+};
+
+window.handleCellInput = function(series, partId, dateStr, field, val){
+  const num = parseInt(val)||0;
+  saveEntryDebounced(series, partId, dateStr, field, num);
+  refreshCumulativeCellsOnly();
+};
+
+// ═════════════════════════════════════════════════════════════════════════
+// RENDER: STATS BAR
+// ═════════════════════════════════════════════════════════════════════════
+function computeTotals(){
+  const list = parts[currentSeries];
+  const src = currentView==='month' ? entries[currentSeries] : yearEntries[currentSeries];
+  let totRec=0, totOk=0, totNotOk=0;
+  list.forEach(p=>{
+    const pe = src[p.id] || {};
+    Object.values(pe).forEach(d=>{
+      totRec += d.rec||0; totOk += d.ok||0; totNotOk += d.notok||0;
+    });
+  });
+  return { totRec, totOk, totNotOk, partsCount:list.length };
+}
+
+function renderStats(){
+  const t = computeTotals();
+  const periodLabel = currentView==='month' ? `${MONTH_FULL[calMonth]} ${calYear}` : `Year ${viewYear}`;
+  document.getElementById('statsBar').innerHTML = `
+    <div class="stat-card parts"><div class="stat-label">Total Parts</div><div class="stat-val">${t.partsCount}</div></div>
+    <div class="stat-card rec"><div class="stat-label">${periodLabel} — Received</div><div class="stat-val">${t.totRec}</div></div>
+    <div class="stat-card ok"><div class="stat-label">${periodLabel} — Ok</div><div class="stat-val">${t.totOk}</div></div>
+    <div class="stat-card notok"><div class="stat-label">${periodLabel} — Not Ok</div><div class="stat-val">${t.totNotOk}</div></div>
+  `;
+}
+
+// ═════════════════════════════════════════════════════════════════════════
+// RENDER: MONTH TABLE (daily entry grid)
+// ═════════════════════════════════════════════════════════════════════════
+function renderMonthTable(){
+  document.getElementById('monthLabel').textContent = `${MONTH_FULL[calMonth]} ${calYear}`;
+  const list = parts[currentSeries];
+  const isH = currentSeries==='H-Series';
+  const nDays = daysInMonth(calYear, calMonth);
+  const dateList = [];
+  for(let d=1; d<=nDays; d++) dateList.push(toDateStr(calYear, calMonth, d));
+
+  if(!list.length){
+    document.getElementById('tableContainer').innerHTML = `<div class="empty-state">No parts added yet for ${currentSeries}. Add a part below to start.</div>`;
+    return;
+  }
+
+  // sticky col widths for offset calc
+  const numW=32, partNoW=92, modelW = isH?92:0;
+  let html = `<div class="table-scroll"><table class="reg-table"><thead>`;
+
+  // Row 1: date headers (colspan 3)
+  html += `<tr class="date-row">
+    <th class="sticky-col" style="left:0;width:${numW}px;" rowspan="2">#</th>
+    <th class="sticky-col2" style="left:${numW}px;width:${partNoW}px;" rowspan="2">Part No</th>`;
+  if(isH) html += `<th class="sticky-col2" style="left:${numW+partNoW}px;width:${modelW}px;" rowspan="2">Model</th>`;
+  html += `<th class="sticky-col2" style="left:${numW+partNoW+modelW}px;min-width:140px;" rowspan="2">Part Name</th>`;
+  dateList.forEach(ds=>{
+    const d = parseInt(ds.split('-')[2]);
+    html += `<th colspan="3">${ddmmyyyy(calYear,calMonth,d)}</th>`;
+  });
+  html += `<th colspan="3" style="background:#eef0ff;">Monthly Cumulative</th>`;
+  html += `<th rowspan="2" style="width:40px;">Del</th>`;
+  html += `</tr>`;
+
+  // Row 2: Rec/Ok/NotOk sub headers
+  html += `<tr class="sub-row">`;
+  dateList.forEach(()=>{
+    html += `<th class="rec-h">Rec</th><th class="ok-h">Ok</th><th class="notok-h">NotOk</th>`;
+  });
+  html += `<th class="rec-h">Rec</th><th class="ok-h">Ok</th><th class="notok-h">NotOk</th>`;
+  html += `</tr></thead><tbody id="monthTbody">`;
+
+  list.forEach((p, idx)=>{
+    const pe = entries[currentSeries][p.id] || {};
+    let cumRec=0, cumOk=0, cumNotOk=0;
+    dateList.forEach(ds=>{
+      const d = pe[ds];
+      if(d){ cumRec+=d.rec||0; cumOk+=d.ok||0; cumNotOk+=d.notok||0; }
+    });
+
+    html += `<tr data-part="${p.id}">
+      <td class="sticky-col col-num" style="left:0;width:${numW}px;">${idx+1}</td>
+      <td class="sticky-col2 col-partno" style="left:${numW}px;width:${partNoW}px;"><span class="part-no">${p.partNo||'—'}</span></td>`;
+    if(isH) html += `<td class="sticky-col2 col-model" style="left:${numW+partNoW}px;width:${modelW}px;"><span class="part-model">${p.model||'—'}</span></td>`;
+    html += `<td class="sticky-col2 col-name" style="left:${numW+partNoW+modelW}px;min-width:140px;"><span class="part-name">${p.partName||'—'}</span></td>`;
+
+    dateList.forEach(ds=>{
+      const d = pe[ds]||{rec:'',ok:'',notok:''};
+      html += `<td><input class="cell-input rec-input" type="number" min="0" value="${d.rec||''}" data-part="${p.id}" data-date="${ds}" data-field="rec" oninput="handleCellInput('${currentSeries}','${p.id}','${ds}','rec',this.value)"></td>`;
+      html += `<td><input class="cell-input ok-input" type="number" min="0" value="${d.ok||''}" data-part="${p.id}" data-date="${ds}" data-field="ok" oninput="handleCellInput('${currentSeries}','${p.id}','${ds}','ok',this.value)"></td>`;
+      html += `<td><input class="cell-input notok-input" type="number" min="0" value="${d.notok||''}" data-part="${p.id}" data-date="${ds}" data-field="notok" oninput="handleCellInput('${currentSeries}','${p.id}','${ds}','notok',this.value)"></td>`;
+    });
+
+    html += `<td class="cum-cell rec" data-cumtype="rec" data-part="${p.id}">${cumRec||0}</td>`;
+    html += `<td class="cum-cell ok" data-cumtype="ok" data-part="${p.id}">${cumOk||0}</td>`;
+    html += `<td class="cum-cell notok" data-cumtype="notok" data-part="${p.id}">${cumNotOk||0}</td>`;
+    html += `<td><button class="del-row-btn" onclick="deletePart('${p.id}','${(p.partName||'').replace(/'/g,"\\'")}')">✕</button></td>`;
+    html += `</tr>`;
+  });
+
+  html += `</tbody></table></div>`;
+  document.getElementById('tableContainer').innerHTML = html;
+}
+
+// Lightweight: update only cumulative cell text without re-rendering whole table (called after each keystroke save)
+function refreshCumulativeCellsOnly(){
+  if(currentView!=='month') return;
+  const list = parts[currentSeries];
+  const nDays = daysInMonth(calYear, calMonth);
+  const dateList = [];
+  for(let d=1; d<=nDays; d++) dateList.push(toDateStr(calYear, calMonth, d));
+
+  list.forEach(p=>{
+    const pe = entries[currentSeries][p.id] || {};
+    let cumRec=0, cumOk=0, cumNotOk=0;
+    dateList.forEach(ds=>{
+      const d = pe[ds];
+      if(d){ cumRec+=d.rec||0; cumOk+=d.ok||0; cumNotOk+=d.notok||0; }
+    });
+    const recCell = document.querySelector(`td.cum-cell.rec[data-part="${p.id}"]`);
+    const okCell = document.querySelector(`td.cum-cell.ok[data-part="${p.id}"]`);
+    const notokCell = document.querySelector(`td.cum-cell.notok[data-part="${p.id}"]`);
+    if(recCell) recCell.textContent = cumRec||0;
+    if(okCell) okCell.textContent = cumOk||0;
+    if(notokCell) notokCell.textContent = cumNotOk||0;
+  });
+  renderStats();
+}
+
+// ═════════════════════════════════════════════════════════════════════════
+// RENDER: YEAR CUMULATIVE TABLE (one row per part, columns = 12 months + year total)
+// ═════════════════════════════════════════════════════════════════════════
+function renderYearTable(){
+  document.getElementById('yearLabel').textContent = `${viewYear}`;
+  const list = parts[currentSeries];
+  const isH = currentSeries==='H-Series';
+
+  if(!list.length){
+    document.getElementById('tableContainer').innerHTML = `<div class="empty-state">No parts added yet for ${currentSeries}.</div>`;
+    return;
+  }
+
+  const numW=32, partNoW=92, modelW = isH?92:0;
+
+  let html = `<div class="table-scroll"><table class="reg-table"><thead>`;
+  html += `<tr class="date-row">
+    <th class="sticky-col" style="left:0;width:${numW}px;" rowspan="2">#</th>
+    <th class="sticky-col2" style="left:${numW}px;width:${partNoW}px;" rowspan="2">Part No</th>`;
+  if(isH) html += `<th class="sticky-col2" style="left:${numW+partNoW}px;width:${modelW}px;" rowspan="2">Model</th>`;
+  html += `<th class="sticky-col2" style="left:${numW+partNoW+modelW}px;min-width:140px;" rowspan="2">Part Name</th>`;
+  MONTH_SHORT.forEach(m=>{ html += `<th colspan="3">${m} ${viewYear}</th>`; });
+  html += `<th colspan="3" style="background:#eef0ff;">Year Cumulative</th></tr>`;
+
+  html += `<tr class="sub-row">`;
+  MONTH_SHORT.forEach(()=>{ html += `<th class="rec-h">Rec</th><th class="ok-h">Ok</th><th class="notok-h">NotOk</th>`; });
+  html += `<th class="rec-h">Rec</th><th class="ok-h">Ok</th><th class="notok-h">NotOk</th>`;
+  html += `</tr></thead><tbody>`;
+
+  list.forEach((p, idx)=>{
+    const pe = yearEntries[currentSeries][p.id] || {};
+    // aggregate per month
+    const monthAgg = Array.from({length:12}, ()=>({rec:0,ok:0,notok:0}));
+    Object.keys(pe).forEach(ds=>{
+      const mIdx = parseInt(ds.split('-')[1])-1;
+      const d = pe[ds];
+      monthAgg[mIdx].rec += d.rec||0;
+      monthAgg[mIdx].ok += d.ok||0;
+      monthAgg[mIdx].notok += d.notok||0;
+    });
+    const yearTot = monthAgg.reduce((acc,m)=>({rec:acc.rec+m.rec, ok:acc.ok+m.ok, notok:acc.notok+m.notok}),{rec:0,ok:0,notok:0});
+
+    html += `<tr>
+      <td class="sticky-col col-num" style="left:0;width:${numW}px;">${idx+1}</td>
+      <td class="sticky-col2 col-partno" style="left:${numW}px;width:${partNoW}px;"><span class="part-no">${p.partNo||'—'}</span></td>`;
+    if(isH) html += `<td class="sticky-col2 col-model" style="left:${numW+partNoW}px;width:${modelW}px;"><span class="part-model">${p.model||'—'}</span></td>`;
+    html += `<td class="sticky-col2 col-name" style="left:${numW+partNoW+modelW}px;min-width:140px;"><span class="part-name">${p.partName||'—'}</span></td>`;
+
+    monthAgg.forEach(m=>{
+      html += `<td class="cum-cell rec" style="background:transparent;font-weight:600;">${m.rec||''}</td>`;
+      html += `<td class="cum-cell ok" style="background:transparent;font-weight:600;">${m.ok||''}</td>`;
+      html += `<td class="cum-cell notok" style="background:transparent;font-weight:600;">${m.notok||''}</td>`;
+    });
+    html += `<td class="cum-cell rec">${yearTot.rec||0}</td>`;
+    html += `<td class="cum-cell ok">${yearTot.ok||0}</td>`;
+    html += `<td class="cum-cell notok">${yearTot.notok||0}</td>`;
+    html += `</tr>`;
+  });
+
+  // Grand total row
+  const grand = Array.from({length:12}, ()=>({rec:0,ok:0,notok:0}));
+  list.forEach(p=>{
+    const pe = yearEntries[currentSeries][p.id] || {};
+    Object.keys(pe).forEach(ds=>{
+      const mIdx = parseInt(ds.split('-')[1])-1;
+      const d = pe[ds];
+      grand[mIdx].rec += d.rec||0; grand[mIdx].ok += d.ok||0; grand[mIdx].notok += d.notok||0;
+    });
+  });
+  const grandTot = grand.reduce((acc,m)=>({rec:acc.rec+m.rec, ok:acc.ok+m.ok, notok:acc.notok+m.notok}),{rec:0,ok:0,notok:0});
+
+  html += `<tr style="background:var(--faint);font-weight:700;">
+    <td class="sticky-col" style="left:0;width:${numW}px;background:var(--faint);"></td>
+    <td class="sticky-col2" style="left:${numW}px;width:${partNoW}px;background:var(--faint);" colspan="${isH?2:1}">GRAND TOTAL</td>`;
+  grand.forEach(m=>{
+    html += `<td class="cum-cell rec">${m.rec||0}</td><td class="cum-cell ok">${m.ok||0}</td><td class="cum-cell notok">${m.notok||0}</td>`;
+  });
+  html += `<td class="cum-cell rec">${grandTot.rec}</td><td class="cum-cell ok">${grandTot.ok}</td><td class="cum-cell notok">${grandTot.notok}</td>`;
+  html += `</tr>`;
+
+  html += `</tbody></table></div>`;
+  document.getElementById('tableContainer').innerHTML = html;
+}
+
+function renderAll(){
+  renderStats();
+  if(currentView==='month') renderMonthTable();
+  else renderYearTable();
+}
+
+// ═════════════════════════════════════════════════════════════════════════
+// EXCEL EXPORT — matches your MC Shop format exactly
+// ═════════════════════════════════════════════════════════════════════════
+window.downloadExcel = function(){
+  try{
+    const wb = XLSX.utils.book_new();
+
+    // Build a sheet for whichever series+view is active, but for a complete download
+    // we export BOTH series, each as its own sheet, using the currently selected view (month/year).
+    ['H-Series','P15-Series'].forEach(series=>{
+      const isH = series==='H-Series';
+      const list = parts[series];
+      if(!list.length) return;
+
+      let dateList, label;
+      let srcEntries;
+      if(currentView==='month'){
+        const nDays = daysInMonth(calYear, calMonth);
+        dateList = [];
+        for(let d=1; d<=nDays; d++) dateList.push(toDateStr(calYear, calMonth, d));
+        label = `${MONTH_SHORT[calMonth]} ${calYear}`;
+        srcEntries = entries[series];
+      } else {
+        // year view: build a synthetic "month" axis instead of daily axis (12 cols)
+        label = `Year ${viewYear}`;
+        srcEntries = yearEntries[series];
+      }
+
+      const rows = [];
+
+      if(currentView==='month'){
+        // Header row 1
+        const headerRow1 = isH ? ['Sl No','Part No','Model','Date'] : ['Sl No','Part No','Date'];
+        dateList.forEach(ds=>{
+          const d = parseInt(ds.split('-')[2]);
+          headerRow1.push(ddmmyyyy(calYear,calMonth,d), '', '');
+        });
+        headerRow1.push('Overall Cumulative','','');
+        rows.push(headerRow1);
+
+        // Header row 2
+        const headerRow2 = isH ? ['','','',''] : ['','',''];
+        dateList.forEach(()=>{ headerRow2.push('Received','Ok','Not Ok'); });
+        headerRow2.push('Received','Ok','Not Ok');
+        rows.push(headerRow2);
+
+        // Data rows
+        list.forEach((p,idx)=>{
+          const pe = srcEntries[p.id] || {};
+          let cumRec=0, cumOk=0, cumNotOk=0;
+          const row = isH ? [idx+1, p.partNo||'', p.model||'', p.partName||''] : [idx+1, p.partNo||'', p.partName||''];
+          dateList.forEach(ds=>{
+            const d = pe[ds];
+            const rec=d?d.rec||0:'', ok=d?d.ok||0:'', notok=d?d.notok||0:'';
+            row.push(rec===0?'':rec, ok===0?'':ok, notok===0?'':notok);
+            if(d){ cumRec+=d.rec||0; cumOk+=d.ok||0; cumNotOk+=d.notok||0; }
+          });
+          row.push(cumRec||0, cumOk||0, cumNotOk||0);
+          rows.push(row);
+        });
+
+        // Grand total row
+        const totRow = isH ? ['','','','GRAND TOTAL'] : ['','','GRAND TOTAL'];
+        let gRec=0,gOk=0,gNotOk=0;
+        dateList.forEach(ds=>{
+          let dRec=0,dOk=0,dNotOk=0;
+          list.forEach(p=>{
+            const d=(srcEntries[p.id]||{})[ds];
+            if(d){ dRec+=d.rec||0; dOk+=d.ok||0; dNotOk+=d.notok||0; }
+          });
+          totRow.push(dRec||'', dOk||'', dNotOk||'');
+          gRec+=dRec; gOk+=dOk; gNotOk+=dNotOk;
+        });
+        totRow.push(gRec,gOk,gNotOk);
+        rows.push(totRow);
+
+      } else {
+        // YEAR VIEW EXPORT: months as columns
+        const headerRow1 = isH ? ['Sl No','Part No','Model','Part Name'] : ['Sl No','Part No','Part Name'];
+        MONTH_SHORT.forEach(m=>{ headerRow1.push(`${m} ${viewYear}`, '', ''); });
+        headerRow1.push('Year Cumulative','','');
+        rows.push(headerRow1);
+
+        const headerRow2 = isH ? ['','','',''] : ['','',''];
+        MONTH_SHORT.forEach(()=>{ headerRow2.push('Received','Ok','Not Ok'); });
+        headerRow2.push('Received','Ok','Not Ok');
+        rows.push(headerRow2);
+
+        list.forEach((p,idx)=>{
+          const pe = srcEntries[p.id] || {};
+          const monthAgg = Array.from({length:12}, ()=>({rec:0,ok:0,notok:0}));
+          Object.keys(pe).forEach(ds=>{
+            const mIdx = parseInt(ds.split('-')[1])-1;
+            const d = pe[ds];
+            monthAgg[mIdx].rec += d.rec||0;
+            monthAgg[mIdx].ok += d.ok||0;
+            monthAgg[mIdx].notok += d.notok||0;
+          });
+          const row = isH ? [idx+1, p.partNo||'', p.model||'', p.partName||''] : [idx+1, p.partNo||'', p.partName||''];
+          let yRec=0,yOk=0,yNotOk=0;
+          monthAgg.forEach(m=>{
+            row.push(m.rec||'', m.ok||'', m.notok||'');
+            yRec+=m.rec; yOk+=m.ok; yNotOk+=m.notok;
+          });
+          row.push(yRec,yOk,yNotOk);
+          rows.push(row);
+        });
+
+        // Grand total row
+        const totRow = isH ? ['','','','GRAND TOTAL'] : ['','','GRAND TOTAL'];
+        const grand = Array.from({length:12}, ()=>({rec:0,ok:0,notok:0}));
+        list.forEach(p=>{
+          const pe = srcEntries[p.id]||{};
+          Object.keys(pe).forEach(ds=>{
+            const mIdx = parseInt(ds.split('-')[1])-1;
+            const d = pe[ds];
+            grand[mIdx].rec+=d.rec||0; grand[mIdx].ok+=d.ok||0; grand[mIdx].notok+=d.notok||0;
+          });
+        });
+        let gRec=0,gOk=0,gNotOk=0;
+        grand.forEach(m=>{
+          totRow.push(m.rec||'', m.ok||'', m.notok||'');
+          gRec+=m.rec; gOk+=m.ok; gNotOk+=m.notok;
+        });
+        totRow.push(gRec,gOk,gNotOk);
+        rows.push(totRow);
+      }
+
+      const ws = XLSX.utils.aoa_to_sheet(rows);
+      // merges for the two header rows (date/month spans of 3, plus leading label cols)
+      const leadCols = isH ? 4 : 3;
+      const merges = [];
+      // merge leading label columns vertically across header row1+row2
+      for(let c=0;c<leadCols;c++){
+        merges.push({s:{r:0,c:c}, e:{r:1,c:c}});
+      }
+      // merge each date/month group of 3 cells horizontally in row1
+      const groupCount = currentView==='month' ? dateList.length+1 : 13; // +1 / +1 for cumulative block
+      for(let g=0; g<groupCount; g++){
+        const startCol = leadCols + g*3;
+        merges.push({s:{r:0,c:startCol}, e:{r:0,c:startCol+2}});
+      }
+      ws['!merges'] = merges;
+
+      const colWidths = [];
+      for(let c=0;c<leadCols;c++) colWidths.push({wch: c===leadCols-1?20:12});
+      for(let g=0; g<groupCount; g++){ colWidths.push({wch:9},{wch:7},{wch:9}); }
+      ws['!cols'] = colWidths;
+
+      XLSX.utils.book_append_sheet(wb, ws, series);
+    });
+
+    const fname = currentView==='month'
+      ? `MC_Shop_Parts_${MONTH_SHORT[calMonth]}_${calYear}.xlsx`
+      : `MC_Shop_Parts_Year_${viewYear}.xlsx`;
+    XLSX.writeFile(wb, fname);
+    dbg(`Excel downloaded: ${fname}`);
+  }catch(err){
+    console.error('Excel export error:', err);
+    dbg(`❌ Excel export failed: ${err.message}`);
+    alert('Excel export failed: '+err.message);
+  }
+};
+
+// ═════════════════════════════════════════════════════════════════════════
+// IMPORT FROM EXCEL — reads MC Shop format file, bulk-creates parts + entries
+// ═════════════════════════════════════════════════════════════════════════
+function ddmmyyyyToISO(dstr){
+  const parts = String(dstr).trim().split('.');
+  if(parts.length!==3) return null;
+  const [dd,mm,yyyy] = parts;
+  if(!dd||!mm||!yyyy) return null;
+  return `${yyyy}-${mm.padStart(2,'0')}-${dd.padStart(2,'0')}`;
+}
+
+function parseSeriesSheet(ws, hasModel){
+  const rows = XLSX.utils.sheet_to_json(ws, {header:1, raw:true, defval:null});
+  if(rows.length<3) return [];
+  const headerRow1 = rows[0];
+  const startCol = hasModel ? 4 : 3; // 0-indexed: after Sl No, Part No, (Model), Date/Name
+  const dateCols = []; // {col, iso}
+  let c = startCol;
+  while(c < headerRow1.length){
+    const v = headerRow1[c];
+    if(v && typeof v==='string' && v.includes('.')){
+      const iso = ddmmyyyyToISO(v);
+      if(iso){ dateCols.push({col:c, iso}); c+=3; continue; }
+    }
+    break;
+  }
+  const parts = [];
+  for(let r=2; r<rows.length; r++){
+    const row = rows[r];
+    if(!row) continue;
+    const pno = row[1];
+    const model = hasModel ? row[2] : null;
+    const pname = hasModel ? row[3] : row[2];
+    if(pno==null && model==null && pname==null) continue;
+    const entryMap = {};
+    dateCols.forEach(({col, iso})=>{
+      const rec = row[col], ok = row[col+1], notok = row[col+2];
+      if((rec||ok||notok)){
+        entryMap[iso] = {
+          rec: typeof rec==='number'?rec:0,
+          ok: typeof ok==='number'?ok:0,
+          notok: typeof notok==='number'?notok:0
+        };
+      }
+    });
+    parts.push({
+      partNo: pno!=null?String(pno).trim():'',
+      model: model!=null?String(model).trim():'',
+      partName: pname!=null?String(pname).trim():'',
+      entries: entryMap
+    });
+  }
+  return parts;
+}
+
+window.handleImportFile = async function(evt){
+  const file = evt.target.files[0];
+  if(!file) return;
+  if(!confirm(`Import "${file.name}"?\n\nIdhu existing parts-oda SAME part name/series irundha update aagum, illana puthusa add aagum. Continue?`)){
+    evt.target.value=''; return;
+  }
+
+  document.getElementById('loadingOverlay').style.display='flex';
+  document.getElementById('loadingText').textContent='Reading Excel file…';
+
+  try{
+    const buf = await file.arrayBuffer();
+    const wb = XLSX.read(buf, {type:'array'});
+    const seriesMap = {};
+    if(wb.SheetNames.includes('H-Series')) seriesMap['H-Series'] = parseSeriesSheet(wb.Sheets['H-Series'], true);
+    if(wb.SheetNames.includes('P15-Series')) seriesMap['P15-Series'] = parseSeriesSheet(wb.Sheets['P15-Series'], false);
+
+    if(!Object.keys(seriesMap).length){
+      alert('Sheet names "H-Series" / "P15-Series" kaanom. File format check pannunga.');
+      document.getElementById('loadingOverlay').style.display='none';
+      evt.target.value=''; return;
+    }
+
+    let totalParts=0, totalEntries=0;
+    const monthsTouched = new Set();
+
+    for(const series of Object.keys(seriesMap)){
+      const importParts = seriesMap[series];
+      document.getElementById('loadingText').textContent=`Importing ${series}: ${importParts.length} parts…`;
+
+      // existing parts for dedup by partName+partNo
+      await loadParts(series);
+      const existingByKey = {};
+      parts[series].forEach(p=>{ existingByKey[`${p.partNo}|||${p.partName}`] = p; });
+
+      let order = parts[series].length;
+      for(const ip of importParts){
+        const key = `${ip.partNo}|||${ip.partName}`;
+        let partId;
+        if(existingByKey[key]){
+          partId = existingByKey[key].id;
+        } else {
+          partId = await addPartToFirestore(series, ip.partNo, ip.model, ip.partName, order++);
+          parts[series].push({id:partId, partNo:ip.partNo, model:ip.model, partName:ip.partName, order:order});
+          existingByKey[key] = {id:partId};
+          totalParts++;
+        }
+        // push entries
+        for(const iso of Object.keys(ip.entries)){
+          const e = ip.entries[iso];
+          monthsTouched.add(iso.substring(0,7));
+          const docId = `${SHARED_UID}_${series}_${partId}_${iso}`;
+          await setDoc(doc(db,'partEntries',docId), {
+            uid:SHARED_UID, series, partId, date:iso,
+            month:iso.substring(0,7), year:iso.substring(0,4),
+            rec:e.rec||0, ok:e.ok||0, notok:e.notok||0,
+            updatedAt:new Date().toISOString()
+          });
+          totalEntries++;
+        }
+      }
+    }
+
+    dbg(`Import done: ${totalParts} new parts, ${totalEntries} entries`);
+    alert(`✓ Import complete!\n\nNew parts added: ${totalParts}\nDaily entries imported: ${totalEntries}\nMonths touched: ${[...monthsTouched].join(', ')}`);
+
+    // reload current view fresh
+    await loadParts(currentSeries);
+    if(currentView==='month') await loadMonthEntries(currentSeries, calYear, calMonth);
+    else await loadYearEntries(currentSeries, viewYear);
+    renderAll();
+  }catch(err){
+    console.error('Import error:', err);
+    dbg(`❌ Import failed: ${err.message}`);
+    alert('Import failed: '+err.message);
+  }
+  document.getElementById('loadingOverlay').style.display='none';
+  evt.target.value='';
+};
+
+</script>
+</body>
+</html>
