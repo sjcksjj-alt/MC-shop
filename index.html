@@ -135,11 +135,7 @@ td.cum-cell.notok{color:var(--notok-col);}
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 2v6h6" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/></svg>
     Download Excel
   </button>
-  <button class="btn-excel" style="background:var(--accent);" onclick="document.getElementById('importFileInput').click()">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    Import Excel
-  </button>
-  <input type="file" id="importFileInput" accept=".xlsx,.xls" style="display:none;" onchange="handleImportFile(event)">
+
 </div>
 
 <div class="stats-bar" id="statsBar"></div>
@@ -184,16 +180,12 @@ const MONTH_FULL = ['January','February','March','April','May','June','July','Au
 const MONTH_SHORT= ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 
 // ── State ─────────────────────────────────────────────────────────────────
-let currentSeries = 'H-Series';   // 'H-Series' | 'P15-Series'
-let currentView   = 'month';      // 'month' | 'year'
+let currentSeries = 'H-Series';
+let currentView   = 'month';
 let calYear, calMonth, viewYear;
 
-// parts[series] = [{id, partNo, model, partName, order}]
 let parts = { 'H-Series': [], 'P15-Series': [] };
-
-// entries[series][partId][dateStr] = {rec, ok, notok}
 let entries = { 'H-Series': {}, 'P15-Series': {} };
-// yearEntries[series][partId][dateStr] = {...}  (full year, used for year view)
 let yearEntries = { 'H-Series': {}, 'P15-Series': {} };
 
 const today = new Date();
@@ -212,9 +204,6 @@ function toDateStr(y,m,d){ return `${y}-${String(m+1).padStart(2,'0')}-${String(
 function daysInMonth(y,m){ return new Date(y, m+1, 0).getDate(); }
 function ddmmyyyy(y,m,d){ return `${String(d).padStart(2,'0')}.${String(m+1).padStart(2,'0')}.${y}`; }
 
-// ═════════════════════════════════════════════════════════════════════════
-// FIRESTORE: PARTS (master list, one doc per part)
-// ═════════════════════════════════════════════════════════════════════════
 async function loadParts(series){
   try{
     dbg(`Loading parts for ${series}…`);
@@ -250,9 +239,6 @@ async function deletePartFromFirestore(partId){
   await deleteDoc(doc(db,'parts',partId));
 }
 
-// ═════════════════════════════════════════════════════════════════════════
-// FIRESTORE: ENTRIES (one doc per part+date)
-// ═════════════════════════════════════════════════════════════════════════
 async function loadMonthEntries(series, yr, mo){
   const mk = `${yr}-${String(mo+1).padStart(2,'0')}`;
   entries[series] = {};
@@ -286,7 +272,6 @@ async function loadYearEntries(series, yr){
         yearEntries[series][v.partId][v.date]={rec:v.rec||0, ok:v.ok||0, notok:v.notok||0};
       });
     } else {
-      // fallback: 12 months individually
       const fetches=[];
       for(let m=1;m<=12;m++){
         const mk=`${yr}-${String(m).padStart(2,'0')}`;
@@ -311,7 +296,6 @@ async function loadYearEntries(series, yr){
 
 let saveTimers = {};
 async function saveEntryDebounced(series, partId, dateStr, field, value){
-  // update local memory immediately
   if(!entries[series][partId]) entries[series][partId]={};
   if(!entries[series][partId][dateStr]) entries[series][partId][dateStr]={rec:0,ok:0,notok:0};
   entries[series][partId][dateStr][field] = value;
@@ -339,9 +323,6 @@ async function saveEntryDebounced(series, partId, dateStr, field, value){
   }, 500);
 }
 
-// ═════════════════════════════════════════════════════════════════════════
-// BOOT
-// ═════════════════════════════════════════════════════════════════════════
 async function init(){
   setSync('ing');
   await loadParts(currentSeries);
@@ -362,9 +343,6 @@ window.retryLoad = async function(){
   renderAll();
 };
 
-// ═════════════════════════════════════════════════════════════════════════
-// VIEW / SERIES SWITCHING
-// ═════════════════════════════════════════════════════════════════════════
 window.switchSeries = async function(series){
   currentSeries = series;
   document.querySelectorAll('.series-btn').forEach(b=>b.classList.toggle('active', b.dataset.s===series));
@@ -388,6 +366,7 @@ window.switchView = async function(view){
   document.getElementById('monthNav').classList.toggle('hidden', view!=='month');
   document.getElementById('yearNav').classList.toggle('hidden', view!=='year');
   document.getElementById('addRowBar').classList.toggle('hidden', view!=='month');
+
   if(view==='year'){
     document.getElementById('loadingText').textContent=`Loading ${viewYear} data…`;
     setSync('ing');
@@ -412,9 +391,6 @@ window.changeYear = async function(delta){
   renderAll();
 };
 
-// ═════════════════════════════════════════════════════════════════════════
-// ADD / DELETE PART
-// ═════════════════════════════════════════════════════════════════════════
 window.addPart = async function(){
   const pno = document.getElementById('newPartNo').value.trim();
   const model = document.getElementById('newModel').value.trim();
@@ -459,9 +435,6 @@ window.handleCellInput = function(series, partId, dateStr, field, val){
   refreshCumulativeCellsOnly();
 };
 
-// ═════════════════════════════════════════════════════════════════════════
-// RENDER: STATS BAR
-// ═════════════════════════════════════════════════════════════════════════
 function computeTotals(){
   const list = parts[currentSeries];
   const src = currentView==='month' ? entries[currentSeries] : yearEntries[currentSeries];
@@ -486,9 +459,6 @@ function renderStats(){
   `;
 }
 
-// ═════════════════════════════════════════════════════════════════════════
-// RENDER: MONTH TABLE (daily entry grid)
-// ═════════════════════════════════════════════════════════════════════════
 function renderMonthTable(){
   document.getElementById('monthLabel').textContent = `${MONTH_FULL[calMonth]} ${calYear}`;
   const list = parts[currentSeries];
@@ -502,11 +472,9 @@ function renderMonthTable(){
     return;
   }
 
-  // sticky col widths for offset calc
   const numW=32, partNoW=92, modelW = isH?92:0;
   let html = `<div class="table-scroll"><table class="reg-table"><thead>`;
 
-  // Row 1: date headers (colspan 3)
   html += `<tr class="date-row">
     <th class="sticky-col" style="left:0;width:${numW}px;" rowspan="2">#</th>
     <th class="sticky-col2" style="left:${numW}px;width:${partNoW}px;" rowspan="2">Part No</th>`;
@@ -520,7 +488,6 @@ function renderMonthTable(){
   html += `<th rowspan="2" style="width:40px;">Del</th>`;
   html += `</tr>`;
 
-  // Row 2: Rec/Ok/NotOk sub headers
   html += `<tr class="sub-row">`;
   dateList.forEach(()=>{
     html += `<th class="rec-h">Rec</th><th class="ok-h">Ok</th><th class="notok-h">NotOk</th>`;
@@ -560,7 +527,6 @@ function renderMonthTable(){
   document.getElementById('tableContainer').innerHTML = html;
 }
 
-// Lightweight: update only cumulative cell text without re-rendering whole table (called after each keystroke save)
 function refreshCumulativeCellsOnly(){
   if(currentView!=='month') return;
   const list = parts[currentSeries];
@@ -585,9 +551,6 @@ function refreshCumulativeCellsOnly(){
   renderStats();
 }
 
-// ═════════════════════════════════════════════════════════════════════════
-// RENDER: YEAR CUMULATIVE TABLE (one row per part, columns = 12 months + year total)
-// ═════════════════════════════════════════════════════════════════════════
 function renderYearTable(){
   document.getElementById('yearLabel').textContent = `${viewYear}`;
   const list = parts[currentSeries];
@@ -616,7 +579,6 @@ function renderYearTable(){
 
   list.forEach((p, idx)=>{
     const pe = yearEntries[currentSeries][p.id] || {};
-    // aggregate per month
     const monthAgg = Array.from({length:12}, ()=>({rec:0,ok:0,notok:0}));
     Object.keys(pe).forEach(ds=>{
       const mIdx = parseInt(ds.split('-')[1])-1;
@@ -644,7 +606,6 @@ function renderYearTable(){
     html += `</tr>`;
   });
 
-  // Grand total row
   const grand = Array.from({length:12}, ()=>({rec:0,ok:0,notok:0}));
   list.forEach(p=>{
     const pe = yearEntries[currentSeries][p.id] || {};
@@ -675,15 +636,10 @@ function renderAll(){
   else renderYearTable();
 }
 
-// ═════════════════════════════════════════════════════════════════════════
-// EXCEL EXPORT — matches your MC Shop format exactly
-// ═════════════════════════════════════════════════════════════════════════
 window.downloadExcel = function(){
   try{
     const wb = XLSX.utils.book_new();
 
-    // Build a sheet for whichever series+view is active, but for a complete download
-    // we export BOTH series, each as its own sheet, using the currently selected view (month/year).
     ['H-Series','P15-Series'].forEach(series=>{
       const isH = series==='H-Series';
       const list = parts[series];
@@ -698,7 +654,6 @@ window.downloadExcel = function(){
         label = `${MONTH_SHORT[calMonth]} ${calYear}`;
         srcEntries = entries[series];
       } else {
-        // year view: build a synthetic "month" axis instead of daily axis (12 cols)
         label = `Year ${viewYear}`;
         srcEntries = yearEntries[series];
       }
@@ -706,7 +661,6 @@ window.downloadExcel = function(){
       const rows = [];
 
       if(currentView==='month'){
-        // Header row 1
         const headerRow1 = isH ? ['Sl No','Part No','Model','Date'] : ['Sl No','Part No','Date'];
         dateList.forEach(ds=>{
           const d = parseInt(ds.split('-')[2]);
@@ -715,13 +669,11 @@ window.downloadExcel = function(){
         headerRow1.push('Overall Cumulative','','');
         rows.push(headerRow1);
 
-        // Header row 2
         const headerRow2 = isH ? ['','','',''] : ['','',''];
         dateList.forEach(()=>{ headerRow2.push('Received','Ok','Not Ok'); });
         headerRow2.push('Received','Ok','Not Ok');
         rows.push(headerRow2);
 
-        // Data rows
         list.forEach((p,idx)=>{
           const pe = srcEntries[p.id] || {};
           let cumRec=0, cumOk=0, cumNotOk=0;
@@ -736,7 +688,6 @@ window.downloadExcel = function(){
           rows.push(row);
         });
 
-        // Grand total row
         const totRow = isH ? ['','','','GRAND TOTAL'] : ['','','GRAND TOTAL'];
         let gRec=0,gOk=0,gNotOk=0;
         dateList.forEach(ds=>{
@@ -752,7 +703,6 @@ window.downloadExcel = function(){
         rows.push(totRow);
 
       } else {
-        // YEAR VIEW EXPORT: months as columns
         const headerRow1 = isH ? ['Sl No','Part No','Model','Part Name'] : ['Sl No','Part No','Part Name'];
         MONTH_SHORT.forEach(m=>{ headerRow1.push(`${m} ${viewYear}`, '', ''); });
         headerRow1.push('Year Cumulative','','');
@@ -783,7 +733,6 @@ window.downloadExcel = function(){
           rows.push(row);
         });
 
-        // Grand total row
         const totRow = isH ? ['','','','GRAND TOTAL'] : ['','','GRAND TOTAL'];
         const grand = Array.from({length:12}, ()=>({rec:0,ok:0,notok:0}));
         list.forEach(p=>{
@@ -804,15 +753,12 @@ window.downloadExcel = function(){
       }
 
       const ws = XLSX.utils.aoa_to_sheet(rows);
-      // merges for the two header rows (date/month spans of 3, plus leading label cols)
       const leadCols = isH ? 4 : 3;
       const merges = [];
-      // merge leading label columns vertically across header row1+row2
       for(let c=0;c<leadCols;c++){
         merges.push({s:{r:0,c:c}, e:{r:1,c:c}});
       }
-      // merge each date/month group of 3 cells horizontally in row1
-      const groupCount = currentView==='month' ? dateList.length+1 : 13; // +1 / +1 for cumulative block
+      const groupCount = currentView==='month' ? dateList.length+1 : 13;
       for(let g=0; g<groupCount; g++){
         const startCol = leadCols + g*3;
         merges.push({s:{r:0,c:startCol}, e:{r:0,c:startCol+2}});
@@ -838,142 +784,6 @@ window.downloadExcel = function(){
     alert('Excel export failed: '+err.message);
   }
 };
-
-// ═════════════════════════════════════════════════════════════════════════
-// IMPORT FROM EXCEL — reads MC Shop format file, bulk-creates parts + entries
-// ═════════════════════════════════════════════════════════════════════════
-function ddmmyyyyToISO(dstr){
-  const parts = String(dstr).trim().split('.');
-  if(parts.length!==3) return null;
-  const [dd,mm,yyyy] = parts;
-  if(!dd||!mm||!yyyy) return null;
-  return `${yyyy}-${mm.padStart(2,'0')}-${dd.padStart(2,'0')}`;
-}
-
-function parseSeriesSheet(ws, hasModel){
-  const rows = XLSX.utils.sheet_to_json(ws, {header:1, raw:true, defval:null});
-  if(rows.length<3) return [];
-  const headerRow1 = rows[0];
-  const startCol = hasModel ? 4 : 3; // 0-indexed: after Sl No, Part No, (Model), Date/Name
-  const dateCols = []; // {col, iso}
-  let c = startCol;
-  while(c < headerRow1.length){
-    const v = headerRow1[c];
-    if(v && typeof v==='string' && v.includes('.')){
-      const iso = ddmmyyyyToISO(v);
-      if(iso){ dateCols.push({col:c, iso}); c+=3; continue; }
-    }
-    break;
-  }
-  const parts = [];
-  for(let r=2; r<rows.length; r++){
-    const row = rows[r];
-    if(!row) continue;
-    const pno = row[1];
-    const model = hasModel ? row[2] : null;
-    const pname = hasModel ? row[3] : row[2];
-    if(pno==null && model==null && pname==null) continue;
-    const entryMap = {};
-    dateCols.forEach(({col, iso})=>{
-      const rec = row[col], ok = row[col+1], notok = row[col+2];
-      if((rec||ok||notok)){
-        entryMap[iso] = {
-          rec: typeof rec==='number'?rec:0,
-          ok: typeof ok==='number'?ok:0,
-          notok: typeof notok==='number'?notok:0
-        };
-      }
-    });
-    parts.push({
-      partNo: pno!=null?String(pno).trim():'',
-      model: model!=null?String(model).trim():'',
-      partName: pname!=null?String(pname).trim():'',
-      entries: entryMap
-    });
-  }
-  return parts;
-}
-
-window.handleImportFile = async function(evt){
-  const file = evt.target.files[0];
-  if(!file) return;
-  if(!confirm(`Import "${file.name}"?\n\nIdhu existing parts-oda SAME part name/series irundha update aagum, illana puthusa add aagum. Continue?`)){
-    evt.target.value=''; return;
-  }
-
-  document.getElementById('loadingOverlay').style.display='flex';
-  document.getElementById('loadingText').textContent='Reading Excel file…';
-
-  try{
-    const buf = await file.arrayBuffer();
-    const wb = XLSX.read(buf, {type:'array'});
-    const seriesMap = {};
-    if(wb.SheetNames.includes('H-Series')) seriesMap['H-Series'] = parseSeriesSheet(wb.Sheets['H-Series'], true);
-    if(wb.SheetNames.includes('P15-Series')) seriesMap['P15-Series'] = parseSeriesSheet(wb.Sheets['P15-Series'], false);
-
-    if(!Object.keys(seriesMap).length){
-      alert('Sheet names "H-Series" / "P15-Series" kaanom. File format check pannunga.');
-      document.getElementById('loadingOverlay').style.display='none';
-      evt.target.value=''; return;
-    }
-
-    let totalParts=0, totalEntries=0;
-    const monthsTouched = new Set();
-
-    for(const series of Object.keys(seriesMap)){
-      const importParts = seriesMap[series];
-      document.getElementById('loadingText').textContent=`Importing ${series}: ${importParts.length} parts…`;
-
-      // existing parts for dedup by partName+partNo
-      await loadParts(series);
-      const existingByKey = {};
-      parts[series].forEach(p=>{ existingByKey[`${p.partNo}|||${p.partName}`] = p; });
-
-      let order = parts[series].length;
-      for(const ip of importParts){
-        const key = `${ip.partNo}|||${ip.partName}`;
-        let partId;
-        if(existingByKey[key]){
-          partId = existingByKey[key].id;
-        } else {
-          partId = await addPartToFirestore(series, ip.partNo, ip.model, ip.partName, order++);
-          parts[series].push({id:partId, partNo:ip.partNo, model:ip.model, partName:ip.partName, order:order});
-          existingByKey[key] = {id:partId};
-          totalParts++;
-        }
-        // push entries
-        for(const iso of Object.keys(ip.entries)){
-          const e = ip.entries[iso];
-          monthsTouched.add(iso.substring(0,7));
-          const docId = `${SHARED_UID}_${series}_${partId}_${iso}`;
-          await setDoc(doc(db,'partEntries',docId), {
-            uid:SHARED_UID, series, partId, date:iso,
-            month:iso.substring(0,7), year:iso.substring(0,4),
-            rec:e.rec||0, ok:e.ok||0, notok:e.notok||0,
-            updatedAt:new Date().toISOString()
-          });
-          totalEntries++;
-        }
-      }
-    }
-
-    dbg(`Import done: ${totalParts} new parts, ${totalEntries} entries`);
-    alert(`✓ Import complete!\n\nNew parts added: ${totalParts}\nDaily entries imported: ${totalEntries}\nMonths touched: ${[...monthsTouched].join(', ')}`);
-
-    // reload current view fresh
-    await loadParts(currentSeries);
-    if(currentView==='month') await loadMonthEntries(currentSeries, calYear, calMonth);
-    else await loadYearEntries(currentSeries, viewYear);
-    renderAll();
-  }catch(err){
-    console.error('Import error:', err);
-    dbg(`❌ Import failed: ${err.message}`);
-    alert('Import failed: '+err.message);
-  }
-  document.getElementById('loadingOverlay').style.display='none';
-  evt.target.value='';
-};
-
 </script>
 </body>
 </html>
