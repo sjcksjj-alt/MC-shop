@@ -33,6 +33,8 @@ body{font-family:'Inter',sans-serif;background:#fff;color:var(--text);min-height
 .sync-err{background:#fde8e8;color:var(--warn);}
 .sync-ing{background:#fef0d6;color:var(--p15-series);}
 .header-date-text{font-size:0.82rem;color:var(--muted);}
+.btn-header-excel{display:inline-flex;align-items:center;gap:6px;background:#1d6f42;color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:0.78rem;font-weight:700;cursor:pointer;white-space:nowrap;}
+.btn-header-excel:hover{opacity:.88;}
 
 /* ── TOP NAV TABS ── */
 .top-tabs{display:flex;background:#fafbff;border-bottom:1.5px solid var(--border);}
@@ -240,6 +242,7 @@ td.cum-cell.notok{color:var(--notok-col);}
 <div class="header">
   <h1>MC Shop — <span>Register</span></h1>
   <div class="header-right">
+    <button class="btn-header-excel" onclick="downloadCombinedExcel()">📥 Download All Excel</button>
     <div class="header-date-text" id="headerDate"></div>
     <div class="sync-status sync-ing" id="syncStatus" onclick="retryAll()">⟳ Connecting</div>
   </div>
@@ -989,6 +992,146 @@ window.downloadDEExcel=function(){
   XLSX.writeFile(wb,`DailyEntryRegister_${deCalYear}_${String(deCalMonth+1).padStart(2,'0')}.xlsx`);
 };
 
+// ════════════════════════════════════════════════════════════════
+// COMBINED EXCEL — Recon (H + P15) + Daily Entry, ONE FILE, 3 SHEETS
+// ════════════════════════════════════════════════════════════════
+window.downloadCombinedExcel = function(){
+  try{
+    const wb = XLSX.utils.book_new();
+
+    // ── Sheets 1 & 2: Parts Recon ──
+    ['H-Series','P15-Series'].forEach(series=>{
+      const isH = series==='H-Series';
+      const list = reconParts[series];
+      if(!list.length) return;
+
+      let dateList, srcEntries;
+      if(reconState.currentView==='month'){
+        const nDays = daysInMonth(reconState.calYear, reconState.calMonth);
+        dateList=[];
+        for(let d=1; d<=nDays; d++) dateList.push(toDateStr(reconState.calYear, reconState.calMonth, d));
+        srcEntries = reconEntries[series];
+      } else {
+        srcEntries = reconYearEntries[series];
+      }
+
+      const rows=[];
+      if(reconState.currentView==='month'){
+        const h1=isH?['Sl No','Part No','Model','Date']:['Sl No','Part No','Date'];
+        dateList.forEach(ds=>{
+          const d=parseInt(ds.split('-')[2]);
+          h1.push(ddmmyyyy(reconState.calYear,reconState.calMonth,d),'','');
+        });
+        h1.push('Overall Cumulative','',''); rows.push(h1);
+
+        const h2=isH?['','','','']:['','',''];
+        dateList.forEach(()=>{ h2.push('Received','Ok','Not Ok'); });
+        h2.push('Received','Ok','Not Ok'); rows.push(h2);
+
+        list.forEach((p,idx)=>{
+          const pe=srcEntries[p.id]||{}; let cR=0,cO=0,cN=0;
+          const row=isH?[idx+1,p.partNo||'',p.model||'',p.partName||'']:[idx+1,p.partNo||'',p.partName||''];
+          dateList.forEach(ds=>{
+            const d=pe[ds];
+            const r=d?d.rec||0:'', o=d?d.ok||0:'', n=d?d.notok||0:'';
+            row.push(r===0?'':r, o===0?'':o, n===0?'':n);
+            if(d){ cR+=d.rec||0; cO+=d.ok||0; cN+=d.notok||0; }
+          });
+          row.push(cR||0,cO||0,cN||0); rows.push(row);
+        });
+
+        const tr=isH?['','','','GRAND TOTAL']:['','','GRAND TOTAL'];
+        let gR=0,gO=0,gN=0;
+        dateList.forEach(ds=>{
+          let dR=0,dO=0,dN=0;
+          list.forEach(p=>{ const d=(srcEntries[p.id]||{})[ds]; if(d){ dR+=d.rec||0; dO+=d.ok||0; dN+=d.notok||0; } });
+          tr.push(dR||'',dO||'',dN||''); gR+=dR; gO+=dO; gN+=dN;
+        });
+        tr.push(gR,gO,gN); rows.push(tr);
+      } else {
+        const h1=isH?['Sl No','Part No','Model','Part Name']:['Sl No','Part No','Part Name'];
+        MONTH_SHORT.forEach(m=>{ h1.push(`${m} ${reconState.viewYear}`,'',''); });
+        h1.push('Year Cumulative','',''); rows.push(h1);
+
+        const h2=isH?['','','','']:['','',''];
+        MONTH_SHORT.forEach(()=>{ h2.push('Received','Ok','Not Ok'); });
+        h2.push('Received','Ok','Not Ok'); rows.push(h2);
+
+        list.forEach((p,idx)=>{
+          const pe=srcEntries[p.id]||{};
+          const mAgg=Array.from({length:12},()=>({rec:0,ok:0,notok:0}));
+          Object.keys(pe).forEach(ds=>{
+            const mIdx=parseInt(ds.split('-')[1])-1; const d=pe[ds];
+            mAgg[mIdx].rec+=d.rec||0; mAgg[mIdx].ok+=d.ok||0; mAgg[mIdx].notok+=d.notok||0;
+          });
+          const row=isH?[idx+1,p.partNo||'',p.model||'',p.partName||'']:[idx+1,p.partNo||'',p.partName||''];
+          let yR=0,yO=0,yN=0;
+          mAgg.forEach(m=>{ row.push(m.rec||'',m.ok||'',m.notok||''); yR+=m.rec; yO+=m.ok; yN+=m.notok; });
+          row.push(yR,yO,yN); rows.push(row);
+        });
+
+        const tr=isH?['','','','GRAND TOTAL']:['','','GRAND TOTAL'];
+        const grand=Array.from({length:12},()=>({rec:0,ok:0,notok:0}));
+        list.forEach(p=>{
+          const pe=srcEntries[p.id]||{};
+          Object.keys(pe).forEach(ds=>{
+            const mIdx=parseInt(ds.split('-')[1])-1; const d=pe[ds];
+            grand[mIdx].rec+=d.rec||0; grand[mIdx].ok+=d.ok||0; grand[mIdx].notok+=d.notok||0;
+          });
+        });
+        let gR=0,gO=0,gN=0;
+        grand.forEach(m=>{ tr.push(m.rec||'',m.ok||'',m.notok||''); gR+=m.rec; gO+=m.ok; gN+=m.notok; });
+        tr.push(gR,gO,gN); rows.push(tr);
+      }
+
+      const ws=XLSX.utils.aoa_to_sheet(rows);
+      const leadCols=isH?4:3;
+      const merges=[];
+      for(let c=0;c<leadCols;c++) merges.push({s:{r:0,c:c},e:{r:1,c:c}});
+      const gc=reconState.currentView==='month'? (typeof dateList!=='undefined'?dateList.length:0)+1 : 13;
+      for(let g=0;g<gc;g++){ const sc=leadCols+g*3; merges.push({s:{r:0,c:sc},e:{r:0,c:sc+2}}); }
+      ws['!merges']=merges;
+      const cw=[];
+      for(let c=0;c<leadCols;c++) cw.push({wch:c===leadCols-1?20:12});
+      for(let g=0;g<gc;g++) cw.push({wch:9},{wch:7},{wch:9});
+      ws['!cols']=cw;
+
+      XLSX.utils.book_append_sheet(wb, ws, `Recon ${series}`);
+    });
+
+    // ── Sheet 3: Daily Entry Register ──
+    const dates=Object.keys(deData).sort();
+    const header=['Date','H-Series Received','H-Series Dismantled','A-Series Received','A-Series Dismantled','P15-Series Received','P15-Series Dismantled','ZD30-Series Received','ZD30-Series Dismantled','Total Received','Total Dismantled'];
+    const deRows=[header];
+    let grandRec=0, grandDis=0;
+    dates.forEach(dk=>{
+      const dd=deData[dk]||{};
+      const hR=dd['H-Series']?dd['H-Series'].rec||0:0, hD=dd['H-Series']?dd['H-Series'].dis||0:0;
+      const aR=dd['A-Series']?dd['A-Series'].rec||0:0, aD=dd['A-Series']?dd['A-Series'].dis||0:0;
+      const pR=dd['P15-Series']?dd['P15-Series'].rec||0:0, pD=dd['P15-Series']?dd['P15-Series'].dis||0:0;
+      const zR=dd['ZD30-Series']?dd['ZD30-Series'].rec||0:0, zD=dd['ZD30-Series']?dd['ZD30-Series'].dis||0:0;
+      const tR=hR+aR+pR+zR, tD=hD+aD+pD+zD;
+      grandRec+=tR; grandDis+=tD;
+      deRows.push([formatDisplay(dk),hR,hD,aR,aD,pR,pD,zR,zD,tR,tD]);
+    });
+    deRows.push([]);
+    deRows.push(['Monthly Total','','','','','','','','',grandRec,grandDis]);
+
+    const deWs=XLSX.utils.aoa_to_sheet(deRows);
+    deWs['!cols']=[{wch:16},{wch:16},{wch:18},{wch:16},{wch:18},{wch:18},{wch:20},{wch:18},{wch:20},{wch:14},{wch:16}];
+    XLSX.utils.book_append_sheet(wb, deWs, 'Daily Entry Register');
+
+    const fn = reconState.currentView==='month'
+      ? `MC_Shop_Combined_${MONTH_SHORT[reconState.calMonth]}_${reconState.calYear}.xlsx`
+      : `MC_Shop_Combined_Year_${reconState.viewYear}.xlsx`;
+    XLSX.writeFile(wb, fn);
+    dbg(`Combined Excel: ${fn}`);
+  }catch(err){
+    console.error(err);
+    alert('Combined Excel export failed: '+err.message);
+  }
+};
+
 // ── DE YEAR CUMULATIVE ────────────────────────────────────────
 let deViewYear=todayObj.getFullYear();
 let deYearData={};
@@ -1014,7 +1157,6 @@ async function deLoadYearData(){
 }
 
 function deRenderYearCum(){
-  // Left panel year cumulative boxes
   const ycum={};DE_SERIES.forEach(s=>{ycum[s]={rec:0,dis:0};});
   Object.values(deYearData).forEach(dayObj=>{DE_SERIES.forEach(s=>{if(dayObj[s]){ycum[s].rec+=dayObj[s].rec||0;ycum[s].dis+=dayObj[s].dis||0;}});});
   DE_SERIES.forEach(s=>{
@@ -1024,7 +1166,6 @@ function deRenderYearCum(){
   document.getElementById('ycum-total-rec').textContent=DE_SERIES.reduce((a,s)=>a+ycum[s].rec,0);
   document.getElementById('ycum-total-dis').textContent=DE_SERIES.reduce((a,s)=>a+ycum[s].dis,0);
 
-  // Year cumulative table — aggregate by month
   const tbody=document.getElementById('yearTableBody');
   const tfoot=document.getElementById('yearTableFoot');
   tbody.innerHTML='';
