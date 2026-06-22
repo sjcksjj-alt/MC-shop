@@ -157,7 +157,7 @@ td.cum-cell.notok{color:var(--notok-col);}
 .series-tab[data-series="A-Series"].active{background:var(--a-series);}
 .series-tab[data-series="P15-Series"].active{background:var(--p15-series);}
 .series-tab[data-series="ZD30-Series"].active{background:var(--zd30-series);}
-.entry-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.entry-grid{display:grid;grid-template-columns:1fr;gap:12px;}
 .entry-card{background:#fff;border:1.5px solid var(--border);border-radius:12px;overflow:hidden;}
 .entry-card-header{padding:13px 17px;display:flex;align-items:center;gap:9px;border-bottom:1.5px solid var(--border);}
 .entry-card-header.received{background:#e8faf5;border-bottom-color:#b2e8d8;}
@@ -165,9 +165,9 @@ td.cum-cell.notok{color:var(--notok-col);}
 .entry-card-header h2{font-size:0.92rem;font-weight:700;letter-spacing:.04em;}
 .entry-card-header.received h2{color:var(--accent2);}
 .entry-card-header.dismantled h2{color:var(--warn);}
-.entry-card-body{padding:18px;display:flex;flex-direction:column;gap:13px;}
+.entry-card-body{padding:14px 18px;display:flex;flex-direction:row;align-items:center;gap:16px;}.entry-card-body .entry-card-left{display:flex;flex-direction:column;gap:4px;flex:1;}.entry-card-body .entry-total{flex-shrink:0;min-width:130px;}
 .count-label{font-size:0.73rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:600;}
-.count-input{background:#fff;border:1.5px solid var(--border2);border-radius:8px;padding:13px 15px;font-family:'JetBrains Mono',monospace;font-size:1.9rem;font-weight:700;color:var(--accent2);width:100%;outline:none;text-align:center;transition:border-color .15s,box-shadow .15s;-moz-appearance:textfield;}
+.count-input{background:#fff;border:1.5px solid var(--border2);border-radius:8px;padding:9px 12px;font-family:'JetBrains Mono',monospace;font-size:1.5rem;font-weight:700;color:var(--accent2);width:120px;outline:none;text-align:center;transition:border-color .15s,box-shadow .15s;-moz-appearance:textfield;}
 .count-input.dis-input{color:var(--warn);}
 .count-input::-webkit-inner-spin-button,.count-input::-webkit-outer-spin-button{-webkit-appearance:none;}
 .count-input:focus{border-color:var(--accent2);box-shadow:0 0 0 3px rgba(0,168,132,.12);}
@@ -322,6 +322,25 @@ td.cum-cell.notok{color:var(--notok-col);}
         <div class="summary-row"><span class="stype"><span class="dot" style="background:var(--zd30-series)"></span>ZD30-Series</span><div class="svals"><span class="s-rec" id="cum-zd30-rec">0</span><span class="s-dis" id="cum-zd30-dis">0</span></div></div>
         <div class="summary-row" style="padding-top:5px;"><span style="font-weight:700;font-size:0.83rem;">TOTAL</span><div class="svals"><span class="s-rec" style="font-weight:700;" id="cum-total-rec">0</span><span class="s-dis" style="font-weight:700;" id="cum-total-dis">0</span></div></div>
       </div>
+      <!-- Year Cumulative box -->
+      <div class="summary-box" id="deYearCumBox">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;">
+          <h3 style="margin-bottom:0;">Year Cumulative</h3>
+          <div style="display:flex;align-items:center;gap:4px;">
+            <button onclick="deChangeYear(-1)" style="background:var(--faint);border:1px solid var(--border);border-radius:4px;width:22px;height:22px;cursor:pointer;font-size:0.85rem;">‹</button>
+            <span id="deYearLabel" style="font-family:'JetBrains Mono',monospace;font-size:0.8rem;font-weight:700;color:var(--accent);min-width:36px;text-align:center;"></span>
+            <button onclick="deChangeYear(1)" style="background:var(--faint);border:1px solid var(--border);border-radius:4px;width:22px;height:22px;cursor:pointer;font-size:0.85rem;">›</button>
+          </div>
+        </div>
+        <div class="summary-row" style="font-size:.67rem;color:var(--muted);padding-bottom:3px;">
+          <span>Series</span><div class="svals"><span class="s-rec">Rec</span><span class="s-dis">Dis</span></div>
+        </div>
+        <div class="summary-row"><span class="stype"><span class="dot" style="background:var(--h-series)"></span>H-Series</span><div class="svals"><span class="s-rec" id="ycum-h-rec">0</span><span class="s-dis" id="ycum-h-dis">0</span></div></div>
+        <div class="summary-row"><span class="stype"><span class="dot" style="background:var(--a-series)"></span>A-Series</span><div class="svals"><span class="s-rec" id="ycum-a-rec">0</span><span class="s-dis" id="ycum-a-dis">0</span></div></div>
+        <div class="summary-row"><span class="stype"><span class="dot" style="background:var(--p15-series)"></span>P15-Series</span><div class="svals"><span class="s-rec" id="ycum-p15-rec">0</span><span class="s-dis" id="ycum-p15-dis">0</span></div></div>
+        <div class="summary-row"><span class="stype"><span class="dot" style="background:var(--zd30-series)"></span>ZD30-Series</span><div class="svals"><span class="s-rec" id="ycum-zd30-rec">0</span><span class="s-dis" id="ycum-zd30-dis">0</span></div></div>
+        <div class="summary-row" style="padding-top:5px;"><span style="font-weight:700;font-size:0.83rem;">TOTAL</span><div class="svals"><span class="s-rec" style="font-weight:700;" id="ycum-total-rec">0</span><span class="s-dis" style="font-weight:700;" id="ycum-total-dis">0</span></div></div>
+      </div>
     </div>
 
     <div class="de-main">
@@ -343,9 +362,11 @@ td.cum-cell.notok{color:var(--notok-col);}
               <h2>RECEIVED</h2>
             </div>
             <div class="entry-card-body">
-              <div class="count-label">Enter Count</div>
-              <input class="count-input" id="rec-count" type="number" min="0" placeholder="0" oninput="updateDETotals()">
-              <div class="count-hint">Total number of items received</div>
+              <div class="entry-card-left">
+                <div class="count-label">Enter Count</div>
+                <input class="count-input" id="rec-count" type="number" min="0" placeholder="0" oninput="updateDETotals()">
+                <div class="count-hint">Items received today</div>
+              </div>
               <div class="entry-total"><span class="t-label">Total Received</span><span class="total-val s-rec" id="rec-total">0</span></div>
             </div>
           </div>
@@ -355,9 +376,11 @@ td.cum-cell.notok{color:var(--notok-col);}
               <h2>DISMANTLED</h2>
             </div>
             <div class="entry-card-body">
-              <div class="count-label">Enter Count</div>
-              <input class="count-input dis-input" id="dis-count" type="number" min="0" placeholder="0" oninput="updateDETotals()">
-              <div class="count-hint">Total number of items dismantled</div>
+              <div class="entry-card-left">
+                <div class="count-label">Enter Count</div>
+                <input class="count-input dis-input" id="dis-count" type="number" min="0" placeholder="0" oninput="updateDETotals()">
+                <div class="count-hint">Items dismantled today</div>
+              </div>
               <div class="entry-total"><span class="t-label">Total Dismantled</span><span class="total-val s-dis" id="dis-total">0</span></div>
             </div>
           </div>
@@ -393,6 +416,16 @@ td.cum-cell.notok{color:var(--notok-col);}
             <thead><tr><th>Date</th><th>Series</th><th class="s-rec">Received</th><th class="s-dis">Dismantled</th></tr></thead>
             <tbody id="cumTableBody"><tr><td colspan="4" style="text-align:center;color:var(--muted);padding:22px;">No entries yet for this month.</td></tr></tbody>
             <tfoot id="cumTableFoot"></tfoot>
+          </table>
+        </div>
+      </div>
+      <div>
+        <div class="section-title">Year Cumulative Table — <span id="deYearTableLabel" style="color:var(--accent);text-transform:none;letter-spacing:0;"></span></div>
+        <div class="cum-table-wrap">
+          <table class="cum-table">
+            <thead><tr><th>Month</th><th>Series</th><th class="s-rec">Received</th><th class="s-dis">Dismantled</th></tr></thead>
+            <tbody id="yearTableBody"><tr><td colspan="4" style="text-align:center;color:var(--muted);padding:22px;">Loading…</td></tr></tbody>
+            <tfoot id="yearTableFoot"></tfoot>
           </table>
         </div>
       </div>
@@ -956,6 +989,78 @@ window.downloadDEExcel=function(){
   XLSX.writeFile(wb,`DailyEntryRegister_${deCalYear}_${String(deCalMonth+1).padStart(2,'0')}.xlsx`);
 };
 
+// ── DE YEAR CUMULATIVE ────────────────────────────────────────
+let deViewYear=todayObj.getFullYear();
+let deYearData={};
+
+async function deLoadYearData(){
+  deYearData={};
+  document.getElementById('deYearLabel').textContent=deViewYear;
+  document.getElementById('deYearTableLabel').textContent=deViewYear;
+  try{
+    const q=query(collection(db,'entries'),where('uid','==',SHARED_UID),where('year','==',String(deViewYear)));
+    const snap=await getDocs(q);
+    if(snap.size>0){
+      snap.forEach(d=>{const e=d.data();if(!deYearData[e.date])deYearData[e.date]={};deYearData[e.date][e.series]={rec:e.rec||0,dis:e.dis||0};});
+    } else {
+      const fetches=[];
+      for(let m=1;m<=12;m++){const mk=`${deViewYear}-${String(m).padStart(2,'0')}`;fetches.push(getDocs(query(collection(db,'entries'),where('uid','==',SHARED_UID),where('month','==',mk))));}
+      const results=await Promise.all(fetches);
+      results.forEach(sn=>{sn.forEach(d=>{const e=d.data();if(!deYearData[e.date])deYearData[e.date]={};deYearData[e.date][e.series]={rec:e.rec||0,dis:e.dis||0};});});
+    }
+    dbg(`Year ${deViewYear} DE loaded`);setSync('ok');
+  }catch(err){dbg(`❌ DE Year: ${err.message}`);setSync('err');}
+  deRenderYearCum();
+}
+
+function deRenderYearCum(){
+  // Left panel year cumulative boxes
+  const ycum={};DE_SERIES.forEach(s=>{ycum[s]={rec:0,dis:0};});
+  Object.values(deYearData).forEach(dayObj=>{DE_SERIES.forEach(s=>{if(dayObj[s]){ycum[s].rec+=dayObj[s].rec||0;ycum[s].dis+=dayObj[s].dis||0;}});});
+  DE_SERIES.forEach(s=>{
+    document.getElementById(`ycum-${CUM_ID[s]}-rec`).textContent=ycum[s].rec;
+    document.getElementById(`ycum-${CUM_ID[s]}-dis`).textContent=ycum[s].dis;
+  });
+  document.getElementById('ycum-total-rec').textContent=DE_SERIES.reduce((a,s)=>a+ycum[s].rec,0);
+  document.getElementById('ycum-total-dis').textContent=DE_SERIES.reduce((a,s)=>a+ycum[s].dis,0);
+
+  // Year cumulative table — aggregate by month
+  const tbody=document.getElementById('yearTableBody');
+  const tfoot=document.getElementById('yearTableFoot');
+  tbody.innerHTML='';
+  let grandRec=0,grandDis=0;
+  for(let m=0;m<12;m++){
+    const mk=`${deViewYear}-${String(m+1).padStart(2,'0')}`;
+    const monthEntries=Object.keys(deYearData).filter(ds=>ds.startsWith(mk));
+    const seriesTotals={};
+    monthEntries.forEach(ds=>{
+      DE_SERIES.forEach(s=>{
+        if(deYearData[ds][s]){
+          if(!seriesTotals[s])seriesTotals[s]={rec:0,dis:0};
+          seriesTotals[s].rec+=deYearData[ds][s].rec||0;
+          seriesTotals[s].dis+=deYearData[ds][s].dis||0;
+        }
+      });
+    });
+    const activeSeries=DE_SERIES.filter(s=>seriesTotals[s]&&(seriesTotals[s].rec||seriesTotals[s].dis));
+    if(!activeSeries.length)continue;
+    activeSeries.forEach((s,idx)=>{
+      const rc=seriesTotals[s].rec;const dc=seriesTotals[s].dis;
+      grandRec+=rc;grandDis+=dc;
+      const tr=document.createElement('tr');
+      if(idx===0){const td=document.createElement('td');td.rowSpan=activeSeries.length;td.className='label';td.style.borderRight='1px solid var(--border)';td.textContent=`${MONTH_SHORT[m]} ${deViewYear}`;tr.appendChild(td);}
+      tr.innerHTML+=`<td><span class="badge ${BADGE_CLASS[s]}">${s}</span></td><td class="s-rec">${rc}</td><td class="s-dis">${dc}</td>`;
+      tbody.appendChild(tr);
+    });
+  }
+  if(!tbody.children.length){tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:22px;">No entries for '+deViewYear+'.</td></tr>';tfoot.innerHTML='';return;}
+  tfoot.innerHTML=`<tr><td colspan="2" style="text-align:right;padding-right:14px;font-weight:700;">Year Total</td><td class="s-rec">${grandRec}</td><td class="s-dis">${grandDis}</td></tr>`;
+}
+
+window.deChangeYear=async function(delta){
+  deViewYear+=delta;setSync('ing');await deLoadYearData();
+};
+
 // ── BOOT ──────────────────────────────────────────────────────
 async function init(){
   setSync('ing');
@@ -966,6 +1071,9 @@ async function init(){
   dbg('Loading Daily Entries…');
   await deLoadMonthData();
   deRenderCalendar();deLoadFormForDate();deRenderCumTable();deRenderChart();
+  document.getElementById('deYearLabel').textContent=deViewYear;
+  document.getElementById('deYearTableLabel').textContent=deViewYear;
+  await deLoadYearData();
   document.getElementById('loadingOverlay').style.display='none';
   dbg('All loaded ✓');
 }
