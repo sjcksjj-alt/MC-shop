@@ -220,6 +220,23 @@ td.cum-cell.notok{color:var(--notok-col);}
 .debug-bar span{color:#4f7cff;}
 #debugMsg{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
+/* ── Component Master ── */
+.material-select{border:1.5px solid var(--border2);border-radius:6px;padding:5px 8px;font-size:0.75rem;font-family:'Inter',sans-serif;background:#fff;cursor:pointer;font-weight:600;}
+.material-select[data-mat="Aluminium"]{background:#eef2ff;color:#5b52e0;}
+.material-select[data-mat="Cast iron"]{background:#e8faf5;color:#00855f;}
+.material-select[data-mat="Steel"]{background:#fff3e0;color:#b5650a;}
+.master-row[data-mat="Aluminium"]{background:#f7f8ff;}
+.master-row[data-mat="Cast iron"]{background:#f3fcf9;}
+.master-row[data-mat="Steel"]{background:#fffaf2;}
+.master-row:hover td{background:#fafbff!important;}
+.mat-card{border:1.5px solid var(--border);border-radius:10px;padding:14px;background:#fff;border-top:3px solid;}
+.mat-card.Aluminium{border-top-color:#5b52e0;}
+.mat-card.CastIron{border-top-color:#00855f;}
+.mat-card.Steel{border-top-color:#b5650a;}
+.mat-card .mat-name{font-size:0.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
+.mat-card .mat-val{font-family:'JetBrains Mono',monospace;font-size:1.25rem;font-weight:700;color:var(--text);}
+.mat-card .mat-sub{font-size:0.72rem;color:var(--muted);margin-top:4px;}
+
 @media(max-width:900px){.entry-grid{grid-template-columns:1fr;}}
 @media(max-width:680px){
   .de-layout{flex-direction:column;}
@@ -252,6 +269,7 @@ td.cum-cell.notok{color:var(--notok-col);}
 <div class="top-tabs">
   <div class="top-tab active" id="tabRecon" onclick="switchPage('recon')">📋 Parts Recon Register</div>
   <div class="top-tab" id="tabDaily" onclick="switchPage('daily')">📅 Daily Entry Register</div>
+  <div class="top-tab" id="tabMaster" onclick="switchPage('master')">🧩 Component Master</div>
 </div>
 
 <!-- ══════════════════════════════════
@@ -436,6 +454,64 @@ td.cum-cell.notok{color:var(--notok-col);}
   </div>
 </div>
 
+<!-- ══════════════════════════════════
+     PAGE 3 — COMPONENT MASTER
+══════════════════════════════════ -->
+<div class="page" id="pageMaster">
+  <div class="toolbar">
+    <div class="series-switch">
+      <button class="series-btn active" data-ms="H-Series" onclick="masterSwitchSeries('H-Series')">H-Series</button>
+      <button class="series-btn" data-ms="P15-Series" onclick="masterSwitchSeries('P15-Series')">P15-Series</button>
+    </div>
+    <div class="month-nav" style="margin-left:auto;">
+      <span style="font-size:0.78rem;color:var(--muted);">Month:</span>
+      <button class="month-nav-btn" onclick="masterChangeMonth(-1)">&#8249;</button>
+      <span class="month-label" id="masterMonthLabel">—</span>
+      <button class="month-nav-btn" onclick="masterChangeMonth(1)">&#8250;</button>
+    </div>
+    <button class="btn-excel" onclick="downloadMasterExcel()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 2v6h6" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/></svg>
+      Download Excel
+    </button>
+  </div>
+
+  <div class="stats-bar" id="masterStatsBar"></div>
+
+  <div class="table-scroll" style="margin:0 24px 16px;">
+    <table class="reg-table" id="masterTable" style="width:100%;min-width:0;">
+      <thead>
+        <tr>
+          <th class="sticky-col" style="left:0;width:30px;">#</th>
+          <th class="sticky-col2 col-name" style="left:30px;min-width:170px;">Component</th>
+          <th style="min-width:130px;">Material</th>
+          <th style="min-width:90px;">Reuse Qty</th>
+          <th style="min-width:120px;">Aprox.Cost / part (₹)</th>
+          <th style="min-width:130px;">Monthly Turnover (₹)</th>
+          <th style="width:38px;">Del</th>
+        </tr>
+      </thead>
+      <tbody id="masterTbody"></tbody>
+    </table>
+  </div>
+
+  <!-- Material-wise totals -->
+  <div style="padding:0 24px 16px;">
+    <div class="section-title" style="margin-bottom:10px;">Material-wise Cost Summary</div>
+    <div id="masterMaterialCards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;"></div>
+  </div>
+
+  <div class="add-row-bar">
+    <strong style="font-size:0.81rem;color:var(--muted);">Add Component:</strong>
+    <input class="name-in" id="newCompName" placeholder="Component name" style="width:200px;">
+    <select id="newCompMaterial" style="border:1.5px solid var(--border2);border-radius:7px;padding:7px 11px;font-size:0.81rem;font-family:'Inter',sans-serif;">
+      <option value="Aluminium">Aluminium</option>
+      <option value="Cast iron">Cast iron</option>
+      <option value="Steel">Steel</option>
+    </select>
+    <button class="btn-add" onclick="masterAddComponent()">+ Add Component</button>
+  </div>
+</div>
+
 <!-- ── DEBUG BAR ── -->
 <div class="debug-bar"><span>Firebase:</span><span id="debugMsg">Initializing…</span></div>
 
@@ -481,11 +557,18 @@ document.getElementById('headerDate').textContent =
   todayObj.toLocaleDateString('en-IN',{weekday:'short',year:'numeric',month:'long',day:'numeric'});
 
 // ─── PAGE SWITCH ───────────────────────────────────────────────
-window.switchPage = function(page){
+const PAGE_MAP = {recon:'pageRecon', daily:'pageDaily', master:'pageMaster'};
+const TAB_MAP  = {recon:'tabRecon', daily:'tabDaily', master:'tabMaster'};
+window.switchPage = async function(page){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.top-tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById(page==='recon'?'pageRecon':'pageDaily').classList.add('active');
-  document.getElementById(page==='recon'?'tabRecon':'tabDaily').classList.add('active');
+  document.getElementById(PAGE_MAP[page]).classList.add('active');
+  document.getElementById(TAB_MAP[page]).classList.add('active');
+  if(page==='master' && !masterState.loaded){
+    setSync('ing');
+    await masterInit();
+    setSync('ok');
+  }
 };
 
 window.retryAll = async function(){
@@ -496,6 +579,9 @@ window.retryAll = async function(){
   reconRenderAll();
   await deLoadMonthData();
   deRenderCalendar();deLoadFormForDate();deRenderCumTable();deRenderChart();
+  await masterLoadComponents(masterState.currentSeries);
+  await masterLoadEntries(masterState.currentSeries, masterMonthKey());
+  masterRenderAll();
 };
 
 // ════════════════════════════════════════════════════════════════
@@ -1202,6 +1288,298 @@ window.deChangeYear=async function(delta){
   deViewYear+=delta;setSync('ing');await deLoadYearData();
 };
 
+// ════════════════════════════════════════════════════════════════
+// PAGE 3 — COMPONENT MASTER
+// ════════════════════════════════════════════════════════════════
+const DEFAULT_COMPONENTS = {
+  'H-Series':[
+    {name:'IMF',material:'Aluminium'},
+    {name:'Rocker cover',material:'Aluminium'},
+    {name:'Oil Cooler',material:'Aluminium'},
+    {name:'Strainer',material:'Aluminium'},
+    {name:'Cyl.Block',material:'Cast iron'},
+    {name:'Cyl.head',material:'Cast iron'},
+    {name:'Tg case',material:'Cast iron'},
+    {name:'Fw hsg',material:'Cast iron'},
+    {name:'EMF',material:'Cast iron'},
+    {name:'Ts hsg',material:'Cast iron'},
+    {name:'Water Pump',material:'Cast iron'},
+    {name:'Coolent Elbow',material:'Cast iron'},
+    {name:'Crankshaft',material:'Steel'},
+    {name:'Cam shaft',material:'Steel'},
+    {name:'Con Rod (1 Set =6Nos)',material:'Steel'},
+    {name:'Oil pump',material:'Steel'},
+    {name:'Oil Sump',material:'Steel'},
+    {name:'TB plate',material:'Steel'},
+    {name:'Damper',material:'Steel'},
+    {name:'Pully',material:'Steel'},
+    {name:'Hub',material:'Steel'}
+  ],
+  'P15-Series':[
+    {name:'Cylinder head top cover',material:'Aluminium'},
+    {name:'Cam GEAR',material:'Aluminium'},
+    {name:'Rear Adaptor Housing',material:'Cast iron'},
+    {name:'Crank Gear',material:'Steel'},
+    {name:'Cylinder Block',material:'Cast iron'},
+    {name:'oil sump',material:'Aluminium'},
+    {name:'Crank Shaft',material:'Steel'},
+    {name:'Cylinder head',material:'Cast iron'},
+    {name:'Cam Shaft',material:'Steel'},
+    {name:'Outer Cover',material:'Aluminium'},
+    {name:'Inner Cover',material:'Aluminium'},
+    {name:'Con.rod',material:'Steel'},
+    {name:'Strainer',material:'Aluminium'},
+    {name:'Cam Box',material:'Cast iron'},
+    {name:'Tappet',material:'Steel'},
+    {name:'Lifting Hook',material:'Steel'},
+    {name:'Water Pump',material:'Cast iron'},
+    {name:'Real Oil Seal',material:'Steel'},
+    {name:'Outer Spring',material:'Steel'},
+    {name:'Inner Spring',material:'Steel'},
+    {name:'Washer Head Bolt',material:'Steel'}
+  ]
+};
+const MATERIALS=['Aluminium','Cast iron','Steel'];
+
+const masterState={ currentSeries:'H-Series', calYear:todayObj.getFullYear(), calMonth:todayObj.getMonth(), loaded:false };
+let masterComponents={'H-Series':[],'P15-Series':[]};   // [{id,name,material,order}]
+let masterEntries={'H-Series':{},'P15-Series':{}};       // {compId: {reuseQty, costPerPart}} per month-key bucket
+let masterSaveTimers={};
+
+function masterMonthKey(){ return `${masterState.calYear}-${String(masterState.calMonth+1).padStart(2,'0')}`; }
+
+async function masterLoadComponents(series){
+  try{
+    const q=query(collection(db,'masterComponents'),where('uid','==',SHARED_UID),where('series','==',series));
+    const snap=await getDocs(q);
+    const list=[];
+    snap.forEach(d=>{const v=d.data();list.push({id:d.id,name:v.name||'',material:v.material||'Aluminium',order:v.order||0});});
+    if(list.length===0){
+      // seed with defaults on first run
+      const seedOps=[];
+      DEFAULT_COMPONENTS[series].forEach((c,idx)=>{
+        const docId=`${SHARED_UID}_${series}_seed_${idx}_${c.name.replace(/[^a-zA-Z0-9]/g,'')}`;
+        seedOps.push(setDoc(doc(db,'masterComponents',docId),{uid:SHARED_UID,series,name:c.name,material:c.material,order:idx,createdAt:new Date().toISOString()}));
+        list.push({id:docId,name:c.name,material:c.material,order:idx});
+      });
+      await Promise.all(seedOps);
+    }
+    list.sort((a,b)=>a.order-b.order);
+    masterComponents[series]=list;
+  }catch(err){ dbg(`❌ Master components: ${err.message}`); setSync('err'); }
+}
+
+async function masterLoadEntries(series,mk){
+  masterEntries[series]={};
+  try{
+    const q=query(collection(db,'masterEntries'),where('uid','==',SHARED_UID),where('series','==',series),where('month','==',mk));
+    const snap=await getDocs(q);
+    snap.forEach(d=>{const v=d.data(); masterEntries[series][v.compId]={reuseQty:v.reuseQty||0, costPerPart:v.costPerPart||0};});
+  }catch(err){ dbg(`❌ Master entries: ${err.message}`); setSync('err'); }
+}
+
+async function masterInit(){
+  dbg('Loading Component Master…');
+  document.getElementById('masterMonthLabel').textContent=`${MONTH_SHORT[masterState.calMonth]} ${masterState.calYear}`;
+  await masterLoadComponents(masterState.currentSeries);
+  await masterLoadEntries(masterState.currentSeries, masterMonthKey());
+  masterRenderAll();
+  masterState.loaded=true;
+  dbg('Component Master loaded ✓');
+}
+
+window.masterSwitchSeries=async function(series){
+  masterState.currentSeries=series;
+  document.querySelectorAll('#pageMaster .series-btn').forEach(b=>b.classList.toggle('active',b.dataset.ms===series));
+  setSync('ing');
+  if(masterComponents[series].length===0) await masterLoadComponents(series);
+  await masterLoadEntries(series, masterMonthKey());
+  masterRenderAll();
+  setSync('ok');
+};
+
+window.masterChangeMonth=async function(delta){
+  masterState.calMonth+=delta;
+  if(masterState.calMonth<0){masterState.calMonth=11;masterState.calYear--;}
+  if(masterState.calMonth>11){masterState.calMonth=0;masterState.calYear++;}
+  document.getElementById('masterMonthLabel').textContent=`${MONTH_SHORT[masterState.calMonth]} ${masterState.calYear}`;
+  setSync('ing');
+  await masterLoadEntries(masterState.currentSeries, masterMonthKey());
+  masterRenderAll();
+  setSync('ok');
+};
+
+window.masterAddComponent=async function(){
+  const name=document.getElementById('newCompName').value.trim();
+  const material=document.getElementById('newCompMaterial').value;
+  if(!name){ alert('Component name venum'); return; }
+  const series=masterState.currentSeries;
+  const order=masterComponents[series].length;
+  try{
+    setSync('ing');
+    const docId=`${SHARED_UID}_${series}_${Date.now()}`;
+    await setDoc(doc(db,'masterComponents',docId),{uid:SHARED_UID,series,name,material,order,createdAt:new Date().toISOString()});
+    masterComponents[series].push({id:docId,name,material,order});
+    setSync('ok');
+    document.getElementById('newCompName').value='';
+    masterRenderAll();
+  }catch(err){ setSync('err'); alert('Add failed: '+(err.code||err.message)); }
+};
+
+window.masterDeleteComponent=async function(compId,name){
+  if(!confirm(`Delete component "${name}"?`)) return;
+  try{
+    setSync('ing');
+    await deleteDoc(doc(db,'masterComponents',compId));
+    const series=masterState.currentSeries;
+    masterComponents[series]=masterComponents[series].filter(c=>c.id!==compId);
+    delete masterEntries[series][compId];
+    setSync('ok');
+    masterRenderAll();
+  }catch(err){ setSync('err'); alert('Delete failed: '+(err.code||err.message)); }
+};
+
+window.masterChangeMaterial=async function(compId,newMaterial){
+  const series=masterState.currentSeries;
+  const comp=masterComponents[series].find(c=>c.id===compId);
+  if(!comp) return;
+  comp.material=newMaterial;
+  try{
+    await setDoc(doc(db,'masterComponents',compId),{uid:SHARED_UID,series,name:comp.name,material:newMaterial,order:comp.order,createdAt:new Date().toISOString()},{merge:true});
+  }catch(err){ console.error(err); }
+  masterRenderAll();
+};
+
+window.masterHandleInput=function(compId,field,val){
+  const series=masterState.currentSeries;
+  const num=parseFloat(val)||0;
+  if(!masterEntries[series][compId]) masterEntries[series][compId]={reuseQty:0,costPerPart:0};
+  masterEntries[series][compId][field]=num;
+  masterRefreshRow(compId);
+  masterRefreshSummary();
+  const key=`${series}_${compId}_${masterMonthKey()}`;
+  clearTimeout(masterSaveTimers[key]);
+  masterSaveTimers[key]=setTimeout(async()=>{
+    const e=masterEntries[series][compId];
+    try{
+      setSync('ing');
+      const docId=`${SHARED_UID}_${series}_${compId}_${masterMonthKey()}`;
+      await setDoc(doc(db,'masterEntries',docId),{
+        uid:SHARED_UID, series, compId, month:masterMonthKey(),
+        reuseQty:e.reuseQty||0, costPerPart:e.costPerPart||0,
+        updatedAt:new Date().toISOString()
+      });
+      setSync('ok');
+    }catch(err){ dbg(`❌ Save: ${err.message}`); setSync('err'); }
+  },500);
+};
+
+function masterTurnover(compId){
+  const e=masterEntries[masterState.currentSeries][compId];
+  if(!e) return 0;
+  return (e.reuseQty||0)*(e.costPerPart||0);
+}
+
+function masterRefreshRow(compId){
+  const row=document.querySelector(`#masterTbody tr[data-comp="${compId}"]`);
+  if(!row) return;
+  const t=masterTurnover(compId);
+  const tCell=row.querySelector('.mt-cell');
+  if(tCell) tCell.textContent=t? t.toLocaleString('en-IN') : '0';
+}
+
+function masterRenderTable(){
+  const series=masterState.currentSeries;
+  const list=masterComponents[series];
+  const tbody=document.getElementById('masterTbody');
+  if(!list.length){ tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px;">No components yet.</td></tr>`; return; }
+  tbody.innerHTML=list.map((c,idx)=>{
+    const e=masterEntries[series][c.id]||{reuseQty:'',costPerPart:''};
+    const turnover=masterTurnover(c.id);
+    return `<tr class="master-row" data-comp="${c.id}" data-mat="${c.material}">
+      <td class="sticky-col col-num" style="left:0;width:30px;">${idx+1}</td>
+      <td class="sticky-col2 col-name" style="left:30px;min-width:170px;"><span class="part-name">${c.name}</span></td>
+      <td>
+        <select class="material-select" data-mat="${c.material}" onchange="masterChangeMaterial('${c.id}',this.value);this.dataset.mat=this.value;">
+          ${MATERIALS.map(m=>`<option value="${m}" ${m===c.material?'selected':''}>${m}</option>`).join('')}
+        </select>
+      </td>
+      <td><input class="cell-input rec-input" style="width:60px;" type="number" min="0" value="${e.reuseQty||''}" placeholder="0" oninput="masterHandleInput('${c.id}','reuseQty',this.value)"></td>
+      <td><input class="cell-input" style="width:80px;color:var(--accent);" type="number" min="0" value="${e.costPerPart||''}" placeholder="0" oninput="masterHandleInput('${c.id}','costPerPart',this.value)"></td>
+      <td class="cum-cell rec mt-cell">${turnover? turnover.toLocaleString('en-IN'):'0'}</td>
+      <td><button class="del-row-btn" onclick="masterDeleteComponent('${c.id}','${c.name.replace(/'/g,"\\'")}')">✕</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function masterRefreshSummary(){
+  const series=masterState.currentSeries;
+  const list=masterComponents[series];
+  const byMat={'Aluminium':0,'Cast iron':0,'Steel':0};
+  let totalTurnover=0, totalQty=0;
+  list.forEach(c=>{
+    const t=masterTurnover(c.id);
+    byMat[c.material]=(byMat[c.material]||0)+t;
+    totalTurnover+=t;
+    const e=masterEntries[series][c.id];
+    if(e) totalQty+=e.reuseQty||0;
+  });
+
+  document.getElementById('masterStatsBar').innerHTML=`
+    <div class="stat-card parts"><div class="stat-label">Components</div><div class="stat-val">${list.length}</div></div>
+    <div class="stat-card rec"><div class="stat-label">Total Reuse Qty</div><div class="stat-val">${totalQty}</div></div>
+    <div class="stat-card ok"><div class="stat-label">Total Monthly Turnover</div><div class="stat-val">₹${totalTurnover.toLocaleString('en-IN')}</div></div>`;
+
+  const matClassMap={'Aluminium':'Aluminium','Cast iron':'CastIron','Steel':'Steel'};
+  document.getElementById('masterMaterialCards').innerHTML = MATERIALS.map(m=>{
+    const cnt=list.filter(c=>c.material===m).length;
+    return `<div class="mat-card ${matClassMap[m]}">
+      <div class="mat-name">${m}</div>
+      <div class="mat-val">₹${(byMat[m]||0).toLocaleString('en-IN')}</div>
+      <div class="mat-sub">${cnt} component${cnt===1?'':'s'}</div>
+    </div>`;
+  }).join('');
+}
+
+function masterRenderAll(){
+  masterRenderTable();
+  masterRefreshSummary();
+}
+
+window.downloadMasterExcel=function(){
+  try{
+    const wb=XLSX.utils.book_new();
+    ['H-Series','P15-Series'].forEach(series=>{
+      const list=masterComponents[series];
+      if(!list || !list.length) return;
+      const rows=[['Sl No','Component','Material','Reuse Qty','Aprox. Cost per part (Rs)','Monthly Turnover (Rs)','Material-wise Cost (Rs)']];
+      const byMat={'Aluminium':0,'Cast iron':0,'Steel':0};
+      list.forEach(c=>{
+        const e=masterEntries[series][c.id]||{reuseQty:0,costPerPart:0};
+        const t=(e.reuseQty||0)*(e.costPerPart||0);
+        byMat[c.material]=(byMat[c.material]||0)+t;
+      });
+      let printedMat={'Aluminium':false,'Cast iron':false,'Steel':false};
+      list.forEach((c,idx)=>{
+        const e=masterEntries[series][c.id]||{reuseQty:0,costPerPart:0};
+        const t=(e.reuseQty||0)*(e.costPerPart||0);
+        const matCell = printedMat[c.material] ? '' : byMat[c.material];
+        printedMat[c.material]=true;
+        rows.push([idx+1, c.name, c.material, e.reuseQty||0, e.costPerPart||0, t||0, matCell]);
+      });
+      const totalTurnover=list.reduce((a,c)=>{const e=masterEntries[series][c.id]||{};return a+((e.reuseQty||0)*(e.costPerPart||0));},0);
+      rows.push([]);
+      rows.push(['','','','','','GRAND TOTAL',totalTurnover]);
+      const ws=XLSX.utils.aoa_to_sheet(rows);
+      ws['!cols']=[{wch:7},{wch:26},{wch:13},{wch:11},{wch:18},{wch:18},{wch:18}];
+      XLSX.utils.book_append_sheet(wb, ws, `Master ${series}`);
+    });
+    const fn=`MC_Shop_Component_Master_${MONTH_SHORT[masterState.calMonth]}_${masterState.calYear}.xlsx`;
+    XLSX.writeFile(wb, fn);
+    dbg(`Master Excel: ${fn}`);
+  }catch(err){ console.error(err); alert('Master Excel export failed: '+err.message); }
+};
+
 // ── BOOT ──────────────────────────────────────────────────────
 async function init(){
   setSync('ing');
@@ -1215,6 +1593,7 @@ async function init(){
   document.getElementById('deYearLabel').textContent=deViewYear;
   document.getElementById('deYearTableLabel').textContent=deViewYear;
   await deLoadYearData();
+  await masterInit();
   document.getElementById('loadingOverlay').style.display='none';
   dbg('All loaded ✓');
 }
