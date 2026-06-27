@@ -8,22 +8,13 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
-:root{
-  --bg:#fff;--border:#dde2f0;--border2:#c8cfe0;--accent:#4f7cff;--accent2:#00a884;
-  --warn:#e03e3e;--text:#1a1d27;--muted:#7a8099;--faint:#f0f2f8;
-  --h-series:#5b52e0;--a-series:#00a884;--p15-series:#d4870a;--zd30-series:#e03e3e;
-  --ok-col:#00a884;--notok-col:#e03e3e;--rec-col:#4f7cff;
-}
+:root{--bg:#fff;--border:#dde2f0;--border2:#c8cfe0;--accent:#4f7cff;--accent2:#00a884;--warn:#e03e3e;--text:#1a1d27;--muted:#7a8099;--faint:#f0f2f8;--h-series:#5b52e0;--a-series:#00a884;--p15-series:#d4870a;--zd30-series:#e03e3e;--ok-col:#00a884;--notok-col:#e03e3e;--rec-col:#4f7cff;}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:'Inter',sans-serif;background:#fff;color:var(--text);min-height:100vh;display:flex;flex-direction:column;font-size:14px;}
-
-/* ── LOADING ── */
 .loading-overlay{position:fixed;inset:0;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:999;gap:14px;}
 .spinner{width:36px;height:36px;border:4px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;}
 .loading-text{font-size:.92rem;color:var(--muted);font-weight:600;}
 @keyframes spin{to{transform:rotate(360deg);}}
-
-/* ── HEADER ── */
 .header{background:#fff;border-bottom:1.5px solid var(--border);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;position:sticky;top:0;z-index:50;}
 .header h1{font-size:1.1rem;font-weight:700;}
 .header h1 span{color:var(--accent);}
@@ -35,20 +26,12 @@ body{font-family:'Inter',sans-serif;background:#fff;color:var(--text);min-height
 .header-date-text{font-size:0.82rem;color:var(--muted);}
 .btn-header-excel{display:inline-flex;align-items:center;gap:6px;background:#1d6f42;color:#fff;border:none;border-radius:8px;padding:7px 16px;font-size:0.78rem;font-weight:700;cursor:pointer;white-space:nowrap;}
 .btn-header-excel:hover{opacity:.88;}
-
-/* ── TOP NAV TABS ── */
 .top-tabs{display:flex;background:#fafbff;border-bottom:1.5px solid var(--border);}
 .top-tab{flex:1;padding:13px 0;text-align:center;font-size:0.88rem;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:3px solid transparent;transition:all .15s;user-select:none;}
 .top-tab:hover{color:var(--text);background:#f3f5ff;}
 .top-tab.active{color:var(--accent);border-bottom-color:var(--accent);background:#fff;}
-
-/* ── PAGE WRAPPER ── */
 .page{display:none;flex-direction:column;flex:1;}
 .page.active{display:flex;}
-
-/* ══════════════════════════════════════
-   PAGE 1 — PARTS RECON REGISTER
-══════════════════════════════════════ */
 .toolbar{background:#fafbff;border-bottom:1.5px solid var(--border);padding:10px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;}
 .series-switch{display:flex;background:var(--faint);border:1.5px solid var(--border);border-radius:8px;padding:3px;gap:3px;}
 .series-btn{padding:7px 18px;border-radius:6px;border:none;background:transparent;font-size:0.84rem;font-weight:700;color:var(--muted);cursor:pointer;transition:all .15s;}
@@ -113,10 +96,6 @@ td.cum-cell.notok{color:var(--notok-col);}
 .add-row-bar input.name-in{width:190px;}
 .empty-state{text-align:center;padding:50px 20px;color:var(--muted);}
 .hidden{display:none!important;}
-
-/* ══════════════════════════════════════
-   PAGE 2 — DAILY ENTRY REGISTER
-══════════════════════════════════════ */
 .de-layout{display:flex;flex:1;background:#fff;}
 .de-left{width:250px;min-width:250px;background:#fff;border-right:1.5px solid var(--border);padding:18px 13px;display:flex;flex-direction:column;gap:16px;overflow-y:auto;}
 .calendar-widget{border:1.5px solid var(--border);border-radius:10px;overflow:hidden;}
@@ -167,7 +146,9 @@ td.cum-cell.notok{color:var(--notok-col);}
 .entry-card-header h2{font-size:0.92rem;font-weight:700;letter-spacing:.04em;}
 .entry-card-header.received h2{color:var(--accent2);}
 .entry-card-header.dismantled h2{color:var(--warn);}
-.entry-card-body{padding:14px 18px;display:flex;flex-direction:row;align-items:center;gap:16px;}.entry-card-body .entry-card-left{display:flex;flex-direction:column;gap:4px;flex:1;}.entry-card-body .entry-total{flex-shrink:0;min-width:130px;}
+.entry-card-body{padding:14px 18px;display:flex;flex-direction:row;align-items:center;gap:16px;}
+.entry-card-body .entry-card-left{display:flex;flex-direction:column;gap:4px;flex:1;}
+.entry-card-body .entry-total{flex-shrink:0;min-width:130px;}
 .count-label{font-size:0.73rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:600;}
 .count-input{background:#fff;border:1.5px solid var(--border2);border-radius:8px;padding:9px 12px;font-family:'JetBrains Mono',monospace;font-size:1.5rem;font-weight:700;color:var(--accent2);width:120px;outline:none;text-align:center;transition:border-color .15s,box-shadow .15s;-moz-appearance:textfield;}
 .count-input.dis-input{color:var(--warn);}
@@ -205,7 +186,8 @@ td.cum-cell.notok{color:var(--notok-col);}
 .badge-a{background:#d8f5ed;color:var(--a-series);}
 .badge-p15{background:#fef0d6;color:var(--p15-series);}
 .badge-zd30{background:#fde8e8;color:var(--zd30-series);}
-.chart-wrap{background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:14px;}.chart-wrap canvas{max-height:160px;}
+.chart-wrap{background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:14px;}
+.chart-wrap canvas{max-height:160px;}
 .chart-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
 .chart-title{font-size:0.83rem;font-weight:700;color:var(--text);}
 .chart-legend{display:flex;gap:14px;}
@@ -214,13 +196,9 @@ td.cum-cell.notok{color:var(--notok-col);}
 .chart-series-tabs{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px;}
 .chart-series-tab{padding:4px 11px;border-radius:5px;border:1.5px solid var(--border);background:#fff;color:var(--muted);font-size:0.73rem;font-weight:600;cursor:pointer;transition:all .13s;}
 .chart-series-tab.active{color:#fff;border-color:transparent;background:var(--accent);}
-
-/* ── debug bar ── */
 .debug-bar{background:#1a1d27;color:#7a8099;font-family:'JetBrains Mono',monospace;font-size:0.68rem;padding:5px 16px;display:flex;align-items:center;gap:10px;}
 .debug-bar span{color:#4f7cff;}
 #debugMsg{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-
-/* ── Component Master ── */
 .material-select{border:1.5px solid var(--border2);border-radius:6px;padding:5px 8px;font-size:0.75rem;font-family:'Inter',sans-serif;background:#fff;cursor:pointer;font-weight:600;}
 .material-select[data-mat="Aluminium"]{background:#eef2ff;color:#5b52e0;}
 .material-select[data-mat="Cast iron"]{background:#e8faf5;color:#00855f;}
@@ -236,45 +214,107 @@ td.cum-cell.notok{color:var(--notok-col);}
 .mat-card .mat-name{font-size:0.72rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
 .mat-card .mat-val{font-family:'JetBrains Mono',monospace;font-size:1.25rem;font-weight:700;color:var(--text);}
 .mat-card .mat-sub{font-size:0.72rem;color:var(--muted);margin-top:4px;}
-
 @media(max-width:900px){.entry-grid{grid-template-columns:1fr;}}
-@media(max-width:680px){
-  .de-layout{flex-direction:column;}
-  .de-left{width:100%;border-right:none;border-bottom:1.5px solid var(--border);}
-  .de-main{padding:14px;}
-  .toolbar{padding:9px 14px;}
-  .stats-bar{padding:11px 14px;}
-  .table-scroll{margin:0 12px 14px;}
-}
+@media(max-width:680px){.de-layout{flex-direction:column;}.de-left{width:100%;border-right:none;border-bottom:1.5px solid var(--border);}.de-main{padding:14px;}.toolbar{padding:9px 14px;}.stats-bar{padding:11px 14px;}.table-scroll{margin:0 12px 14px;}}
+
+/* ── LOGIN PAGE ── */
+.login-overlay{position:fixed;inset:0;background:linear-gradient(135deg,#1a1d27 0%,#2d3154 100%);display:flex;align-items:center;justify-content:center;z-index:9999;}
+.login-card{background:#fff;border-radius:18px;padding:44px 40px;width:360px;box-shadow:0 20px 60px rgba(0,0,0,.35);display:flex;flex-direction:column;align-items:center;gap:22px;}
+.login-logo{font-size:2rem;font-weight:900;color:var(--text);letter-spacing:-.02em;}
+.login-logo span{color:var(--accent);}
+.login-subtitle{font-size:0.82rem;color:var(--muted);margin-top:-14px;text-align:center;}
+.login-field{width:100%;display:flex;flex-direction:column;gap:6px;}
+.login-field label{font-size:0.73rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+.login-field input{width:100%;border:1.5px solid var(--border2);border-radius:9px;padding:11px 14px;font-size:0.95rem;font-family:'Inter',sans-serif;outline:none;transition:border-color .15s,box-shadow .15s;}
+.login-field input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,124,255,.15);}
+.login-btn{width:100%;background:var(--accent);color:#fff;border:none;border-radius:9px;padding:13px;font-size:0.95rem;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;transition:opacity .15s;}
+.login-btn:hover{opacity:.88;}
+.login-err{font-size:0.8rem;color:var(--warn);font-weight:600;text-align:center;min-height:18px;}
+
+/* ── PART DETAIL MODAL ── */
+.modal-overlay{position:fixed;inset:0;background:rgba(26,29,39,.55);z-index:800;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(2px);}
+.modal-box{background:#fff;border-radius:16px;width:min(700px,94vw);max-height:82vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.22);overflow:hidden;}
+.modal-header{padding:18px 24px;border-bottom:1.5px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.modal-header h2{font-size:1rem;font-weight:700;}
+.modal-header h2 span{color:var(--accent);}
+.modal-close{background:var(--faint);border:none;width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:1.1rem;color:var(--muted);display:flex;align-items:center;justify-content:center;}
+.modal-close:hover{background:#fde8e8;color:var(--warn);}
+.modal-stats{display:flex;gap:12px;padding:14px 24px;background:#fafbff;border-bottom:1.5px solid var(--border);flex-shrink:0;}
+.modal-stat{background:#fff;border:1.5px solid var(--border);border-radius:8px;padding:8px 14px;text-align:center;}
+.modal-stat .ms-label{font-size:0.63rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:700;}
+.modal-stat .ms-val{font-family:'JetBrains Mono',monospace;font-size:1.1rem;font-weight:700;margin-top:2px;}
+.modal-stat.rec .ms-val{color:var(--rec-col);}
+.modal-stat.ok .ms-val{color:var(--ok-col);}
+.modal-stat.notok .ms-val{color:var(--notok-col);}
+.modal-body{overflow-y:auto;padding:16px 24px;}
+.modal-table{width:100%;border-collapse:collapse;font-size:0.82rem;}
+.modal-table th{background:var(--faint);color:var(--muted);font-weight:700;text-transform:uppercase;font-size:0.63rem;letter-spacing:.06em;padding:8px 12px;text-align:left;border-bottom:1.5px solid var(--border);position:sticky;top:0;}
+.modal-table td{padding:8px 12px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.modal-table tr:last-child td{border-bottom:none;}
+.modal-table tr:hover td{background:#fafbff;}
+.modal-table td.dt{font-family:'JetBrains Mono',monospace;font-size:0.79rem;color:var(--muted);}
+.modal-table td.rv{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--rec-col);}
+.modal-table td.ov{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--ok-col);}
+.modal-table td.nv{font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--notok-col);}
+.modal-table td.empty-val{color:var(--muted);font-size:0.75rem;}
+.part-name-link{cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px;}
+.part-name-link:hover{color:var(--accent);}
+
 </style>
 </head>
 <body>
+
+<!-- ── LOGIN OVERLAY ── -->
+<div class="login-overlay" id="loginOverlay">
+  <div class="login-card">
+    <div class="login-logo">MC Shop — <span>Register</span></div>
+    <div class="login-subtitle">Engine Parts Reconditioning System</div>
+    <div class="login-field">
+      <label>Password</label>
+      <input type="password" id="loginPass" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <div class="login-err" id="loginErr"></div>
+    <button class="login-btn" onclick="doLogin()">🔐 Login</button>
+  </div>
+</div>
+
+<!-- ── PART DETAIL MODAL ── -->
+<div class="modal-overlay hidden" id="partModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <h2 id="modalTitle">Part Detail</h2>
+      <button class="modal-close" onclick="closePartModal()">✕</button>
+    </div>
+    <div class="modal-stats" id="modalStats"></div>
+    <div class="modal-body">
+      <table class="modal-table">
+        <thead><tr><th>Date</th><th style="color:var(--rec-col)">Received</th><th style="color:var(--ok-col)">Ok</th><th style="color:var(--notok-col)">Not Ok</th></tr></thead>
+        <tbody id="modalTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
 
 <div class="loading-overlay" id="loadingOverlay">
   <div class="spinner"></div>
   <div class="loading-text" id="loadingText">Connecting to Firebase…</div>
 </div>
-
-<!-- ── HEADER ── -->
 <div class="header">
   <h1>MC Shop — <span>Register</span></h1>
   <div class="header-right">
     <button class="btn-header-excel" onclick="downloadCombinedExcel()">📥 Download All Excel</button>
     <div class="header-date-text" id="headerDate"></div>
     <div class="sync-status sync-ing" id="syncStatus" onclick="retryAll()">⟳ Connecting</div>
+    <button onclick="doLogout()" style="background:#fde8e8;color:var(--warn);border:none;border-radius:8px;padding:7px 14px;font-size:0.78rem;font-weight:700;cursor:pointer;">🔒 Logout</button>
   </div>
 </div>
-
-<!-- ── TOP NAV ── -->
 <div class="top-tabs">
   <div class="top-tab active" id="tabRecon" onclick="switchPage('recon')">📋 Parts Recon Register</div>
   <div class="top-tab" id="tabDaily" onclick="switchPage('daily')">📅 Daily Entry Register</div>
   <div class="top-tab" id="tabMaster" onclick="switchPage('master')">🧩 Component Master</div>
 </div>
 
-<!-- ══════════════════════════════════
-     PAGE 1 — PARTS RECON
-══════════════════════════════════ -->
+<!-- PAGE 1 -->
 <div class="page active" id="pageRecon">
   <div class="toolbar">
     <div class="series-switch">
@@ -311,9 +351,7 @@ td.cum-cell.notok{color:var(--notok-col);}
   </div>
 </div>
 
-<!-- ══════════════════════════════════
-     PAGE 2 — DAILY ENTRY
-══════════════════════════════════ -->
+<!-- PAGE 2 -->
 <div class="page" id="pageDaily">
   <div class="de-layout">
     <div class="de-left">
@@ -334,16 +372,13 @@ td.cum-cell.notok{color:var(--notok-col);}
       </div>
       <div class="summary-box">
         <h3>Month Cumulative</h3>
-        <div class="summary-row" style="font-size:.67rem;color:var(--muted);padding-bottom:3px;">
-          <span>Series</span><div class="svals"><span class="s-rec">Rec</span><span class="s-dis">Dis</span></div>
-        </div>
+        <div class="summary-row" style="font-size:.67rem;color:var(--muted);padding-bottom:3px;"><span>Series</span><div class="svals"><span class="s-rec">Rec</span><span class="s-dis">Dis</span></div></div>
         <div class="summary-row"><span class="stype"><span class="dot" style="background:var(--h-series)"></span>H-Series</span><div class="svals"><span class="s-rec" id="cum-h-rec">0</span><span class="s-dis" id="cum-h-dis">0</span></div></div>
         <div class="summary-row"><span class="stype"><span class="dot" style="background:var(--a-series)"></span>A-Series</span><div class="svals"><span class="s-rec" id="cum-a-rec">0</span><span class="s-dis" id="cum-a-dis">0</span></div></div>
         <div class="summary-row"><span class="stype"><span class="dot" style="background:var(--p15-series)"></span>P15-Series</span><div class="svals"><span class="s-rec" id="cum-p15-rec">0</span><span class="s-dis" id="cum-p15-dis">0</span></div></div>
         <div class="summary-row"><span class="stype"><span class="dot" style="background:var(--zd30-series)"></span>ZD30-Series</span><div class="svals"><span class="s-rec" id="cum-zd30-rec">0</span><span class="s-dis" id="cum-zd30-dis">0</span></div></div>
         <div class="summary-row" style="padding-top:5px;"><span style="font-weight:700;font-size:0.83rem;">TOTAL</span><div class="svals"><span class="s-rec" style="font-weight:700;" id="cum-total-rec">0</span><span class="s-dis" style="font-weight:700;" id="cum-total-dis">0</span></div></div>
       </div>
-      <!-- Year Cumulative box -->
       <div class="summary-box" id="deYearCumBox">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:9px;">
           <h3 style="margin-bottom:0;">Year Cumulative</h3>
@@ -353,9 +388,7 @@ td.cum-cell.notok{color:var(--notok-col);}
             <button onclick="deChangeYear(1)" style="background:var(--faint);border:1px solid var(--border);border-radius:4px;width:22px;height:22px;cursor:pointer;font-size:0.85rem;">›</button>
           </div>
         </div>
-        <div class="summary-row" style="font-size:.67rem;color:var(--muted);padding-bottom:3px;">
-          <span>Series</span><div class="svals"><span class="s-rec">Rec</span><span class="s-dis">Dis</span></div>
-        </div>
+        <div class="summary-row" style="font-size:.67rem;color:var(--muted);padding-bottom:3px;"><span>Series</span><div class="svals"><span class="s-rec">Rec</span><span class="s-dis">Dis</span></div></div>
         <div class="summary-row"><span class="stype"><span class="dot" style="background:var(--h-series)"></span>H-Series</span><div class="svals"><span class="s-rec" id="ycum-h-rec">0</span><span class="s-dis" id="ycum-h-dis">0</span></div></div>
         <div class="summary-row"><span class="stype"><span class="dot" style="background:var(--a-series)"></span>A-Series</span><div class="svals"><span class="s-rec" id="ycum-a-rec">0</span><span class="s-dis" id="ycum-a-dis">0</span></div></div>
         <div class="summary-row"><span class="stype"><span class="dot" style="background:var(--p15-series)"></span>P15-Series</span><div class="svals"><span class="s-rec" id="ycum-p15-rec">0</span><span class="s-dis" id="ycum-p15-dis">0</span></div></div>
@@ -363,7 +396,6 @@ td.cum-cell.notok{color:var(--notok-col);}
         <div class="summary-row" style="padding-top:5px;"><span style="font-weight:700;font-size:0.83rem;">TOTAL</span><div class="svals"><span class="s-rec" style="font-weight:700;" id="ycum-total-rec">0</span><span class="s-dis" style="font-weight:700;" id="ycum-total-dis">0</span></div></div>
       </div>
     </div>
-
     <div class="de-main">
       <div>
         <div class="section-title">Series Type</div>
@@ -454,9 +486,7 @@ td.cum-cell.notok{color:var(--notok-col);}
   </div>
 </div>
 
-<!-- ══════════════════════════════════
-     PAGE 3 — COMPONENT MASTER
-══════════════════════════════════ -->
+<!-- PAGE 3 -->
 <div class="page" id="pageMaster">
   <div class="toolbar">
     <div class="series-switch">
@@ -474,9 +504,7 @@ td.cum-cell.notok{color:var(--notok-col);}
       Download Excel
     </button>
   </div>
-
   <div class="stats-bar" id="masterStatsBar"></div>
-
   <div class="table-scroll" style="margin:0 24px 16px;">
     <table class="reg-table" id="masterTable" style="width:100%;min-width:0;">
       <thead>
@@ -493,13 +521,10 @@ td.cum-cell.notok{color:var(--notok-col);}
       <tbody id="masterTbody"></tbody>
     </table>
   </div>
-
-  <!-- Material-wise totals -->
   <div style="padding:0 24px 16px;">
     <div class="section-title" style="margin-bottom:10px;">Material-wise Cost Summary</div>
     <div id="masterMaterialCards" style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;"></div>
   </div>
-
   <div class="add-row-bar">
     <strong style="font-size:0.81rem;color:var(--muted);">Add Component:</strong>
     <input class="name-in" id="newCompName" placeholder="Component name" style="width:200px;">
@@ -512,7 +537,6 @@ td.cum-cell.notok{color:var(--notok-col);}
   </div>
 </div>
 
-<!-- ── DEBUG BAR ── -->
 <div class="debug-bar"><span>Firebase:</span><span id="debugMsg">Initializing…</span></div>
 
 <script type="module">
@@ -532,7 +556,6 @@ const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
 const SHARED_UID = 'recon-store-shared-user-001';
 
-// ── helpers ──
 const MONTH_FULL=['January','February','March','April','May','June','July','August','September','October','November','December'];
 const MONTH_SHORT=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 const DE_SERIES=['H-Series','A-Series','P15-Series','ZD30-Series'];
@@ -553,45 +576,32 @@ function ddmmyyyy(y,m,d){return `${String(d).padStart(2,'0')}.${String(m+1).padS
 function daysInMonth(y,m){return new Date(y,m+1,0).getDate();}
 function toDateStr(y,m,d){return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
 
-document.getElementById('headerDate').textContent =
-  todayObj.toLocaleDateString('en-IN',{weekday:'short',year:'numeric',month:'long',day:'numeric'});
+document.getElementById('headerDate').textContent = todayObj.toLocaleDateString('en-IN',{weekday:'short',year:'numeric',month:'long',day:'numeric'});
 
-// ─── PAGE SWITCH ───────────────────────────────────────────────
-const PAGE_MAP = {recon:'pageRecon', daily:'pageDaily', master:'pageMaster'};
-const TAB_MAP  = {recon:'tabRecon', daily:'tabDaily', master:'tabMaster'};
-window.switchPage = async function(page){
+const PAGE_MAP={recon:'pageRecon',daily:'pageDaily',master:'pageMaster'};
+const TAB_MAP={recon:'tabRecon',daily:'tabDaily',master:'tabMaster'};
+window.switchPage=async function(page){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.top-tab').forEach(t=>t.classList.remove('active'));
   document.getElementById(PAGE_MAP[page]).classList.add('active');
   document.getElementById(TAB_MAP[page]).classList.add('active');
-  if(page==='master' && !masterState.loaded){
-    setSync('ing');
-    await masterInit();
-    setSync('ok');
-  }
+  if(page==='master'&&!masterState.loaded){setSync('ing');await masterInit();setSync('ok');}
 };
-
-window.retryAll = async function(){
+window.retryAll=async function(){
   setSync('ing');
   await loadParts(reconState.currentSeries);
-  if(reconState.currentView==='month') await loadMonthEntries(reconState.currentSeries,reconState.calYear,reconState.calMonth);
+  if(reconState.currentView==='month')await loadMonthEntries(reconState.currentSeries,reconState.calYear,reconState.calMonth);
   else await loadYearEntries(reconState.currentSeries,reconState.viewYear);
   reconRenderAll();
   await deLoadMonthData();
   deRenderCalendar();deLoadFormForDate();deRenderCumTable();deRenderChart();
   await masterLoadComponents(masterState.currentSeries);
-  await masterLoadEntries(masterState.currentSeries, masterMonthKey());
+  await masterLoadEntries(masterState.currentSeries,masterMonthKey());
   masterRenderAll();
 };
 
-// ════════════════════════════════════════════════════════════════
-// PAGE 1 — PARTS RECON
-// ════════════════════════════════════════════════════════════════
-const reconState = {
-  currentSeries:'H-Series', currentView:'month',
-  calYear:todayObj.getFullYear(), calMonth:todayObj.getMonth(),
-  viewYear:todayObj.getFullYear()
-};
+// ── PAGE 1: PARTS RECON ──
+const reconState={currentSeries:'H-Series',currentView:'month',calYear:todayObj.getFullYear(),calMonth:todayObj.getMonth(),viewYear:todayObj.getFullYear()};
 let reconParts={'H-Series':[],'P15-Series':[]};
 let reconEntries={'H-Series':{},'P15-Series':{}};
 let reconYearEntries={'H-Series':{},'P15-Series':{}};
@@ -601,17 +611,13 @@ async function loadParts(series){
   try{
     dbg(`Loading parts: ${series}…`);
     const q=query(collection(db,'parts'),where('uid','==',SHARED_UID),where('series','==',series));
-    const snap=await getDocs(q);
-    const list=[];
+    const snap=await getDocs(q);const list=[];
     snap.forEach(d=>{const v=d.data();list.push({id:d.id,partNo:v.partNo||'',model:v.model||'',partName:v.partName||'',order:v.order||0});});
-    list.sort((a,b)=>a.order-b.order);
-    reconParts[series]=list;
-    dbg(`Parts loaded: ${list.length}`);setSync('ok');
+    list.sort((a,b)=>a.order-b.order);reconParts[series]=list;dbg(`Parts loaded: ${list.length}`);setSync('ok');
   }catch(err){dbg(`❌ Parts: ${err.message}`);setSync('err');}
 }
 async function loadMonthEntries(series,yr,mo){
-  const mk=`${yr}-${String(mo+1).padStart(2,'0')}`;
-  reconEntries[series]={};
+  const mk=`${yr}-${String(mo+1).padStart(2,'0')}`;reconEntries[series]={};
   try{
     const q=query(collection(db,'partEntries'),where('uid','==',SHARED_UID),where('series','==',series),where('month','==',mk));
     const snap=await getDocs(q);
@@ -624,9 +630,8 @@ async function loadYearEntries(series,yr){
   try{
     const q=query(collection(db,'partEntries'),where('uid','==',SHARED_UID),where('series','==',series),where('year','==',String(yr)));
     const snap=await getDocs(q);
-    if(snap.size>0){
-      snap.forEach(d=>{const v=d.data();if(!reconYearEntries[series][v.partId])reconYearEntries[series][v.partId]={};reconYearEntries[series][v.partId][v.date]={rec:v.rec||0,ok:v.ok||0,notok:v.notok||0};});
-    } else {
+    if(snap.size>0){snap.forEach(d=>{const v=d.data();if(!reconYearEntries[series][v.partId])reconYearEntries[series][v.partId]={};reconYearEntries[series][v.partId][v.date]={rec:v.rec||0,ok:v.ok||0,notok:v.notok||0};});}
+    else{
       const fetches=[];
       for(let m=1;m<=12;m++){const mk=`${yr}-${String(m).padStart(2,'0')}`;fetches.push(getDocs(query(collection(db,'partEntries'),where('uid','==',SHARED_UID),where('series','==',series),where('month','==',mk))));}
       const results=await Promise.all(fetches);
@@ -666,10 +671,9 @@ window.switchSeries=async function(series){
   document.getElementById('loadingText').textContent=`Loading ${series}…`;
   setSync('ing');
   await loadParts(series);
-  if(reconState.currentView==='month') await loadMonthEntries(series,reconState.calYear,reconState.calMonth);
+  if(reconState.currentView==='month')await loadMonthEntries(series,reconState.calYear,reconState.calMonth);
   else await loadYearEntries(series,reconState.viewYear);
-  reconRenderAll();
-  document.getElementById('loadingOverlay').style.display='none';
+  reconRenderAll();document.getElementById('loadingOverlay').style.display='none';
 };
 window.switchView=async function(view){
   reconState.currentView=view;
@@ -687,9 +691,7 @@ window.changeMonth=async function(delta){
   if(reconState.calMonth>11){reconState.calMonth=0;reconState.calYear++;}
   setSync('ing');await loadMonthEntries(reconState.currentSeries,reconState.calYear,reconState.calMonth);reconRenderAll();
 };
-window.changeYear=async function(delta){
-  reconState.viewYear+=delta;setSync('ing');await loadYearEntries(reconState.currentSeries,reconState.viewYear);reconRenderAll();
-};
+window.changeYear=async function(delta){reconState.viewYear+=delta;setSync('ing');await loadYearEntries(reconState.currentSeries,reconState.viewYear);reconRenderAll();};
 window.addPart=async function(){
   const pno=document.getElementById('newPartNo').value.trim();
   const model=document.getElementById('newModel').value.trim();
@@ -701,28 +703,51 @@ window.addPart=async function(){
     const id=await addPartToFirestore(reconState.currentSeries,pno,model,pname,order);
     reconParts[reconState.currentSeries].push({id,partNo:pno,model,partName:pname,order});
     setSync('ok');
-    document.getElementById('newPartNo').value='';
-    document.getElementById('newModel').value='';
-    document.getElementById('newPartName').value='';
+    document.getElementById('newPartNo').value='';document.getElementById('newModel').value='';document.getElementById('newPartName').value='';
     reconRenderAll();
   }catch(err){setSync('err');alert('Add failed: '+(err.code||err.message));}
 };
 window.deletePart=async function(partId,partName){
   if(!confirm(`Delete part "${partName}"? Athoda entries-um delete aagum.`))return;
   try{
-    setSync('ing');
-    await deletePartFromFirestore(partId);
+    setSync('ing');await deletePartFromFirestore(partId);
     reconParts[reconState.currentSeries]=reconParts[reconState.currentSeries].filter(p=>p.id!==partId);
-    delete reconEntries[reconState.currentSeries][partId];
-    delete reconYearEntries[reconState.currentSeries][partId];
+    delete reconEntries[reconState.currentSeries][partId];delete reconYearEntries[reconState.currentSeries][partId];
     setSync('ok');reconRenderAll();
   }catch(err){setSync('err');alert('Delete failed: '+(err.code||err.message));}
 };
 window.handleCellInput=function(series,partId,dateStr,field,val){
-  const num=parseInt(val)||0;
-  saveReconEntryDebounced(series,partId,dateStr,field,num);
-  refreshCumCells();
+  const num=parseInt(val)||0;saveReconEntryDebounced(series,partId,dateStr,field,num);refreshCumCells();
 };
+
+// ── KEYBOARD NAVIGATION for recon table ──────────────────────
+// Enter/↓ = next row same column | ↑ = prev row | ←→ = prev/next cell
+document.addEventListener('keydown',function(e){
+  const active=document.activeElement;
+  if(!active||!active.classList.contains('cell-input'))return;
+  const allInputs=Array.from(document.querySelectorAll('#monthTbody .cell-input'));
+  const idx=allInputs.indexOf(active);
+  if(idx===-1)return;
+  const tbody=document.getElementById('monthTbody');
+  if(!tbody)return;
+  const firstRow=tbody.querySelector('tr');
+  const inputsPerRow=firstRow?firstRow.querySelectorAll('.cell-input').length:3;
+  let next=-1;
+  if(e.key==='Enter'||e.key==='ArrowDown'){
+    e.preventDefault();
+    next=idx+inputsPerRow;
+    if(next>=allInputs.length)next=idx%inputsPerRow;
+  }else if(e.key==='ArrowUp'){
+    e.preventDefault();
+    next=idx-inputsPerRow;
+    if(next<0)next=allInputs.length-inputsPerRow+(idx%inputsPerRow);
+  }else if(e.key==='ArrowRight'&&active.selectionStart===active.value.length){
+    e.preventDefault();next=Math.min(idx+1,allInputs.length-1);
+  }else if(e.key==='ArrowLeft'&&active.selectionStart===0){
+    e.preventDefault();next=Math.max(idx-1,0);
+  }
+  if(next>=0&&next<allInputs.length){allInputs[next].focus();allInputs[next].select();}
+});
 function computeReconTotals(){
   const list=reconParts[reconState.currentSeries];
   const src=reconState.currentView==='month'?reconEntries[reconState.currentSeries]:reconYearEntries[reconState.currentSeries];
@@ -733,115 +758,84 @@ function computeReconTotals(){
 function reconRenderStats(){
   const t=computeReconTotals();
   const lbl=reconState.currentView==='month'?`${MONTH_FULL[reconState.calMonth]} ${reconState.calYear}`:`Year ${reconState.viewYear}`;
-  document.getElementById('statsBar').innerHTML=`
-    <div class="stat-card parts"><div class="stat-label">Total Parts</div><div class="stat-val">${t.partsCount}</div></div>
-    <div class="stat-card rec"><div class="stat-label">${lbl} — Received</div><div class="stat-val">${t.totRec}</div></div>
-    <div class="stat-card ok"><div class="stat-label">${lbl} — Ok</div><div class="stat-val">${t.totOk}</div></div>
-    <div class="stat-card notok"><div class="stat-label">${lbl} — Not Ok</div><div class="stat-val">${t.totNotOk}</div></div>`;
+  document.getElementById('statsBar').innerHTML=`<div class="stat-card parts"><div class="stat-label">Total Parts</div><div class="stat-val">${t.partsCount}</div></div><div class="stat-card rec"><div class="stat-label">${lbl} — Received</div><div class="stat-val">${t.totRec}</div></div><div class="stat-card ok"><div class="stat-label">${lbl} — Ok</div><div class="stat-val">${t.totOk}</div></div><div class="stat-card notok"><div class="stat-label">${lbl} — Not Ok</div><div class="stat-val">${t.totNotOk}</div></div>`;
 }
 function reconRenderMonthTable(){
   document.getElementById('monthLabel').textContent=`${MONTH_FULL[reconState.calMonth]} ${reconState.calYear}`;
-  const list=reconParts[reconState.currentSeries];
-  const isH=reconState.currentSeries==='H-Series';
-  const nDays=daysInMonth(reconState.calYear,reconState.calMonth);
-  const dateList=[];
+  const list=reconParts[reconState.currentSeries];const isH=reconState.currentSeries==='H-Series';
+  const nDays=daysInMonth(reconState.calYear,reconState.calMonth);const dateList=[];
   for(let d=1;d<=nDays;d++)dateList.push(toDateStr(reconState.calYear,reconState.calMonth,d));
   if(!list.length){document.getElementById('tableContainer').innerHTML=`<div class="empty-state">No parts added yet for ${reconState.currentSeries}. Add a part below to start.</div>`;return;}
   const numW=30,partNoW=90,modelW=isH?90:0;
   let html=`<div class="table-scroll"><table class="reg-table"><thead>`;
-  html+=`<tr class="date-row">
-    <th class="sticky-col" style="left:0;width:${numW}px;" rowspan="2">#</th>
-    <th class="sticky-col2" style="left:${numW}px;width:${partNoW}px;" rowspan="2">Part No</th>`;
+  html+=`<tr class="date-row"><th class="sticky-col" style="left:0;width:${numW}px;" rowspan="2">#</th><th class="sticky-col2" style="left:${numW}px;width:${partNoW}px;" rowspan="2">Part No</th>`;
   if(isH)html+=`<th class="sticky-col2" style="left:${numW+partNoW}px;width:${modelW}px;" rowspan="2">Model</th>`;
   html+=`<th class="sticky-col2" style="left:${numW+partNoW+modelW}px;min-width:135px;" rowspan="2">Part Name</th>`;
   dateList.forEach(ds=>{const d=parseInt(ds.split('-')[2]);html+=`<th colspan="3">${ddmmyyyy(reconState.calYear,reconState.calMonth,d)}</th>`;});
-  html+=`<th colspan="3" style="background:#eef0ff;">Monthly Cumulative</th>`;
-  html+=`<th rowspan="2" style="width:38px;">Del</th></tr>`;
+  html+=`<th colspan="3" style="background:#eef0ff;">Monthly Cumulative</th><th rowspan="2" style="width:38px;">Del</th></tr>`;
   html+=`<tr class="sub-row">`;
   dateList.forEach(()=>{html+=`<th class="rec-h">Rec</th><th class="ok-h">Ok</th><th class="notok-h">NotOk</th>`;});
-  html+=`<th class="rec-h">Rec</th><th class="ok-h">Ok</th><th class="notok-h">NotOk</th>`;
-  html+=`</tr></thead><tbody id="monthTbody">`;
+  html+=`<th class="rec-h">Rec</th><th class="ok-h">Ok</th><th class="notok-h">NotOk</th></tr></thead><tbody id="monthTbody">`;
   list.forEach((p,idx)=>{
-    const pe=reconEntries[reconState.currentSeries][p.id]||{};
-    let cumRec=0,cumOk=0,cumNotOk=0;
+    const pe=reconEntries[reconState.currentSeries][p.id]||{};let cumRec=0,cumOk=0,cumNotOk=0;
     dateList.forEach(ds=>{const d=pe[ds];if(d){cumRec+=d.rec||0;cumOk+=d.ok||0;cumNotOk+=d.notok||0;}});
-    html+=`<tr data-part="${p.id}">
-      <td class="sticky-col col-num" style="left:0;width:${numW}px;">${idx+1}</td>
-      <td class="sticky-col2 col-partno" style="left:${numW}px;width:${partNoW}px;"><span class="part-no">${p.partNo||'—'}</span></td>`;
+    html+=`<tr data-part="${p.id}"><td class="sticky-col col-num" style="left:0;width:${numW}px;">${idx+1}</td><td class="sticky-col2 col-partno" style="left:${numW}px;width:${partNoW}px;"><span class="part-no">${p.partNo||'—'}</span></td>`;
     if(isH)html+=`<td class="sticky-col2 col-model" style="left:${numW+partNoW}px;width:${modelW}px;"><span class="part-model">${p.model||'—'}</span></td>`;
-    html+=`<td class="sticky-col2 col-name" style="left:${numW+partNoW+modelW}px;min-width:135px;"><span class="part-name">${p.partName||'—'}</span></td>`;
+    html+=`<td class="sticky-col2 col-name" style="left:${numW+partNoW+modelW}px;min-width:135px;"><span class="part-name part-name-link" onclick="openPartModal('${p.id}')" title="Click to view history">${p.partName||'—'}</span></td>`;
     dateList.forEach(ds=>{
       const d=pe[ds]||{rec:'',ok:'',notok:''};
       html+=`<td><input class="cell-input rec-input" type="number" min="0" value="${d.rec||''}" oninput="handleCellInput('${reconState.currentSeries}','${p.id}','${ds}','rec',this.value)"></td>`;
       html+=`<td><input class="cell-input ok-input" type="number" min="0" value="${d.ok||''}" oninput="handleCellInput('${reconState.currentSeries}','${p.id}','${ds}','ok',this.value)"></td>`;
       html+=`<td><input class="cell-input notok-input" type="number" min="0" value="${d.notok||''}" oninput="handleCellInput('${reconState.currentSeries}','${p.id}','${ds}','notok',this.value)"></td>`;
     });
-    html+=`<td class="cum-cell rec" data-cumtype="rec" data-part="${p.id}">${cumRec||0}</td>`;
-    html+=`<td class="cum-cell ok" data-cumtype="ok" data-part="${p.id}">${cumOk||0}</td>`;
-    html+=`<td class="cum-cell notok" data-cumtype="notok" data-part="${p.id}">${cumNotOk||0}</td>`;
-    html+=`<td><button class="del-row-btn" onclick="deletePart('${p.id}','${(p.partName||'').replace(/'/g,"\\'")}')">✕</button></td>`;
-    html+=`</tr>`;
+    html+=`<td class="cum-cell rec" data-cumtype="rec" data-part="${p.id}">${cumRec||0}</td><td class="cum-cell ok" data-cumtype="ok" data-part="${p.id}">${cumOk||0}</td><td class="cum-cell notok" data-cumtype="notok" data-part="${p.id}">${cumNotOk||0}</td>`;
+    html+=`<td><button class="del-row-btn" onclick="deletePart('${p.id}','${(p.partName||'').replace(/'/g,"\\'")}')">✕</button></td></tr>`;
   });
   html+=`</tbody></table></div>`;
   document.getElementById('tableContainer').innerHTML=html;
 }
 function refreshCumCells(){
   if(reconState.currentView!=='month')return;
-  const list=reconParts[reconState.currentSeries];
-  const nDays=daysInMonth(reconState.calYear,reconState.calMonth);
+  const list=reconParts[reconState.currentSeries];const nDays=daysInMonth(reconState.calYear,reconState.calMonth);
   const dateList=[];for(let d=1;d<=nDays;d++)dateList.push(toDateStr(reconState.calYear,reconState.calMonth,d));
   list.forEach(p=>{
-    const pe=reconEntries[reconState.currentSeries][p.id]||{};
-    let cumRec=0,cumOk=0,cumNotOk=0;
+    const pe=reconEntries[reconState.currentSeries][p.id]||{};let cumRec=0,cumOk=0,cumNotOk=0;
     dateList.forEach(ds=>{const d=pe[ds];if(d){cumRec+=d.rec||0;cumOk+=d.ok||0;cumNotOk+=d.notok||0;}});
     const rc=document.querySelector(`td.cum-cell.rec[data-part="${p.id}"]`);
     const oc=document.querySelector(`td.cum-cell.ok[data-part="${p.id}"]`);
     const nc=document.querySelector(`td.cum-cell.notok[data-part="${p.id}"]`);
     if(rc)rc.textContent=cumRec||0;if(oc)oc.textContent=cumOk||0;if(nc)nc.textContent=cumNotOk||0;
-  });
-  reconRenderStats();
+  });reconRenderStats();
 }
 function reconRenderYearTable(){
   document.getElementById('yearLabel').textContent=`${reconState.viewYear}`;
-  const list=reconParts[reconState.currentSeries];
-  const isH=reconState.currentSeries==='H-Series';
+  const list=reconParts[reconState.currentSeries];const isH=reconState.currentSeries==='H-Series';
   if(!list.length){document.getElementById('tableContainer').innerHTML=`<div class="empty-state">No parts for ${reconState.currentSeries}.</div>`;return;}
   const numW=30,partNoW=90,modelW=isH?90:0;
-  let html=`<div class="table-scroll"><table class="reg-table"><thead>`;
-  html+=`<tr class="date-row">
-    <th class="sticky-col" style="left:0;width:${numW}px;" rowspan="2">#</th>
-    <th class="sticky-col2" style="left:${numW}px;width:${partNoW}px;" rowspan="2">Part No</th>`;
+  let html=`<div class="table-scroll"><table class="reg-table"><thead><tr class="date-row"><th class="sticky-col" style="left:0;width:${numW}px;" rowspan="2">#</th><th class="sticky-col2" style="left:${numW}px;width:${partNoW}px;" rowspan="2">Part No</th>`;
   if(isH)html+=`<th class="sticky-col2" style="left:${numW+partNoW}px;width:${modelW}px;" rowspan="2">Model</th>`;
   html+=`<th class="sticky-col2" style="left:${numW+partNoW+modelW}px;min-width:135px;" rowspan="2">Part Name</th>`;
   MONTH_SHORT.forEach(m=>{html+=`<th colspan="3">${m} ${reconState.viewYear}</th>`;});
-  html+=`<th colspan="3" style="background:#eef0ff;">Year Cumulative</th></tr>`;
-  html+=`<tr class="sub-row">`;
+  html+=`<th colspan="3" style="background:#eef0ff;">Year Cumulative</th></tr><tr class="sub-row">`;
   MONTH_SHORT.forEach(()=>{html+=`<th class="rec-h">Rec</th><th class="ok-h">Ok</th><th class="notok-h">NotOk</th>`;});
-  html+=`<th class="rec-h">Rec</th><th class="ok-h">Ok</th><th class="notok-h">NotOk</th>`;
-  html+=`</tr></thead><tbody>`;
+  html+=`<th class="rec-h">Rec</th><th class="ok-h">Ok</th><th class="notok-h">NotOk</th></tr></thead><tbody>`;
   list.forEach((p,idx)=>{
     const pe=reconYearEntries[reconState.currentSeries][p.id]||{};
     const mAgg=Array.from({length:12},()=>({rec:0,ok:0,notok:0}));
     Object.keys(pe).forEach(ds=>{const mIdx=parseInt(ds.split('-')[1])-1;const d=pe[ds];mAgg[mIdx].rec+=d.rec||0;mAgg[mIdx].ok+=d.ok||0;mAgg[mIdx].notok+=d.notok||0;});
     const yt=mAgg.reduce((a,m)=>({rec:a.rec+m.rec,ok:a.ok+m.ok,notok:a.notok+m.notok}),{rec:0,ok:0,notok:0});
-    html+=`<tr>
-      <td class="sticky-col col-num" style="left:0;width:${numW}px;">${idx+1}</td>
-      <td class="sticky-col2 col-partno" style="left:${numW}px;width:${partNoW}px;"><span class="part-no">${p.partNo||'—'}</span></td>`;
+    html+=`<tr><td class="sticky-col col-num" style="left:0;width:${numW}px;">${idx+1}</td><td class="sticky-col2 col-partno" style="left:${numW}px;width:${partNoW}px;"><span class="part-no">${p.partNo||'—'}</span></td>`;
     if(isH)html+=`<td class="sticky-col2 col-model" style="left:${numW+partNoW}px;width:${modelW}px;"><span class="part-model">${p.model||'—'}</span></td>`;
     html+=`<td class="sticky-col2 col-name" style="left:${numW+partNoW+modelW}px;min-width:135px;"><span class="part-name">${p.partName||'—'}</span></td>`;
     mAgg.forEach(m=>{html+=`<td class="cum-cell rec" style="background:transparent;font-weight:600;">${m.rec||''}</td><td class="cum-cell ok" style="background:transparent;font-weight:600;">${m.ok||''}</td><td class="cum-cell notok" style="background:transparent;font-weight:600;">${m.notok||''}</td>`;});
-    html+=`<td class="cum-cell rec">${yt.rec||0}</td><td class="cum-cell ok">${yt.ok||0}</td><td class="cum-cell notok">${yt.notok||0}</td>`;
-    html+=`</tr>`;
+    html+=`<td class="cum-cell rec">${yt.rec||0}</td><td class="cum-cell ok">${yt.ok||0}</td><td class="cum-cell notok">${yt.notok||0}</td></tr>`;
   });
   const grand=Array.from({length:12},()=>({rec:0,ok:0,notok:0}));
   list.forEach(p=>{const pe=reconYearEntries[reconState.currentSeries][p.id]||{};Object.keys(pe).forEach(ds=>{const mIdx=parseInt(ds.split('-')[1])-1;const d=pe[ds];grand[mIdx].rec+=d.rec||0;grand[mIdx].ok+=d.ok||0;grand[mIdx].notok+=d.notok||0;});});
   const gt=grand.reduce((a,m)=>({rec:a.rec+m.rec,ok:a.ok+m.ok,notok:a.notok+m.notok}),{rec:0,ok:0,notok:0});
-  html+=`<tr style="background:var(--faint);font-weight:700;">
-    <td class="sticky-col" style="left:0;width:${numW}px;background:var(--faint);"></td>
-    <td class="sticky-col2" style="left:${numW}px;width:${partNoW}px;background:var(--faint);" colspan="${isH?2:1}">GRAND TOTAL</td>`;
+  html+=`<tr style="background:var(--faint);font-weight:700;"><td class="sticky-col" style="left:0;width:${numW}px;background:var(--faint);"></td><td class="sticky-col2" style="left:${numW}px;width:${partNoW}px;background:var(--faint);" colspan="${isH?2:1}">GRAND TOTAL</td>`;
   grand.forEach(m=>{html+=`<td class="cum-cell rec">${m.rec||0}</td><td class="cum-cell ok">${m.ok||0}</td><td class="cum-cell notok">${m.notok||0}</td>`;});
-  html+=`<td class="cum-cell rec">${gt.rec}</td><td class="cum-cell ok">${gt.ok}</td><td class="cum-cell notok">${gt.notok}</td></tr>`;
-  html+=`</tbody></table></div>`;
+  html+=`<td class="cum-cell rec">${gt.rec}</td><td class="cum-cell ok">${gt.ok}</td><td class="cum-cell notok">${gt.notok}</td></tr></tbody></table></div>`;
   document.getElementById('tableContainer').innerHTML=html;
 }
 function reconRenderAll(){reconRenderStats();if(reconState.currentView==='month')reconRenderMonthTable();else reconRenderYearTable();}
@@ -903,19 +897,114 @@ window.downloadReconExcel=function(){
   }catch(err){console.error(err);alert('Excel export failed: '+err.message);}
 };
 
-// ════════════════════════════════════════════════════════════════
-// PAGE 2 — DAILY ENTRY
-// ════════════════════════════════════════════════════════════════
+// ── COMBINED EXCEL — 5 sheets: Recon H, Recon P15, Daily Entry, Master H, Master P15 ──
+window.downloadCombinedExcel=function(){
+  try{
+    const wb=XLSX.utils.book_new();
+
+    // Sheets 1 & 2: Parts Recon
+    ['H-Series','P15-Series'].forEach(series=>{
+      const isH=series==='H-Series';const list=reconParts[series];if(!list.length)return;
+      let dateList,srcEntries;
+      if(reconState.currentView==='month'){
+        const nDays=daysInMonth(reconState.calYear,reconState.calMonth);dateList=[];
+        for(let d=1;d<=nDays;d++)dateList.push(toDateStr(reconState.calYear,reconState.calMonth,d));
+        srcEntries=reconEntries[series];
+      }else{srcEntries=reconYearEntries[series];}
+      const rows=[];
+      if(reconState.currentView==='month'){
+        const h1=isH?['Sl No','Part No','Model','Date']:['Sl No','Part No','Date'];
+        dateList.forEach(ds=>{const d=parseInt(ds.split('-')[2]);h1.push(ddmmyyyy(reconState.calYear,reconState.calMonth,d),'','');});
+        h1.push('Overall Cumulative','','');rows.push(h1);
+        const h2=isH?['','','','']:['','',''];
+        dateList.forEach(()=>{h2.push('Received','Ok','Not Ok');});h2.push('Received','Ok','Not Ok');rows.push(h2);
+        list.forEach((p,idx)=>{
+          const pe=srcEntries[p.id]||{};let cR=0,cO=0,cN=0;
+          const row=isH?[idx+1,p.partNo||'',p.model||'',p.partName||'']:[idx+1,p.partNo||'',p.partName||''];
+          dateList.forEach(ds=>{const d=pe[ds];const r=d?d.rec||0:'',o=d?d.ok||0:'',n=d?d.notok||0:'';row.push(r===0?'':r,o===0?'':o,n===0?'':n);if(d){cR+=d.rec||0;cO+=d.ok||0;cN+=d.notok||0;}});
+          row.push(cR||0,cO||0,cN||0);rows.push(row);
+        });
+        const tr=isH?['','','','GRAND TOTAL']:['','','GRAND TOTAL'];let gR=0,gO=0,gN=0;
+        dateList.forEach(ds=>{let dR=0,dO=0,dN=0;list.forEach(p=>{const d=(srcEntries[p.id]||{})[ds];if(d){dR+=d.rec||0;dO+=d.ok||0;dN+=d.notok||0;}});tr.push(dR||'',dO||'',dN||'');gR+=dR;gO+=dO;gN+=dN;});
+        tr.push(gR,gO,gN);rows.push(tr);
+      }else{
+        const h1=isH?['Sl No','Part No','Model','Part Name']:['Sl No','Part No','Part Name'];
+        MONTH_SHORT.forEach(m=>{h1.push(`${m} ${reconState.viewYear}`,'','');});h1.push('Year Cumulative','','');rows.push(h1);
+        const h2=isH?['','','','']:['','',''];MONTH_SHORT.forEach(()=>{h2.push('Received','Ok','Not Ok');});h2.push('Received','Ok','Not Ok');rows.push(h2);
+        list.forEach((p,idx)=>{
+          const pe=srcEntries[p.id]||{};const mAgg=Array.from({length:12},()=>({rec:0,ok:0,notok:0}));
+          Object.keys(pe).forEach(ds=>{const mIdx=parseInt(ds.split('-')[1])-1;const d=pe[ds];mAgg[mIdx].rec+=d.rec||0;mAgg[mIdx].ok+=d.ok||0;mAgg[mIdx].notok+=d.notok||0;});
+          const row=isH?[idx+1,p.partNo||'',p.model||'',p.partName||'']:[idx+1,p.partNo||'',p.partName||''];
+          let yR=0,yO=0,yN=0;mAgg.forEach(m=>{row.push(m.rec||'',m.ok||'',m.notok||'');yR+=m.rec;yO+=m.ok;yN+=m.notok;});
+          row.push(yR,yO,yN);rows.push(row);
+        });
+        const tr=isH?['','','','GRAND TOTAL']:['','','GRAND TOTAL'];
+        const grand=Array.from({length:12},()=>({rec:0,ok:0,notok:0}));
+        list.forEach(p=>{const pe=srcEntries[p.id]||{};Object.keys(pe).forEach(ds=>{const mIdx=parseInt(ds.split('-')[1])-1;const d=pe[ds];grand[mIdx].rec+=d.rec||0;grand[mIdx].ok+=d.ok||0;grand[mIdx].notok+=d.notok||0;});});
+        let gR=0,gO=0,gN=0;grand.forEach(m=>{tr.push(m.rec||'',m.ok||'',m.notok||'');gR+=m.rec;gO+=m.ok;gN+=m.notok;});tr.push(gR,gO,gN);rows.push(tr);
+      }
+      const ws=XLSX.utils.aoa_to_sheet(rows);
+      const leadCols=isH?4:3;const merges=[];
+      for(let c=0;c<leadCols;c++)merges.push({s:{r:0,c:c},e:{r:1,c:c}});
+      const gc=reconState.currentView==='month'?(dateList?dateList.length:0)+1:13;
+      for(let g=0;g<gc;g++){const sc=leadCols+g*3;merges.push({s:{r:0,c:sc},e:{r:0,c:sc+2}});}
+      ws['!merges']=merges;
+      const cw=[];for(let c=0;c<leadCols;c++)cw.push({wch:c===leadCols-1?20:12});for(let g=0;g<gc;g++)cw.push({wch:9},{wch:7},{wch:9});ws['!cols']=cw;
+      XLSX.utils.book_append_sheet(wb,ws,`Recon ${series}`);
+    });
+
+    // Sheet 3: Daily Entry Register
+    const dates=Object.keys(deData).sort();
+    const deHeader=['Date','H-Series Rec','H-Series Dis','A-Series Rec','A-Series Dis','P15-Series Rec','P15-Series Dis','ZD30-Series Rec','ZD30-Series Dis','Total Rec','Total Dis'];
+    const deRows=[deHeader];let grandRec=0,grandDis=0;
+    dates.forEach(dk=>{
+      const dd=deData[dk]||{};
+      const hR=dd['H-Series']?dd['H-Series'].rec||0:0,hD=dd['H-Series']?dd['H-Series'].dis||0:0;
+      const aR=dd['A-Series']?dd['A-Series'].rec||0:0,aD=dd['A-Series']?dd['A-Series'].dis||0:0;
+      const pR=dd['P15-Series']?dd['P15-Series'].rec||0:0,pD=dd['P15-Series']?dd['P15-Series'].dis||0:0;
+      const zR=dd['ZD30-Series']?dd['ZD30-Series'].rec||0:0,zD=dd['ZD30-Series']?dd['ZD30-Series'].dis||0:0;
+      const tR=hR+aR+pR+zR,tD=hD+aD+pD+zD;grandRec+=tR;grandDis+=tD;
+      deRows.push([formatDisplay(dk),hR,hD,aR,aD,pR,pD,zR,zD,tR,tD]);
+    });
+    deRows.push([]);deRows.push(['Monthly Total','','','','','','','','',grandRec,grandDis]);
+    const deWs=XLSX.utils.aoa_to_sheet(deRows);
+    deWs['!cols']=[{wch:16},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14},{wch:12},{wch:12}];
+    XLSX.utils.book_append_sheet(wb,deWs,'Daily Entry');
+
+    // Sheets 4 & 5: Component Master
+    ['H-Series','P15-Series'].forEach(series=>{
+      const mList=masterComponents[series];if(!mList||!mList.length)return;
+      const byMat={'Aluminium':0,'Cast iron':0,'Steel':0};
+      mList.forEach(c=>{const e=masterEntries[series][c.id]||{};const t=(e.reuseQty||0)*(e.costPerPart||0);byMat[c.material]=(byMat[c.material]||0)+t;});
+      const mRows=[['Sl No','Component','Material','Reuse Qty','Cost per part (Rs)','Monthly Turnover (Rs)']];
+      mList.forEach((c,idx)=>{
+        const e=masterEntries[series][c.id]||{reuseQty:0,costPerPart:0};
+        const t=(e.reuseQty||0)*(e.costPerPart||0);
+        mRows.push([idx+1,c.name,c.material,e.reuseQty||0,e.costPerPart||0,t||0]);
+      });
+      const totalT=mList.reduce((a,c)=>{const e=masterEntries[series][c.id]||{};return a+((e.reuseQty||0)*(e.costPerPart||0));},0);
+      mRows.push([]);mRows.push(['','','','','GRAND TOTAL (Rs)',totalT]);
+      mRows.push([]);mRows.push(['Material','Components','Turnover (Rs)']);
+      ['Aluminium','Cast iron','Steel'].forEach(m=>{mRows.push([m,mList.filter(c=>c.material===m).length,byMat[m]||0]);});
+      const mWs=XLSX.utils.aoa_to_sheet(mRows);
+      mWs['!cols']=[{wch:7},{wch:28},{wch:13},{wch:11},{wch:20},{wch:20}];
+      XLSX.utils.book_append_sheet(wb,mWs,`Master ${series}`);
+    });
+
+    const fn=reconState.currentView==='month'
+      ?`MC_Shop_Combined_${MONTH_SHORT[reconState.calMonth]}_${reconState.calYear}.xlsx`
+      :`MC_Shop_Combined_Year_${reconState.viewYear}.xlsx`;
+    XLSX.writeFile(wb,fn);dbg(`Combined Excel: ${fn}`);
+  }catch(err){console.error(err);alert('Combined Excel failed: '+err.message);}
+};
+
+// ── PAGE 2: DAILY ENTRY ──
 let deCalYear=todayObj.getFullYear(),deCalMonth=todayObj.getMonth();
 let deSelectedDate=toDateStr2(todayObj);
-let deData={};
-let deCurrentSeries='H-Series';
-let deChartSeries='All';
-let deLineChart=null;
+let deData={};let deCurrentSeries='H-Series';let deChartSeries='All';let deLineChart=null;
 
 async function deLoadMonthData(){
-  const mk=`${deCalYear}-${String(deCalMonth+1).padStart(2,'0')}`;
-  deData={};
+  const mk=`${deCalYear}-${String(deCalMonth+1).padStart(2,'0')}`;deData={};
   try{
     const q=query(collection(db,'entries'),where('uid','==',SHARED_UID),where('month','==',mk));
     const snap=await getDocs(q);
@@ -923,13 +1012,11 @@ async function deLoadMonthData(){
     setSync('ok');dbg(`DE entries: ${snap.size}`);
   }catch(e){console.error('DE Load:',e);setSync('err');}
 }
-
 function deRenderCalendar(){
   document.getElementById('calTitle').textContent=`${MONTH_FULL[deCalMonth]} ${deCalYear}`;
   document.getElementById('selDateDisplay').textContent=formatDisplay(deSelectedDate);
   const grid=document.getElementById('calGrid');grid.innerHTML='';
-  const first=new Date(deCalYear,deCalMonth,1).getDay();
-  const days=new Date(deCalYear,deCalMonth+1,0).getDate();
+  const first=new Date(deCalYear,deCalMonth,1).getDay();const days=new Date(deCalYear,deCalMonth+1,0).getDate();
   const todayStr=toDateStr2(todayObj);
   for(let i=0;i<first;i++){const e=document.createElement('div');e.className='cal-day empty';grid.appendChild(e);}
   for(let d=1;d<=days;d++){
@@ -943,16 +1030,8 @@ function deRenderCalendar(){
   }
   deUpdateMonthlyCum();
 }
-
-document.getElementById('calPrev').onclick=async()=>{
-  deCalMonth--;if(deCalMonth<0){deCalMonth=11;deCalYear--;}
-  setSync('ing');await deLoadMonthData();deRenderCalendar();deRenderCumTable();deRenderChart();
-};
-document.getElementById('calNext').onclick=async()=>{
-  deCalMonth++;if(deCalMonth>11){deCalMonth=0;deCalYear++;}
-  setSync('ing');await deLoadMonthData();deRenderCalendar();deRenderCumTable();deRenderChart();
-};
-
+document.getElementById('calPrev').onclick=async()=>{deCalMonth--;if(deCalMonth<0){deCalMonth=11;deCalYear--;}setSync('ing');await deLoadMonthData();deRenderCalendar();deRenderCumTable();deRenderChart();};
+document.getElementById('calNext').onclick=async()=>{deCalMonth++;if(deCalMonth>11){deCalMonth=0;deCalYear++;}setSync('ing');await deLoadMonthData();deRenderCalendar();deRenderCumTable();deRenderChart();};
 document.getElementById('seriesTabs').addEventListener('click',e=>{
   const tab=e.target.closest('.series-tab');if(!tab)return;
   document.querySelectorAll('#seriesTabs .series-tab').forEach(t=>t.classList.remove('active'));
@@ -964,22 +1043,18 @@ document.getElementById('chartSeriesTabs').addEventListener('click',e=>{
   document.querySelectorAll('.chart-series-tab').forEach(t=>t.classList.remove('active'));
   tab.classList.add('active');deChartSeries=tab.dataset.series;deRenderChart();
 });
-
 window.updateDETotals=function(){
   const rv=parseInt(document.getElementById('rec-count').value)||0;
   const dv=parseInt(document.getElementById('dis-count').value)||0;
-  document.getElementById('rec-total').textContent=rv;
-  document.getElementById('dis-total').textContent=dv;
+  document.getElementById('rec-total').textContent=rv;document.getElementById('dis-total').textContent=dv;
 };
 function deLoadFormForDate(){
   const dd=deData[deSelectedDate]&&deData[deSelectedDate][deCurrentSeries];
   document.getElementById('rec-count').value=dd?dd.rec||'':'';
-  document.getElementById('dis-count').value=dd?dd.dis||'':'';
-  updateDETotals();
+  document.getElementById('dis-count').value=dd?dd.dis||'':'';updateDETotals();
 }
 window.saveEntry=async function(){
-  const btn=document.getElementById('saveBtn');
-  const msg=document.getElementById('saveMsg');
+  const btn=document.getElementById('saveBtn');const msg=document.getElementById('saveMsg');
   const rv=parseInt(document.getElementById('rec-count').value)||0;
   const dv=parseInt(document.getElementById('dis-count').value)||0;
   btn.disabled=true;btn.textContent='Saving...';msg.className='save-msg';msg.textContent='';
@@ -1011,15 +1086,12 @@ function deUpdateMonthlyCum(){
   document.getElementById('cum-total-dis').textContent=DE_SERIES.reduce((a,s)=>a+cum[s].dis,0);
 }
 function deRenderCumTable(){
-  const tbody=document.getElementById('cumTableBody');const tfoot=document.getElementById('cumTableFoot');
-  tbody.innerHTML='';
+  const tbody=document.getElementById('cumTableBody');const tfoot=document.getElementById('cumTableFoot');tbody.innerHTML='';
   const dates=Object.keys(deData).sort();
   if(!dates.length){tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:22px;">No entries yet for this month.</td></tr>';tfoot.innerHTML='';return;}
   let grandRec=0,grandDis=0;
   dates.forEach(dk=>{
-    const dayData=deData[dk];
-    const sp=DE_SERIES.filter(s=>dayData[s]&&(dayData[s].rec||dayData[s].dis));
-    if(!sp.length)return;
+    const dayData=deData[dk];const sp=DE_SERIES.filter(s=>dayData[s]&&(dayData[s].rec||dayData[s].dis));if(!sp.length)return;
     sp.forEach((s,idx)=>{
       const sd=dayData[s];const rc=sd.rec||0;const dc=sd.dis||0;grandRec+=rc;grandDis+=dc;
       const tr=document.createElement('tr');
@@ -1031,35 +1103,23 @@ function deRenderCumTable(){
   tfoot.innerHTML=`<tr><td colspan="2" style="text-align:right;padding-right:14px;font-weight:700;">Monthly Total</td><td class="s-rec">${grandRec}</td><td class="s-dis">${grandDis}</td></tr>`;
 }
 function deRenderChart(){
-  const canvas=document.getElementById('lineChart');
-  const ctx=canvas.getContext('2d');
+  const canvas=document.getElementById('lineChart');const ctx=canvas.getContext('2d');
   if(deLineChart){deLineChart.destroy();deLineChart=null;}
-  const nDays=new Date(deCalYear,deCalMonth+1,0).getDate();
-  const allDays=[];
+  const nDays=new Date(deCalYear,deCalMonth+1,0).getDate();const allDays=[];
   for(let d=1;d<=nDays;d++)allDays.push(`${deCalYear}-${String(deCalMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`);
   const labels=allDays.map(d=>String(parseInt(d.split('-')[2])));
   const recData=allDays.map(d=>{const dayObj=deData[d]||{};return deChartSeries==='All'?DE_SERIES.reduce((a,s)=>a+(dayObj[s]?dayObj[s].rec||0:0),0):(dayObj[deChartSeries]?dayObj[deChartSeries].rec||0:0);});
   const disData=allDays.map(d=>{const dayObj=deData[d]||{};return deChartSeries==='All'?DE_SERIES.reduce((a,s)=>a+(dayObj[s]?dayObj[s].dis||0:0),0):(dayObj[deChartSeries]?dayObj[deChartSeries].dis||0:0);});
   const maxVal=Math.max(...recData,...disData,5);
-  deLineChart=new Chart(ctx,{
-    type:'line',
-    data:{labels,datasets:[
-      {label:'Received',data:recData,borderColor:'#00a884',backgroundColor:'rgba(0,168,132,.08)',borderWidth:2.5,pointBackgroundColor:recData.map(v=>v>0?'#00a884':'transparent'),pointBorderColor:recData.map(v=>v>0?'#00a884':'transparent'),pointRadius:recData.map(v=>v>0?5:0),pointHoverRadius:7,tension:0.3,fill:true,spanGaps:false},
-      {label:'Dismantled',data:disData,borderColor:'#e03e3e',backgroundColor:'rgba(224,62,62,.06)',borderWidth:2.5,pointBackgroundColor:disData.map(v=>v>0?'#e03e3e':'transparent'),pointBorderColor:disData.map(v=>v>0?'#e03e3e':'transparent'),pointRadius:disData.map(v=>v>0?5:0),pointHoverRadius:7,tension:0.3,fill:true,spanGaps:false}
-    ]},
-    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-      plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1d27',titleColor:'#fff',bodyColor:'#b0b7cc',padding:12,
-        callbacks:{title:items=>`${items[0].label} ${MONTH_SHORT[deCalMonth]} ${deCalYear}`,label:item=>`${item.dataset.label}: ${item.raw}`}}},
-      scales:{
-        x:{grid:{color:'#f0f2f8'},border:{color:'#c8cfe0'},ticks:{color:'#7a8099',font:{size:10},maxRotation:0}},
-        y:{grid:{color:'#f0f2f8'},border:{color:'#c8cfe0'},ticks:{color:'#7a8099',font:{size:11},stepSize:1},beginAtZero:true,min:0,suggestedMax:maxVal+2}
-      }
-    }
-  });
+  deLineChart=new Chart(ctx,{type:'line',data:{labels,datasets:[
+    {label:'Received',data:recData,borderColor:'#00a884',backgroundColor:'rgba(0,168,132,.08)',borderWidth:2.5,pointBackgroundColor:recData.map(v=>v>0?'#00a884':'transparent'),pointBorderColor:recData.map(v=>v>0?'#00a884':'transparent'),pointRadius:recData.map(v=>v>0?5:0),pointHoverRadius:7,tension:0.3,fill:true,spanGaps:false},
+    {label:'Dismantled',data:disData,borderColor:'#e03e3e',backgroundColor:'rgba(224,62,62,.06)',borderWidth:2.5,pointBackgroundColor:disData.map(v=>v>0?'#e03e3e':'transparent'),pointBorderColor:disData.map(v=>v>0?'#e03e3e':'transparent'),pointRadius:disData.map(v=>v>0?5:0),pointHoverRadius:7,tension:0.3,fill:true,spanGaps:false}
+  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1d27',titleColor:'#fff',bodyColor:'#b0b7cc',padding:12,callbacks:{title:items=>`${items[0].label} ${MONTH_SHORT[deCalMonth]} ${deCalYear}`,label:item=>`${item.dataset.label}: ${item.raw}`}}},
+    scales:{x:{grid:{color:'#f0f2f8'},border:{color:'#c8cfe0'},ticks:{color:'#7a8099',font:{size:10},maxRotation:0}},y:{grid:{color:'#f0f2f8'},border:{color:'#c8cfe0'},ticks:{color:'#7a8099',font:{size:11},stepSize:1},beginAtZero:true,min:0,suggestedMax:maxVal+2}}}});
 }
 window.downloadDEExcel=function(){
-  const monthName=`${MONTH_FULL[deCalMonth]} ${deCalYear}`;
-  const dates=Object.keys(deData).sort();
+  const monthName=`${MONTH_FULL[deCalMonth]} ${deCalYear}`;const dates=Object.keys(deData).sort();
   const header=['Date','H-Series Received','H-Series Dismantled','A-Series Received','A-Series Dismantled','P15-Series Received','P15-Series Dismantled','ZD30-Series Received','ZD30-Series Dismantled','Total Received','Total Dismantled'];
   const rows=[header];let grandRec=0,grandDis=0;
   dates.forEach(dk=>{
@@ -1078,160 +1138,15 @@ window.downloadDEExcel=function(){
   XLSX.writeFile(wb,`DailyEntryRegister_${deCalYear}_${String(deCalMonth+1).padStart(2,'0')}.xlsx`);
 };
 
-// ════════════════════════════════════════════════════════════════
-// COMBINED EXCEL — Recon (H + P15) + Daily Entry, ONE FILE, 3 SHEETS
-// ════════════════════════════════════════════════════════════════
-window.downloadCombinedExcel = function(){
-  try{
-    const wb = XLSX.utils.book_new();
-
-    // ── Sheets 1 & 2: Parts Recon ──
-    ['H-Series','P15-Series'].forEach(series=>{
-      const isH = series==='H-Series';
-      const list = reconParts[series];
-      if(!list.length) return;
-
-      let dateList, srcEntries;
-      if(reconState.currentView==='month'){
-        const nDays = daysInMonth(reconState.calYear, reconState.calMonth);
-        dateList=[];
-        for(let d=1; d<=nDays; d++) dateList.push(toDateStr(reconState.calYear, reconState.calMonth, d));
-        srcEntries = reconEntries[series];
-      } else {
-        srcEntries = reconYearEntries[series];
-      }
-
-      const rows=[];
-      if(reconState.currentView==='month'){
-        const h1=isH?['Sl No','Part No','Model','Date']:['Sl No','Part No','Date'];
-        dateList.forEach(ds=>{
-          const d=parseInt(ds.split('-')[2]);
-          h1.push(ddmmyyyy(reconState.calYear,reconState.calMonth,d),'','');
-        });
-        h1.push('Overall Cumulative','',''); rows.push(h1);
-
-        const h2=isH?['','','','']:['','',''];
-        dateList.forEach(()=>{ h2.push('Received','Ok','Not Ok'); });
-        h2.push('Received','Ok','Not Ok'); rows.push(h2);
-
-        list.forEach((p,idx)=>{
-          const pe=srcEntries[p.id]||{}; let cR=0,cO=0,cN=0;
-          const row=isH?[idx+1,p.partNo||'',p.model||'',p.partName||'']:[idx+1,p.partNo||'',p.partName||''];
-          dateList.forEach(ds=>{
-            const d=pe[ds];
-            const r=d?d.rec||0:'', o=d?d.ok||0:'', n=d?d.notok||0:'';
-            row.push(r===0?'':r, o===0?'':o, n===0?'':n);
-            if(d){ cR+=d.rec||0; cO+=d.ok||0; cN+=d.notok||0; }
-          });
-          row.push(cR||0,cO||0,cN||0); rows.push(row);
-        });
-
-        const tr=isH?['','','','GRAND TOTAL']:['','','GRAND TOTAL'];
-        let gR=0,gO=0,gN=0;
-        dateList.forEach(ds=>{
-          let dR=0,dO=0,dN=0;
-          list.forEach(p=>{ const d=(srcEntries[p.id]||{})[ds]; if(d){ dR+=d.rec||0; dO+=d.ok||0; dN+=d.notok||0; } });
-          tr.push(dR||'',dO||'',dN||''); gR+=dR; gO+=dO; gN+=dN;
-        });
-        tr.push(gR,gO,gN); rows.push(tr);
-      } else {
-        const h1=isH?['Sl No','Part No','Model','Part Name']:['Sl No','Part No','Part Name'];
-        MONTH_SHORT.forEach(m=>{ h1.push(`${m} ${reconState.viewYear}`,'',''); });
-        h1.push('Year Cumulative','',''); rows.push(h1);
-
-        const h2=isH?['','','','']:['','',''];
-        MONTH_SHORT.forEach(()=>{ h2.push('Received','Ok','Not Ok'); });
-        h2.push('Received','Ok','Not Ok'); rows.push(h2);
-
-        list.forEach((p,idx)=>{
-          const pe=srcEntries[p.id]||{};
-          const mAgg=Array.from({length:12},()=>({rec:0,ok:0,notok:0}));
-          Object.keys(pe).forEach(ds=>{
-            const mIdx=parseInt(ds.split('-')[1])-1; const d=pe[ds];
-            mAgg[mIdx].rec+=d.rec||0; mAgg[mIdx].ok+=d.ok||0; mAgg[mIdx].notok+=d.notok||0;
-          });
-          const row=isH?[idx+1,p.partNo||'',p.model||'',p.partName||'']:[idx+1,p.partNo||'',p.partName||''];
-          let yR=0,yO=0,yN=0;
-          mAgg.forEach(m=>{ row.push(m.rec||'',m.ok||'',m.notok||''); yR+=m.rec; yO+=m.ok; yN+=m.notok; });
-          row.push(yR,yO,yN); rows.push(row);
-        });
-
-        const tr=isH?['','','','GRAND TOTAL']:['','','GRAND TOTAL'];
-        const grand=Array.from({length:12},()=>({rec:0,ok:0,notok:0}));
-        list.forEach(p=>{
-          const pe=srcEntries[p.id]||{};
-          Object.keys(pe).forEach(ds=>{
-            const mIdx=parseInt(ds.split('-')[1])-1; const d=pe[ds];
-            grand[mIdx].rec+=d.rec||0; grand[mIdx].ok+=d.ok||0; grand[mIdx].notok+=d.notok||0;
-          });
-        });
-        let gR=0,gO=0,gN=0;
-        grand.forEach(m=>{ tr.push(m.rec||'',m.ok||'',m.notok||''); gR+=m.rec; gO+=m.ok; gN+=m.notok; });
-        tr.push(gR,gO,gN); rows.push(tr);
-      }
-
-      const ws=XLSX.utils.aoa_to_sheet(rows);
-      const leadCols=isH?4:3;
-      const merges=[];
-      for(let c=0;c<leadCols;c++) merges.push({s:{r:0,c:c},e:{r:1,c:c}});
-      const gc=reconState.currentView==='month'? (typeof dateList!=='undefined'?dateList.length:0)+1 : 13;
-      for(let g=0;g<gc;g++){ const sc=leadCols+g*3; merges.push({s:{r:0,c:sc},e:{r:0,c:sc+2}}); }
-      ws['!merges']=merges;
-      const cw=[];
-      for(let c=0;c<leadCols;c++) cw.push({wch:c===leadCols-1?20:12});
-      for(let g=0;g<gc;g++) cw.push({wch:9},{wch:7},{wch:9});
-      ws['!cols']=cw;
-
-      XLSX.utils.book_append_sheet(wb, ws, `Recon ${series}`);
-    });
-
-    // ── Sheet 3: Daily Entry Register ──
-    const dates=Object.keys(deData).sort();
-    const header=['Date','H-Series Received','H-Series Dismantled','A-Series Received','A-Series Dismantled','P15-Series Received','P15-Series Dismantled','ZD30-Series Received','ZD30-Series Dismantled','Total Received','Total Dismantled'];
-    const deRows=[header];
-    let grandRec=0, grandDis=0;
-    dates.forEach(dk=>{
-      const dd=deData[dk]||{};
-      const hR=dd['H-Series']?dd['H-Series'].rec||0:0, hD=dd['H-Series']?dd['H-Series'].dis||0:0;
-      const aR=dd['A-Series']?dd['A-Series'].rec||0:0, aD=dd['A-Series']?dd['A-Series'].dis||0:0;
-      const pR=dd['P15-Series']?dd['P15-Series'].rec||0:0, pD=dd['P15-Series']?dd['P15-Series'].dis||0:0;
-      const zR=dd['ZD30-Series']?dd['ZD30-Series'].rec||0:0, zD=dd['ZD30-Series']?dd['ZD30-Series'].dis||0:0;
-      const tR=hR+aR+pR+zR, tD=hD+aD+pD+zD;
-      grandRec+=tR; grandDis+=tD;
-      deRows.push([formatDisplay(dk),hR,hD,aR,aD,pR,pD,zR,zD,tR,tD]);
-    });
-    deRows.push([]);
-    deRows.push(['Monthly Total','','','','','','','','',grandRec,grandDis]);
-
-    const deWs=XLSX.utils.aoa_to_sheet(deRows);
-    deWs['!cols']=[{wch:16},{wch:16},{wch:18},{wch:16},{wch:18},{wch:18},{wch:20},{wch:18},{wch:20},{wch:14},{wch:16}];
-    XLSX.utils.book_append_sheet(wb, deWs, 'Daily Entry Register');
-
-    const fn = reconState.currentView==='month'
-      ? `MC_Shop_Combined_${MONTH_SHORT[reconState.calMonth]}_${reconState.calYear}.xlsx`
-      : `MC_Shop_Combined_Year_${reconState.viewYear}.xlsx`;
-    XLSX.writeFile(wb, fn);
-    dbg(`Combined Excel: ${fn}`);
-  }catch(err){
-    console.error(err);
-    alert('Combined Excel export failed: '+err.message);
-  }
-};
-
-// ── DE YEAR CUMULATIVE ────────────────────────────────────────
-let deViewYear=todayObj.getFullYear();
-let deYearData={};
-
+// ── DE YEAR CUMULATIVE ──
+let deViewYear=todayObj.getFullYear();let deYearData={};
 async function deLoadYearData(){
-  deYearData={};
-  document.getElementById('deYearLabel').textContent=deViewYear;
-  document.getElementById('deYearTableLabel').textContent=deViewYear;
+  deYearData={};document.getElementById('deYearLabel').textContent=deViewYear;document.getElementById('deYearTableLabel').textContent=deViewYear;
   try{
     const q=query(collection(db,'entries'),where('uid','==',SHARED_UID),where('year','==',String(deViewYear)));
     const snap=await getDocs(q);
-    if(snap.size>0){
-      snap.forEach(d=>{const e=d.data();if(!deYearData[e.date])deYearData[e.date]={};deYearData[e.date][e.series]={rec:e.rec||0,dis:e.dis||0};});
-    } else {
+    if(snap.size>0){snap.forEach(d=>{const e=d.data();if(!deYearData[e.date])deYearData[e.date]={};deYearData[e.date][e.series]={rec:e.rec||0,dis:e.dis||0};});}
+    else{
       const fetches=[];
       for(let m=1;m<=12;m++){const mk=`${deViewYear}-${String(m).padStart(2,'0')}`;fetches.push(getDocs(query(collection(db,'entries'),where('uid','==',SHARED_UID),where('month','==',mk))));}
       const results=await Promise.all(fetches);
@@ -1241,121 +1156,51 @@ async function deLoadYearData(){
   }catch(err){dbg(`❌ DE Year: ${err.message}`);setSync('err');}
   deRenderYearCum();
 }
-
 function deRenderYearCum(){
   const ycum={};DE_SERIES.forEach(s=>{ycum[s]={rec:0,dis:0};});
   Object.values(deYearData).forEach(dayObj=>{DE_SERIES.forEach(s=>{if(dayObj[s]){ycum[s].rec+=dayObj[s].rec||0;ycum[s].dis+=dayObj[s].dis||0;}});});
-  DE_SERIES.forEach(s=>{
-    document.getElementById(`ycum-${CUM_ID[s]}-rec`).textContent=ycum[s].rec;
-    document.getElementById(`ycum-${CUM_ID[s]}-dis`).textContent=ycum[s].dis;
-  });
+  DE_SERIES.forEach(s=>{document.getElementById(`ycum-${CUM_ID[s]}-rec`).textContent=ycum[s].rec;document.getElementById(`ycum-${CUM_ID[s]}-dis`).textContent=ycum[s].dis;});
   document.getElementById('ycum-total-rec').textContent=DE_SERIES.reduce((a,s)=>a+ycum[s].rec,0);
   document.getElementById('ycum-total-dis').textContent=DE_SERIES.reduce((a,s)=>a+ycum[s].dis,0);
-
-  const tbody=document.getElementById('yearTableBody');
-  const tfoot=document.getElementById('yearTableFoot');
-  tbody.innerHTML='';
+  const tbody=document.getElementById('yearTableBody');const tfoot=document.getElementById('yearTableFoot');tbody.innerHTML='';
   let grandRec=0,grandDis=0;
   for(let m=0;m<12;m++){
     const mk=`${deViewYear}-${String(m+1).padStart(2,'0')}`;
     const monthEntries=Object.keys(deYearData).filter(ds=>ds.startsWith(mk));
     const seriesTotals={};
-    monthEntries.forEach(ds=>{
-      DE_SERIES.forEach(s=>{
-        if(deYearData[ds][s]){
-          if(!seriesTotals[s])seriesTotals[s]={rec:0,dis:0};
-          seriesTotals[s].rec+=deYearData[ds][s].rec||0;
-          seriesTotals[s].dis+=deYearData[ds][s].dis||0;
-        }
-      });
-    });
-    const activeSeries=DE_SERIES.filter(s=>seriesTotals[s]&&(seriesTotals[s].rec||seriesTotals[s].dis));
-    if(!activeSeries.length)continue;
+    monthEntries.forEach(ds=>{DE_SERIES.forEach(s=>{if(deYearData[ds][s]){if(!seriesTotals[s])seriesTotals[s]={rec:0,dis:0};seriesTotals[s].rec+=deYearData[ds][s].rec||0;seriesTotals[s].dis+=deYearData[ds][s].dis||0;}});});
+    const activeSeries=DE_SERIES.filter(s=>seriesTotals[s]&&(seriesTotals[s].rec||seriesTotals[s].dis));if(!activeSeries.length)continue;
     activeSeries.forEach((s,idx)=>{
-      const rc=seriesTotals[s].rec;const dc=seriesTotals[s].dis;
-      grandRec+=rc;grandDis+=dc;
+      const rc=seriesTotals[s].rec;const dc=seriesTotals[s].dis;grandRec+=rc;grandDis+=dc;
       const tr=document.createElement('tr');
       if(idx===0){const td=document.createElement('td');td.rowSpan=activeSeries.length;td.className='label';td.style.borderRight='1px solid var(--border)';td.textContent=`${MONTH_SHORT[m]} ${deViewYear}`;tr.appendChild(td);}
       tr.innerHTML+=`<td><span class="badge ${BADGE_CLASS[s]}">${s}</span></td><td class="s-rec">${rc}</td><td class="s-dis">${dc}</td>`;
       tbody.appendChild(tr);
     });
   }
-  if(!tbody.children.length){tbody.innerHTML='<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:22px;">No entries for '+deViewYear+'.</td></tr>';tfoot.innerHTML='';return;}
+  if(!tbody.children.length){tbody.innerHTML=`<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:22px;">No entries for ${deViewYear}.</td></tr>`;tfoot.innerHTML='';return;}
   tfoot.innerHTML=`<tr><td colspan="2" style="text-align:right;padding-right:14px;font-weight:700;">Year Total</td><td class="s-rec">${grandRec}</td><td class="s-dis">${grandDis}</td></tr>`;
 }
+window.deChangeYear=async function(delta){deViewYear+=delta;setSync('ing');await deLoadYearData();};
 
-window.deChangeYear=async function(delta){
-  deViewYear+=delta;setSync('ing');await deLoadYearData();
-};
-
-// ════════════════════════════════════════════════════════════════
-// PAGE 3 — COMPONENT MASTER
-// ════════════════════════════════════════════════════════════════
-const DEFAULT_COMPONENTS = {
-  'H-Series':[
-    {name:'IMF',material:'Aluminium'},
-    {name:'Rocker cover',material:'Aluminium'},
-    {name:'Oil Cooler',material:'Aluminium'},
-    {name:'Strainer',material:'Aluminium'},
-    {name:'Cyl.Block',material:'Cast iron'},
-    {name:'Cyl.head',material:'Cast iron'},
-    {name:'Tg case',material:'Cast iron'},
-    {name:'Fw hsg',material:'Cast iron'},
-    {name:'EMF',material:'Cast iron'},
-    {name:'Ts hsg',material:'Cast iron'},
-    {name:'Water Pump',material:'Cast iron'},
-    {name:'Coolent Elbow',material:'Cast iron'},
-    {name:'Crankshaft',material:'Steel'},
-    {name:'Cam shaft',material:'Steel'},
-    {name:'Con Rod (1 Set =6Nos)',material:'Steel'},
-    {name:'Oil pump',material:'Steel'},
-    {name:'Oil Sump',material:'Steel'},
-    {name:'TB plate',material:'Steel'},
-    {name:'Damper',material:'Steel'},
-    {name:'Pully',material:'Steel'},
-    {name:'Hub',material:'Steel'}
-  ],
-  'P15-Series':[
-    {name:'Cylinder head top cover',material:'Aluminium'},
-    {name:'Cam GEAR',material:'Aluminium'},
-    {name:'Rear Adaptor Housing',material:'Cast iron'},
-    {name:'Crank Gear',material:'Steel'},
-    {name:'Cylinder Block',material:'Cast iron'},
-    {name:'oil sump',material:'Aluminium'},
-    {name:'Crank Shaft',material:'Steel'},
-    {name:'Cylinder head',material:'Cast iron'},
-    {name:'Cam Shaft',material:'Steel'},
-    {name:'Outer Cover',material:'Aluminium'},
-    {name:'Inner Cover',material:'Aluminium'},
-    {name:'Con.rod',material:'Steel'},
-    {name:'Strainer',material:'Aluminium'},
-    {name:'Cam Box',material:'Cast iron'},
-    {name:'Tappet',material:'Steel'},
-    {name:'Lifting Hook',material:'Steel'},
-    {name:'Water Pump',material:'Cast iron'},
-    {name:'Real Oil Seal',material:'Steel'},
-    {name:'Outer Spring',material:'Steel'},
-    {name:'Inner Spring',material:'Steel'},
-    {name:'Washer Head Bolt',material:'Steel'}
-  ]
+// ── PAGE 3: COMPONENT MASTER ──
+const DEFAULT_COMPONENTS={
+  'H-Series':[{name:'IMF',material:'Aluminium'},{name:'Rocker cover',material:'Aluminium'},{name:'Oil Cooler',material:'Aluminium'},{name:'Strainer',material:'Aluminium'},{name:'Cyl.Block',material:'Cast iron'},{name:'Cyl.head',material:'Cast iron'},{name:'Tg case',material:'Cast iron'},{name:'Fw hsg',material:'Cast iron'},{name:'EMF',material:'Cast iron'},{name:'Ts hsg',material:'Cast iron'},{name:'Water Pump',material:'Cast iron'},{name:'Coolent Elbow',material:'Cast iron'},{name:'Crankshaft',material:'Steel'},{name:'Cam shaft',material:'Steel'},{name:'Con Rod (1 Set =6Nos)',material:'Steel'},{name:'Oil pump',material:'Steel'},{name:'Oil Sump',material:'Steel'},{name:'TB plate',material:'Steel'},{name:'Damper',material:'Steel'},{name:'Pully',material:'Steel'},{name:'Hub',material:'Steel'}],
+  'P15-Series':[{name:'Cylinder head top cover',material:'Aluminium'},{name:'Cam GEAR',material:'Aluminium'},{name:'Rear Adaptor Housing',material:'Cast iron'},{name:'Crank Gear',material:'Steel'},{name:'Cylinder Block',material:'Cast iron'},{name:'oil sump',material:'Aluminium'},{name:'Crank Shaft',material:'Steel'},{name:'Cylinder head',material:'Cast iron'},{name:'Cam Shaft',material:'Steel'},{name:'Outer Cover',material:'Aluminium'},{name:'Inner Cover',material:'Aluminium'},{name:'Con.rod',material:'Steel'},{name:'Strainer',material:'Aluminium'},{name:'Cam Box',material:'Cast iron'},{name:'Tappet',material:'Steel'},{name:'Lifting Hook',material:'Steel'},{name:'Water Pump',material:'Cast iron'},{name:'Real Oil Seal',material:'Steel'},{name:'Outer Spring',material:'Steel'},{name:'Inner Spring',material:'Steel'},{name:'Washer Head Bolt',material:'Steel'}]
 };
 const MATERIALS=['Aluminium','Cast iron','Steel'];
-
-const masterState={ currentSeries:'H-Series', calYear:todayObj.getFullYear(), calMonth:todayObj.getMonth(), loaded:false };
-let masterComponents={'H-Series':[],'P15-Series':[]};   // [{id,name,material,order}]
-let masterEntries={'H-Series':{},'P15-Series':{}};       // {compId: {reuseQty, costPerPart}} per month-key bucket
+const masterState={currentSeries:'H-Series',calYear:todayObj.getFullYear(),calMonth:todayObj.getMonth(),loaded:false};
+let masterComponents={'H-Series':[],'P15-Series':[]};
+let masterEntries={'H-Series':{},'P15-Series':{}};
 let masterSaveTimers={};
-
-function masterMonthKey(){ return `${masterState.calYear}-${String(masterState.calMonth+1).padStart(2,'0')}`; }
+function masterMonthKey(){return `${masterState.calYear}-${String(masterState.calMonth+1).padStart(2,'0')}`;}
 
 async function masterLoadComponents(series){
   try{
     const q=query(collection(db,'masterComponents'),where('uid','==',SHARED_UID),where('series','==',series));
-    const snap=await getDocs(q);
-    const list=[];
+    const snap=await getDocs(q);const list=[];
     snap.forEach(d=>{const v=d.data();list.push({id:d.id,name:v.name||'',material:v.material||'Aluminium',order:v.order||0});});
     if(list.length===0){
-      // seed with defaults on first run
       const seedOps=[];
       DEFAULT_COMPONENTS[series].forEach((c,idx)=>{
         const docId=`${SHARED_UID}_${series}_seed_${idx}_${c.name.replace(/[^a-zA-Z0-9]/g,'')}`;
@@ -1364,230 +1209,242 @@ async function masterLoadComponents(series){
       });
       await Promise.all(seedOps);
     }
-    list.sort((a,b)=>a.order-b.order);
-    masterComponents[series]=list;
-  }catch(err){ dbg(`❌ Master components: ${err.message}`); setSync('err'); }
+    list.sort((a,b)=>a.order-b.order);masterComponents[series]=list;
+  }catch(err){dbg(`❌ Master components: ${err.message}`);setSync('err');}
 }
-
 async function masterLoadEntries(series,mk){
   masterEntries[series]={};
   try{
     const q=query(collection(db,'masterEntries'),where('uid','==',SHARED_UID),where('series','==',series),where('month','==',mk));
     const snap=await getDocs(q);
-    snap.forEach(d=>{const v=d.data(); masterEntries[series][v.compId]={reuseQty:v.reuseQty||0, costPerPart:v.costPerPart||0};});
-  }catch(err){ dbg(`❌ Master entries: ${err.message}`); setSync('err'); }
+    snap.forEach(d=>{const v=d.data();masterEntries[series][v.compId]={reuseQty:v.reuseQty||0,costPerPart:v.costPerPart||0};});
+  }catch(err){dbg(`❌ Master entries: ${err.message}`);setSync('err');}
 }
-
 async function masterInit(){
   dbg('Loading Component Master…');
   document.getElementById('masterMonthLabel').textContent=`${MONTH_SHORT[masterState.calMonth]} ${masterState.calYear}`;
   await masterLoadComponents(masterState.currentSeries);
-  await masterLoadEntries(masterState.currentSeries, masterMonthKey());
-  masterRenderAll();
-  masterState.loaded=true;
-  dbg('Component Master loaded ✓');
+  await masterLoadEntries(masterState.currentSeries,masterMonthKey());
+  masterRenderAll();masterState.loaded=true;dbg('Component Master loaded ✓');
 }
-
 window.masterSwitchSeries=async function(series){
   masterState.currentSeries=series;
   document.querySelectorAll('#pageMaster .series-btn').forEach(b=>b.classList.toggle('active',b.dataset.ms===series));
   setSync('ing');
-  if(masterComponents[series].length===0) await masterLoadComponents(series);
-  await masterLoadEntries(series, masterMonthKey());
-  masterRenderAll();
-  setSync('ok');
+  if(masterComponents[series].length===0)await masterLoadComponents(series);
+  await masterLoadEntries(series,masterMonthKey());masterRenderAll();setSync('ok');
 };
-
 window.masterChangeMonth=async function(delta){
   masterState.calMonth+=delta;
   if(masterState.calMonth<0){masterState.calMonth=11;masterState.calYear--;}
   if(masterState.calMonth>11){masterState.calMonth=0;masterState.calYear++;}
   document.getElementById('masterMonthLabel').textContent=`${MONTH_SHORT[masterState.calMonth]} ${masterState.calYear}`;
-  setSync('ing');
-  await masterLoadEntries(masterState.currentSeries, masterMonthKey());
-  masterRenderAll();
-  setSync('ok');
+  setSync('ing');await masterLoadEntries(masterState.currentSeries,masterMonthKey());masterRenderAll();setSync('ok');
 };
-
 window.masterAddComponent=async function(){
-  const name=document.getElementById('newCompName').value.trim();
-  const material=document.getElementById('newCompMaterial').value;
-  if(!name){ alert('Component name venum'); return; }
-  const series=masterState.currentSeries;
-  const order=masterComponents[series].length;
+  const name=document.getElementById('newCompName').value.trim();const material=document.getElementById('newCompMaterial').value;
+  if(!name){alert('Component name venum');return;}
+  const series=masterState.currentSeries;const order=masterComponents[series].length;
   try{
-    setSync('ing');
-    const docId=`${SHARED_UID}_${series}_${Date.now()}`;
+    setSync('ing');const docId=`${SHARED_UID}_${series}_${Date.now()}`;
     await setDoc(doc(db,'masterComponents',docId),{uid:SHARED_UID,series,name,material,order,createdAt:new Date().toISOString()});
-    masterComponents[series].push({id:docId,name,material,order});
-    setSync('ok');
-    document.getElementById('newCompName').value='';
-    masterRenderAll();
-  }catch(err){ setSync('err'); alert('Add failed: '+(err.code||err.message)); }
+    masterComponents[series].push({id:docId,name,material,order});setSync('ok');
+    document.getElementById('newCompName').value='';masterRenderAll();
+  }catch(err){setSync('err');alert('Add failed: '+(err.code||err.message));}
 };
-
 window.masterDeleteComponent=async function(compId,name){
-  if(!confirm(`Delete component "${name}"?`)) return;
+  if(!confirm(`Delete component "${name}"?`))return;
   try{
-    setSync('ing');
-    await deleteDoc(doc(db,'masterComponents',compId));
+    setSync('ing');await deleteDoc(doc(db,'masterComponents',compId));
     const series=masterState.currentSeries;
     masterComponents[series]=masterComponents[series].filter(c=>c.id!==compId);
-    delete masterEntries[series][compId];
-    setSync('ok');
-    masterRenderAll();
-  }catch(err){ setSync('err'); alert('Delete failed: '+(err.code||err.message)); }
+    delete masterEntries[series][compId];setSync('ok');masterRenderAll();
+  }catch(err){setSync('err');alert('Delete failed: '+(err.code||err.message));}
 };
-
 window.masterChangeMaterial=async function(compId,newMaterial){
-  const series=masterState.currentSeries;
-  const comp=masterComponents[series].find(c=>c.id===compId);
-  if(!comp) return;
+  const series=masterState.currentSeries;const comp=masterComponents[series].find(c=>c.id===compId);if(!comp)return;
   comp.material=newMaterial;
-  try{
-    await setDoc(doc(db,'masterComponents',compId),{uid:SHARED_UID,series,name:comp.name,material:newMaterial,order:comp.order,createdAt:new Date().toISOString()},{merge:true});
-  }catch(err){ console.error(err); }
+  try{await setDoc(doc(db,'masterComponents',compId),{uid:SHARED_UID,series,name:comp.name,material:newMaterial,order:comp.order,createdAt:new Date().toISOString()},{merge:true});}catch(err){console.error(err);}
   masterRenderAll();
 };
-
 window.masterHandleInput=function(compId,field,val){
-  const series=masterState.currentSeries;
-  const num=parseFloat(val)||0;
-  if(!masterEntries[series][compId]) masterEntries[series][compId]={reuseQty:0,costPerPart:0};
-  masterEntries[series][compId][field]=num;
-  masterRefreshRow(compId);
-  masterRefreshSummary();
-  const key=`${series}_${compId}_${masterMonthKey()}`;
-  clearTimeout(masterSaveTimers[key]);
+  const series=masterState.currentSeries;const num=parseFloat(val)||0;
+  if(!masterEntries[series][compId])masterEntries[series][compId]={reuseQty:0,costPerPart:0};
+  masterEntries[series][compId][field]=num;masterRefreshRow(compId);masterRefreshSummary();
+  const key=`${series}_${compId}_${masterMonthKey()}`;clearTimeout(masterSaveTimers[key]);
   masterSaveTimers[key]=setTimeout(async()=>{
     const e=masterEntries[series][compId];
     try{
-      setSync('ing');
-      const docId=`${SHARED_UID}_${series}_${compId}_${masterMonthKey()}`;
-      await setDoc(doc(db,'masterEntries',docId),{
-        uid:SHARED_UID, series, compId, month:masterMonthKey(),
-        reuseQty:e.reuseQty||0, costPerPart:e.costPerPart||0,
-        updatedAt:new Date().toISOString()
-      });
+      setSync('ing');const docId=`${SHARED_UID}_${series}_${compId}_${masterMonthKey()}`;
+      await setDoc(doc(db,'masterEntries',docId),{uid:SHARED_UID,series,compId,month:masterMonthKey(),reuseQty:e.reuseQty||0,costPerPart:e.costPerPart||0,updatedAt:new Date().toISOString()});
       setSync('ok');
-    }catch(err){ dbg(`❌ Save: ${err.message}`); setSync('err'); }
+    }catch(err){dbg(`❌ Save: ${err.message}`);setSync('err');}
   },500);
 };
-
-function masterTurnover(compId){
-  const e=masterEntries[masterState.currentSeries][compId];
-  if(!e) return 0;
-  return (e.reuseQty||0)*(e.costPerPart||0);
-}
-
+function masterTurnover(compId){const e=masterEntries[masterState.currentSeries][compId];if(!e)return 0;return(e.reuseQty||0)*(e.costPerPart||0);}
 function masterRefreshRow(compId){
-  const row=document.querySelector(`#masterTbody tr[data-comp="${compId}"]`);
-  if(!row) return;
-  const t=masterTurnover(compId);
-  const tCell=row.querySelector('.mt-cell');
-  if(tCell) tCell.textContent=t? t.toLocaleString('en-IN') : '0';
+  const row=document.querySelector(`#masterTbody tr[data-comp="${compId}"]`);if(!row)return;
+  const t=masterTurnover(compId);const tCell=row.querySelector('.mt-cell');
+  if(tCell)tCell.textContent=t?t.toLocaleString('en-IN'):'0';
 }
-
 function masterRenderTable(){
-  const series=masterState.currentSeries;
-  const list=masterComponents[series];
-  const tbody=document.getElementById('masterTbody');
-  if(!list.length){ tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px;">No components yet.</td></tr>`; return; }
+  const series=masterState.currentSeries;const list=masterComponents[series];const tbody=document.getElementById('masterTbody');
+  if(!list.length){tbody.innerHTML=`<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px;">No components yet.</td></tr>`;return;}
   tbody.innerHTML=list.map((c,idx)=>{
-    const e=masterEntries[series][c.id]||{reuseQty:'',costPerPart:''};
-    const turnover=masterTurnover(c.id);
+    const e=masterEntries[series][c.id]||{reuseQty:'',costPerPart:''};const turnover=masterTurnover(c.id);
     return `<tr class="master-row" data-comp="${c.id}" data-mat="${c.material}">
       <td class="sticky-col col-num" style="left:0;width:30px;">${idx+1}</td>
       <td class="sticky-col2 col-name" style="left:30px;min-width:170px;"><span class="part-name">${c.name}</span></td>
-      <td>
-        <select class="material-select" data-mat="${c.material}" onchange="masterChangeMaterial('${c.id}',this.value);this.dataset.mat=this.value;">
-          ${MATERIALS.map(m=>`<option value="${m}" ${m===c.material?'selected':''}>${m}</option>`).join('')}
-        </select>
-      </td>
+      <td><select class="material-select" data-mat="${c.material}" onchange="masterChangeMaterial('${c.id}',this.value);this.dataset.mat=this.value;">${MATERIALS.map(m=>`<option value="${m}" ${m===c.material?'selected':''}>${m}</option>`).join('')}</select></td>
       <td><input class="cell-input rec-input" style="width:60px;" type="number" min="0" value="${e.reuseQty||''}" placeholder="0" oninput="masterHandleInput('${c.id}','reuseQty',this.value)"></td>
       <td><input class="cell-input" style="width:80px;color:var(--accent);" type="number" min="0" value="${e.costPerPart||''}" placeholder="0" oninput="masterHandleInput('${c.id}','costPerPart',this.value)"></td>
-      <td class="cum-cell rec mt-cell">${turnover? turnover.toLocaleString('en-IN'):'0'}</td>
+      <td class="cum-cell rec mt-cell">${turnover?turnover.toLocaleString('en-IN'):'0'}</td>
       <td><button class="del-row-btn" onclick="masterDeleteComponent('${c.id}','${c.name.replace(/'/g,"\\'")}')">✕</button></td>
     </tr>`;
   }).join('');
 }
-
 function masterRefreshSummary(){
-  const series=masterState.currentSeries;
-  const list=masterComponents[series];
-  const byMat={'Aluminium':0,'Cast iron':0,'Steel':0};
-  let totalTurnover=0, totalQty=0;
-  list.forEach(c=>{
-    const t=masterTurnover(c.id);
-    byMat[c.material]=(byMat[c.material]||0)+t;
-    totalTurnover+=t;
-    const e=masterEntries[series][c.id];
-    if(e) totalQty+=e.reuseQty||0;
-  });
-
-  document.getElementById('masterStatsBar').innerHTML=`
-    <div class="stat-card parts"><div class="stat-label">Components</div><div class="stat-val">${list.length}</div></div>
-    <div class="stat-card rec"><div class="stat-label">Total Reuse Qty</div><div class="stat-val">${totalQty}</div></div>
-    <div class="stat-card ok"><div class="stat-label">Total Monthly Turnover</div><div class="stat-val">₹${totalTurnover.toLocaleString('en-IN')}</div></div>`;
-
+  const series=masterState.currentSeries;const list=masterComponents[series];
+  const byMat={'Aluminium':0,'Cast iron':0,'Steel':0};let totalTurnover=0,totalQty=0;
+  list.forEach(c=>{const t=masterTurnover(c.id);byMat[c.material]=(byMat[c.material]||0)+t;totalTurnover+=t;const e=masterEntries[series][c.id];if(e)totalQty+=e.reuseQty||0;});
+  document.getElementById('masterStatsBar').innerHTML=`<div class="stat-card parts"><div class="stat-label">Components</div><div class="stat-val">${list.length}</div></div><div class="stat-card rec"><div class="stat-label">Total Reuse Qty</div><div class="stat-val">${totalQty}</div></div><div class="stat-card ok"><div class="stat-label">Total Monthly Turnover</div><div class="stat-val">₹${totalTurnover.toLocaleString('en-IN')}</div></div>`;
   const matClassMap={'Aluminium':'Aluminium','Cast iron':'CastIron','Steel':'Steel'};
-  document.getElementById('masterMaterialCards').innerHTML = MATERIALS.map(m=>{
+  document.getElementById('masterMaterialCards').innerHTML=MATERIALS.map(m=>{
     const cnt=list.filter(c=>c.material===m).length;
-    return `<div class="mat-card ${matClassMap[m]}">
-      <div class="mat-name">${m}</div>
-      <div class="mat-val">₹${(byMat[m]||0).toLocaleString('en-IN')}</div>
-      <div class="mat-sub">${cnt} component${cnt===1?'':'s'}</div>
-    </div>`;
+    return `<div class="mat-card ${matClassMap[m]}"><div class="mat-name">${m}</div><div class="mat-val">₹${(byMat[m]||0).toLocaleString('en-IN')}</div><div class="mat-sub">${cnt} component${cnt===1?'':'s'}</div></div>`;
   }).join('');
 }
-
-function masterRenderAll(){
-  masterRenderTable();
-  masterRefreshSummary();
-}
+function masterRenderAll(){masterRenderTable();masterRefreshSummary();}
 
 window.downloadMasterExcel=function(){
   try{
     const wb=XLSX.utils.book_new();
     ['H-Series','P15-Series'].forEach(series=>{
-      const list=masterComponents[series];
-      if(!list || !list.length) return;
+      const list=masterComponents[series];if(!list||!list.length)return;
       const rows=[['Sl No','Component','Material','Reuse Qty','Aprox. Cost per part (Rs)','Monthly Turnover (Rs)','Material-wise Cost (Rs)']];
       const byMat={'Aluminium':0,'Cast iron':0,'Steel':0};
-      list.forEach(c=>{
-        const e=masterEntries[series][c.id]||{reuseQty:0,costPerPart:0};
-        const t=(e.reuseQty||0)*(e.costPerPart||0);
-        byMat[c.material]=(byMat[c.material]||0)+t;
-      });
+      list.forEach(c=>{const e=masterEntries[series][c.id]||{reuseQty:0,costPerPart:0};const t=(e.reuseQty||0)*(e.costPerPart||0);byMat[c.material]=(byMat[c.material]||0)+t;});
       let printedMat={'Aluminium':false,'Cast iron':false,'Steel':false};
       list.forEach((c,idx)=>{
-        const e=masterEntries[series][c.id]||{reuseQty:0,costPerPart:0};
-        const t=(e.reuseQty||0)*(e.costPerPart||0);
-        const matCell = printedMat[c.material] ? '' : byMat[c.material];
-        printedMat[c.material]=true;
-        rows.push([idx+1, c.name, c.material, e.reuseQty||0, e.costPerPart||0, t||0, matCell]);
+        const e=masterEntries[series][c.id]||{reuseQty:0,costPerPart:0};const t=(e.reuseQty||0)*(e.costPerPart||0);
+        const matCell=printedMat[c.material]?'':byMat[c.material];printedMat[c.material]=true;
+        rows.push([idx+1,c.name,c.material,e.reuseQty||0,e.costPerPart||0,t||0,matCell]);
       });
       const totalTurnover=list.reduce((a,c)=>{const e=masterEntries[series][c.id]||{};return a+((e.reuseQty||0)*(e.costPerPart||0));},0);
-      rows.push([]);
-      rows.push(['','','','','','GRAND TOTAL',totalTurnover]);
-      const ws=XLSX.utils.aoa_to_sheet(rows);
-      ws['!cols']=[{wch:7},{wch:26},{wch:13},{wch:11},{wch:18},{wch:18},{wch:18}];
-      XLSX.utils.book_append_sheet(wb, ws, `Master ${series}`);
+      rows.push([]);rows.push(['','','','','','GRAND TOTAL',totalTurnover]);
+      const ws=XLSX.utils.aoa_to_sheet(rows);ws['!cols']=[{wch:7},{wch:26},{wch:13},{wch:11},{wch:18},{wch:18},{wch:18}];
+      XLSX.utils.book_append_sheet(wb,ws,`Master ${series}`);
     });
     const fn=`MC_Shop_Component_Master_${MONTH_SHORT[masterState.calMonth]}_${masterState.calYear}.xlsx`;
-    XLSX.writeFile(wb, fn);
-    dbg(`Master Excel: ${fn}`);
-  }catch(err){ console.error(err); alert('Master Excel export failed: '+err.message); }
+    XLSX.writeFile(wb,fn);dbg(`Master Excel: ${fn}`);
+  }catch(err){console.error(err);alert('Master Excel export failed: '+err.message);}
 };
 
-// ── BOOT ──────────────────────────────────────────────────────
+
+// ── LOGIN ──────────────────────────────────────────────────────
+const LOGIN_PASS = 'mcshop2024';
+window.doLogin = function(){
+  const val = document.getElementById('loginPass').value;
+  if(val === LOGIN_PASS){
+    document.getElementById('loginOverlay').style.display = 'none';
+    sessionStorage.setItem('mcShopAuth','1');
+  } else {
+    const err = document.getElementById('loginErr');
+    err.textContent = '❌ Wrong password. Try again.';
+    document.getElementById('loginPass').value = '';
+    setTimeout(()=>{err.textContent='';},2500);
+  }
+};
+// Check if already logged in this session
+if(sessionStorage.getItem('mcShopAuth')==='1'){
+  document.getElementById('loginOverlay').style.display='none';
+}
+window.doLogout = function(){
+  sessionStorage.removeItem('mcShopAuth');
+  document.getElementById('loginOverlay').style.display='flex';
+  document.getElementById('loginPass').value='';
+  document.getElementById('loginErr').textContent='';
+};
+
+// ── PART DETAIL MODAL ──────────────────────────────────────────
+window.openPartModal = function(partId){
+  // Lookup part info from reconParts
+  const series = reconState.currentSeries;
+  const partObj = reconParts[series].find(p=>p.id===partId) || {};
+  const partName = partObj.partName || '—';
+  const partNo = partObj.partNo || '';
+  const model = partObj.model || '';
+  // Gather entries for this part from current month view
+  const yr = reconState.calYear;
+  const mo = reconState.calMonth;
+  const nDays = daysInMonth(yr, mo);
+  const dateList = [];
+  for(let d=1; d<=nDays; d++) dateList.push(toDateStr(yr, mo, d));
+
+  const pe = reconEntries[series][partId] || {};
+
+  // Compute totals
+  let totRec=0, totOk=0, totNotOk=0;
+  dateList.forEach(ds=>{
+    const d=pe[ds];
+    if(d){totRec+=d.rec||0;totOk+=d.ok||0;totNotOk+=d.notok||0;}
+  });
+
+  // Update modal title
+  const titleEl = document.getElementById('modalTitle');
+  titleEl.innerHTML = `<span>${partName}</span>${partNo?` <span style="font-size:0.78rem;color:var(--muted);font-weight:500;">${partNo}</span>`:''}${model?` <span style="font-size:0.72rem;color:var(--muted);font-weight:400;">[${model}]</span>`:''}`;
+
+  // Stats
+  document.getElementById('modalStats').innerHTML = `
+    <div class="modal-stat rec"><div class="ms-label">Total Received</div><div class="ms-val">${totRec}</div></div>
+    <div class="modal-stat ok"><div class="ms-label">Total Ok</div><div class="ms-val">${totOk}</div></div>
+    <div class="modal-stat notok"><div class="ms-label">Total Not Ok</div><div class="ms-val">${totNotOk}</div></div>
+    <div class="modal-stat" style="margin-left:auto;"><div class="ms-label">Month</div><div class="ms-val" style="color:var(--accent);font-size:0.85rem;">${MONTH_SHORT[mo]} ${yr}</div></div>
+  `;
+
+  // Table rows — only dates that have data
+  const tbody = document.getElementById('modalTableBody');
+  const rows = dateList.filter(ds=>pe[ds]&&(pe[ds].rec||pe[ds].ok||pe[ds].notok));
+
+  if(!rows.length){
+    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:28px;">No entries for this part in ${MONTH_FULL[mo]} ${yr}.</td></tr>`;
+  } else {
+    tbody.innerHTML = rows.map(ds=>{
+      const d = pe[ds];
+      const [y,m,day] = ds.split('-');
+      const dispDate = `${day} ${MONTH_SHORT[+m-1]} ${y}`;
+      return `<tr>
+        <td class="dt">${dispDate}</td>
+        <td class="rv">${d.rec||0}</td>
+        <td class="ov">${d.ok||0}</td>
+        <td class="nv">${d.notok||0}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  document.getElementById('partModal').classList.remove('hidden');
+};
+
+window.closePartModal = function(){
+  document.getElementById('partModal').classList.add('hidden');
+};
+
+// Close modal on overlay click
+document.getElementById('partModal').addEventListener('click', function(e){
+  if(e.target === this) closePartModal();
+});
+
+// ESC key to close
+document.addEventListener('keydown', function(e){
+  if(e.key==='Escape') closePartModal();
+});
+
+// ── BOOT ──
 async function init(){
-  setSync('ing');
-  dbg('Loading Parts Recon…');
+  setSync('ing');dbg('Loading Parts Recon…');
   await loadParts(reconState.currentSeries);
   await loadMonthEntries(reconState.currentSeries,reconState.calYear,reconState.calMonth);
-  reconRenderAll();
-  dbg('Loading Daily Entries…');
+  reconRenderAll();dbg('Loading Daily Entries…');
   await deLoadMonthData();
   deRenderCalendar();deLoadFormForDate();deRenderCumTable();deRenderChart();
   document.getElementById('deYearLabel').textContent=deViewYear;
