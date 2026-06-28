@@ -358,8 +358,17 @@ td.cum-cell.notok{color:var(--notok-col);}
       <div class="calendar-widget">
         <div class="cal-header">
           <button class="cal-nav" id="calPrev">&#8249;</button>
-          <span class="cal-title" id="calTitle">—</span>
+          <span class="cal-title" id="calTitle" onclick="toggleMonthPicker()" style="cursor:pointer;user-select:none;" title="Click to pick month">—</span>
           <button class="cal-nav" id="calNext">&#8250;</button>
+        </div>
+        <!-- Month Picker Dropdown -->
+        <div id="monthPickerDrop" style="display:none;background:#fff;border:1.5px solid var(--border);border-radius:0 0 10px 10px;padding:10px 8px;box-shadow:0 6px 20px rgba(0,0,0,.1);">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;padding:0 4px;">
+            <button onclick="mpChangeYear(-1)" style="background:var(--faint);border:1px solid var(--border);border-radius:4px;width:24px;height:24px;cursor:pointer;font-size:0.9rem;">‹</button>
+            <span id="mpYearLabel" style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent);font-size:0.88rem;"></span>
+            <button onclick="mpChangeYear(1)" style="background:var(--faint);border:1px solid var(--border);border-radius:4px;width:24px;height:24px;cursor:pointer;font-size:0.9rem;">›</button>
+          </div>
+          <div id="mpGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;"></div>
         </div>
         <div class="cal-body">
           <div class="cal-dow"><span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span></div>
@@ -721,32 +730,53 @@ window.handleCellInput=function(series,partId,dateStr,field,val){
 };
 
 // ── KEYBOARD NAVIGATION for recon table ──────────────────────
-// Enter/↓ = next row same column | ↑ = prev row | ←→ = prev/next cell
+// Tab/Enter = next cell | Shift+Tab = prev cell
+// ↑/↓ = number +1/-1 | ←/→ = prev/next cell
 document.addEventListener('keydown',function(e){
   const active=document.activeElement;
   if(!active||!active.classList.contains('cell-input'))return;
   const allInputs=Array.from(document.querySelectorAll('#monthTbody .cell-input'));
   const idx=allInputs.indexOf(active);
   if(idx===-1)return;
-  const tbody=document.getElementById('monthTbody');
-  if(!tbody)return;
-  const firstRow=tbody.querySelector('tr');
-  const inputsPerRow=firstRow?firstRow.querySelectorAll('.cell-input').length:3;
   let next=-1;
-  if(e.key==='Enter'||e.key==='ArrowDown'){
+
+  if(e.key==='Tab'&&!e.shiftKey){
     e.preventDefault();
-    next=idx+inputsPerRow;
-    if(next>=allInputs.length)next=idx%inputsPerRow;
+    next=idx+1;
+    if(next>=allInputs.length)next=0;
+  }else if(e.key==='Tab'&&e.shiftKey){
+    e.preventDefault();
+    next=idx-1;
+    if(next<0)next=allInputs.length-1;
+  }else if(e.key==='Enter'){
+    e.preventDefault();
+    next=idx+1;
+    if(next>=allInputs.length)next=0;
   }else if(e.key==='ArrowUp'){
     e.preventDefault();
-    next=idx-inputsPerRow;
-    if(next<0)next=allInputs.length-inputsPerRow+(idx%inputsPerRow);
-  }else if(e.key==='ArrowRight'&&active.selectionStart===active.value.length){
-    e.preventDefault();next=Math.min(idx+1,allInputs.length-1);
-  }else if(e.key==='ArrowLeft'&&active.selectionStart===0){
-    e.preventDefault();next=Math.max(idx-1,0);
+    const cur=parseInt(active.value)||0;
+    active.value=cur+1;
+    active.dispatchEvent(new Event('input',{bubbles:true}));
+    return;
+  }else if(e.key==='ArrowDown'){
+    e.preventDefault();
+    const cur=parseInt(active.value)||0;
+    active.value=Math.max(0,cur-1);
+    active.dispatchEvent(new Event('input',{bubbles:true}));
+    return;
+  }else if(e.key==='ArrowRight'){
+    e.preventDefault();
+    next=Math.min(idx+1,allInputs.length-1);
+  }else if(e.key==='ArrowLeft'){
+    e.preventDefault();
+    next=Math.max(idx-1,0);
   }
-  if(next>=0&&next<allInputs.length){allInputs[next].focus();allInputs[next].select();}
+
+  if(next>=0&&next<allInputs.length){
+    allInputs[next].focus();
+    allInputs[next].select();
+    allInputs[next].scrollIntoView({block:'nearest',inline:'nearest'});
+  }
 });
 function computeReconTotals(){
   const list=reconParts[reconState.currentSeries];
@@ -953,20 +983,47 @@ window.downloadCombinedExcel=function(){
       XLSX.utils.book_append_sheet(wb,ws,`Recon ${series}`);
     });
 
-    // Sheet 3: Daily Entry Register
-    const dates=Object.keys(deData).sort();
+    // Sheet 3: Daily Entry — Full Year (deYearData has all months of the year)
     const deHeader=['Date','H-Series Rec','H-Series Dis','A-Series Rec','A-Series Dis','P15-Series Rec','P15-Series Dis','ZD30-Series Rec','ZD30-Series Dis','Total Rec','Total Dis'];
     const deRows=[deHeader];let grandRec=0,grandDis=0;
-    dates.forEach(dk=>{
-      const dd=deData[dk]||{};
+
+    // Merge deYearData + deData (current month might have unsaved-to-year entries)
+    const allDeData={...deYearData};
+    Object.keys(deData).forEach(dk=>{
+      if(!allDeData[dk])allDeData[dk]={};
+      Object.assign(allDeData[dk],deData[dk]);
+    });
+
+    const allDates=Object.keys(allDeData).sort();
+    // Group by month for subtotals
+    let prevMonth='';
+    let mRec=0,mDis=0;
+    allDates.forEach(dk=>{
+      const curMonth=dk.substring(0,7);
+      // Print month subtotal when month changes
+      if(prevMonth&&curMonth!==prevMonth){
+        const [py,pm]=prevMonth.split('-');
+        deRows.push(['','','','','','','','','',mRec,mDis].map((v,i)=>i===0?`${MONTH_SHORT[+pm-1]} ${py} Total`:v));
+        deRows.push([]);
+        mRec=0;mDis=0;
+      }
+      prevMonth=curMonth;
+      const dd=allDeData[dk]||{};
       const hR=dd['H-Series']?dd['H-Series'].rec||0:0,hD=dd['H-Series']?dd['H-Series'].dis||0:0;
       const aR=dd['A-Series']?dd['A-Series'].rec||0:0,aD=dd['A-Series']?dd['A-Series'].dis||0:0;
       const pR=dd['P15-Series']?dd['P15-Series'].rec||0:0,pD=dd['P15-Series']?dd['P15-Series'].dis||0:0;
       const zR=dd['ZD30-Series']?dd['ZD30-Series'].rec||0:0,zD=dd['ZD30-Series']?dd['ZD30-Series'].dis||0:0;
-      const tR=hR+aR+pR+zR,tD=hD+aD+pD+zD;grandRec+=tR;grandDis+=tD;
+      const tR=hR+aR+pR+zR,tD=hD+aD+pD+zD;
+      grandRec+=tR;grandDis+=tD;mRec+=tR;mDis+=tD;
       deRows.push([formatDisplay(dk),hR,hD,aR,aD,pR,pD,zR,zD,tR,tD]);
     });
-    deRows.push([]);deRows.push(['Monthly Total','','','','','','','','',grandRec,grandDis]);
+    // Last month subtotal
+    if(prevMonth){
+      const [py,pm]=prevMonth.split('-');
+      deRows.push(['','','','','','','','','',mRec,mDis].map((v,i)=>i===0?`${MONTH_SHORT[+pm-1]} ${py} Total`:v));
+    }
+    deRows.push([]);
+    deRows.push(['YEAR TOTAL','','','','','','','','',grandRec,grandDis]);
     const deWs=XLSX.utils.aoa_to_sheet(deRows);
     deWs['!cols']=[{wch:16},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14},{wch:12},{wch:12}];
     XLSX.utils.book_append_sheet(wb,deWs,'Daily Entry');
@@ -1030,6 +1087,42 @@ function deRenderCalendar(){
   }
   deUpdateMonthlyCum();
 }
+// ── MONTH PICKER ──────────────────────────────────────────────
+let mpYear = todayObj.getFullYear();
+window.toggleMonthPicker = function(){
+  const drop = document.getElementById('monthPickerDrop');
+  const isOpen = drop.style.display !== 'none';
+  if(isOpen){ drop.style.display='none'; return; }
+  mpYear = deCalYear;
+  renderMonthPicker();
+  drop.style.display='block';
+};
+function renderMonthPicker(){
+  document.getElementById('mpYearLabel').textContent = mpYear;
+  const grid = document.getElementById('mpGrid');
+  grid.innerHTML = MONTH_SHORT.map((m,i)=>{
+    const isActive = (i===deCalMonth && mpYear===deCalYear);
+    return `<button onclick="selectMonth(${i},${mpYear})" style="padding:7px 4px;border-radius:6px;border:1.5px solid ${isActive?'var(--accent)':'var(--border)'};background:${isActive?'var(--accent)':'#fff'};color:${isActive?'#fff':'var(--text)'};font-size:0.78rem;font-weight:${isActive?'700':'500'};cursor:pointer;">${m}</button>`;
+  }).join('');
+}
+window.mpChangeYear = function(delta){
+  mpYear += delta;
+  renderMonthPicker();
+};
+window.selectMonth = async function(month, year){
+  deCalMonth = month;
+  deCalYear = year;
+  document.getElementById('monthPickerDrop').style.display='none';
+  setSync('ing');
+  await deLoadMonthData();
+  deRenderCalendar();deRenderCumTable();deRenderChart();
+};
+// Close picker on outside click
+document.addEventListener('click', function(e){
+  const drop = document.getElementById('monthPickerDrop');
+  if(!drop) return;
+  if(!e.target.closest('.calendar-widget')) drop.style.display='none';
+});
 document.getElementById('calPrev').onclick=async()=>{deCalMonth--;if(deCalMonth<0){deCalMonth=11;deCalYear--;}setSync('ing');await deLoadMonthData();deRenderCalendar();deRenderCumTable();deRenderChart();};
 document.getElementById('calNext').onclick=async()=>{deCalMonth++;if(deCalMonth>11){deCalMonth=0;deCalYear++;}setSync('ing');await deLoadMonthData();deRenderCalendar();deRenderCumTable();deRenderChart();};
 document.getElementById('seriesTabs').addEventListener('click',e=>{
@@ -1437,6 +1530,45 @@ document.getElementById('partModal').addEventListener('click', function(e){
 // ESC key to close
 document.addEventListener('keydown', function(e){
   if(e.key==='Escape') closePartModal();
+
+  // ── KEYBOARD NAVIGATION for Component Master table ──
+  const active=document.activeElement;
+  if(!active||!active.closest('#masterTbody'))return;
+  if(!active.classList.contains('cell-input'))return;
+  const allInputs=Array.from(document.querySelectorAll('#masterTbody .cell-input'));
+  const idx=allInputs.indexOf(active);
+  if(idx===-1)return;
+  let next=-1;
+
+  if(e.key==='Tab'&&!e.shiftKey){
+    e.preventDefault();next=idx+1;if(next>=allInputs.length)next=0;
+  }else if(e.key==='Tab'&&e.shiftKey){
+    e.preventDefault();next=idx-1;if(next<0)next=allInputs.length-1;
+  }else if(e.key==='Enter'){
+    e.preventDefault();next=idx+1;if(next>=allInputs.length)next=0;
+  }else if(e.key==='ArrowUp'){
+    e.preventDefault();
+    const cur=parseFloat(active.value)||0;
+    active.value=cur+1;
+    active.dispatchEvent(new Event('input',{bubbles:true}));
+    return;
+  }else if(e.key==='ArrowDown'){
+    e.preventDefault();
+    const cur=parseFloat(active.value)||0;
+    active.value=Math.max(0,cur-1);
+    active.dispatchEvent(new Event('input',{bubbles:true}));
+    return;
+  }else if(e.key==='ArrowRight'){
+    e.preventDefault();next=Math.min(idx+1,allInputs.length-1);
+  }else if(e.key==='ArrowLeft'){
+    e.preventDefault();next=Math.max(idx-1,0);
+  }
+
+  if(next>=0&&next<allInputs.length){
+    allInputs[next].focus();
+    allInputs[next].select();
+    allInputs[next].scrollIntoView({block:'nearest',inline:'nearest'});
+  }
 });
 
 // ── BOOT ──
