@@ -278,6 +278,29 @@ td.cum-cell.notok{color:var(--notok-col);}
   </div>
 </div>
 
+<!-- ── DE MONTH SELECT MODAL ── -->
+<div class="modal-overlay hidden" id="deMonthSelectModal">
+  <div class="modal-box" style="max-width:420px;">
+    <div class="modal-header">
+      <h2>📅 Select Months — <span>Daily Entry Excel</span></h2>
+      <button class="modal-close" onclick="closeDEMonthModal()">✕</button>
+    </div>
+    <div style="padding:16px 20px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <button onclick="deMsChangeYear(-1)" class="month-nav-btn">&#8249;</button>
+        <span id="deMsYearLabel" style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent);font-size:1rem;"></span>
+        <button onclick="deMsChangeYear(1)" class="month-nav-btn">&#8250;</button>
+      </div>
+      <div id="deMsMonthGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;"></div>
+      <div style="display:flex;gap:8px;margin-bottom:16px;">
+        <button onclick="deMsSelectAll()" style="flex:1;padding:7px;border-radius:7px;border:1.5px solid var(--border);background:var(--faint);font-size:0.78rem;font-weight:600;cursor:pointer;">Select All</button>
+        <button onclick="deMsSelectNone()" style="flex:1;padding:7px;border-radius:7px;border:1.5px solid var(--border);background:var(--faint);font-size:0.78rem;font-weight:600;cursor:pointer;">Clear All</button>
+      </div>
+      <button onclick="downloadDEWithSelectedMonths()" style="width:100%;background:#1d6f42;color:#fff;border:none;border-radius:9px;padding:12px;font-size:0.95rem;font-weight:700;cursor:pointer;">⬇ Download Excel</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── PART DETAIL MODAL ── -->
 <div class="modal-overlay hidden" id="partModal">
   <div class="modal-box">
@@ -302,7 +325,7 @@ td.cum-cell.notok{color:var(--notok-col);}
 <div class="header">
   <h1>MC Shop — <span>Register</span></h1>
   <div class="header-right">
-    <button class="btn-header-excel" onclick="downloadCombinedExcel()">📥 Download All Excel</button>
+    <button class="btn-header-excel" onclick="openMonthModal()">📥 Download All Excel</button>
     <div class="header-date-text" id="headerDate"></div>
     <div class="sync-status sync-ing" id="syncStatus" onclick="retryAll()">⟳ Connecting</div>
     <button onclick="doLogout()" style="background:#fde8e8;color:var(--warn);border:none;border-radius:8px;padding:7px 14px;font-size:0.78rem;font-weight:700;cursor:pointer;">🔒 Logout</button>
@@ -426,7 +449,7 @@ td.cum-cell.notok{color:var(--notok-col);}
             <div class="entry-card-body">
               <div class="entry-card-left">
                 <div class="count-label">Enter Count</div>
-                <input class="count-input" id="rec-count" type="number" min="0" placeholder="0" oninput="updateDETotals()">
+                <input class="count-input" id="rec-count" type="number" min="0" placeholder="0" oninput="updateDETotals()" onkeydown="deArrowAdjust(event,this)">
                 <div class="count-hint">Items received today</div>
               </div>
               <div class="entry-total"><span class="t-label">Total Received</span><span class="total-val s-rec" id="rec-total">0</span></div>
@@ -440,7 +463,7 @@ td.cum-cell.notok{color:var(--notok-col);}
             <div class="entry-card-body">
               <div class="entry-card-left">
                 <div class="count-label">Enter Count</div>
-                <input class="count-input dis-input" id="dis-count" type="number" min="0" placeholder="0" oninput="updateDETotals()">
+                <input class="count-input dis-input" id="dis-count" type="number" min="0" placeholder="0" oninput="updateDETotals()" onkeydown="deArrowAdjust(event,this)">
                 <div class="count-hint">Items dismantled today</div>
               </div>
               <div class="entry-total"><span class="t-label">Total Dismantled</span><span class="total-val s-dis" id="dis-total">0</span></div>
@@ -451,7 +474,7 @@ td.cum-cell.notok{color:var(--notok-col);}
       <div class="save-bar">
         <button class="btn-save" id="saveBtn" onclick="saveEntry()">Save Entry</button>
         <button class="btn-clear" onclick="clearForm()">Clear</button>
-        <button class="btn-de-excel" onclick="downloadDEExcel()">⬇ Excel</button>
+        <button class="btn-de-excel" onclick="openDEMonthModal()">⬇ Excel</button>
         <span class="save-msg" id="saveMsg"></span>
       </div>
       <div class="chart-wrap">
@@ -546,8 +569,62 @@ td.cum-cell.notok{color:var(--notok-col);}
   </div>
 </div>
 
+<!-- ── MONTH SELECT MODAL for Excel Download ── -->
+<div class="modal-overlay hidden" id="monthSelectModal">
+  <div class="modal-box" style="width:min(480px,94vw);max-height:70vh;">
+    <div class="modal-header">
+      <h2>📥 Select <span>Months to Export</span></h2>
+      <button class="modal-close" onclick="closeMonthModal()">✕</button>
+    </div>
+    <div style="padding:16px 24px;border-bottom:1.5px solid var(--border);display:flex;gap:10px;flex-wrap:wrap;align-items:center;">
+      <button onclick="msSelectAll()" style="background:var(--accent);color:#fff;border:none;border-radius:6px;padding:6px 14px;font-size:0.78rem;font-weight:700;cursor:pointer;">✓ All</button>
+      <button onclick="msSelectNone()" style="background:var(--faint);color:var(--muted);border:1.5px solid var(--border);border-radius:6px;padding:6px 14px;font-size:0.78rem;font-weight:700;cursor:pointer;">✕ None</button>
+      <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
+        <button onclick="msChangeYear(-1)" style="background:var(--faint);border:1px solid var(--border);border-radius:4px;width:24px;height:24px;cursor:pointer;">‹</button>
+        <span id="msYearLabel" style="font-family:'JetBrains Mono',monospace;font-weight:700;color:var(--accent);font-size:0.88rem;min-width:38px;text-align:center;"></span>
+        <button onclick="msChangeYear(1)" style="background:var(--faint);border:1px solid var(--border);border-radius:4px;width:24px;height:24px;cursor:pointer;">›</button>
+      </div>
+    </div>
+    <div style="padding:16px 24px;overflow-y:auto;">
+      <div id="msMonthGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;"></div>
+    </div>
+    <div style="padding:14px 24px;border-top:1.5px solid var(--border);display:flex;gap:10px;justify-content:flex-end;">
+      <button onclick="closeMonthModal()" style="background:#fff;color:var(--muted);border:1.5px solid var(--border);border-radius:8px;padding:9px 20px;font-size:0.85rem;font-weight:600;cursor:pointer;">Cancel</button>
+      <button onclick="downloadWithSelectedMonths()" style="background:#1d6f42;color:#fff;border:none;border-radius:8px;padding:9px 22px;font-size:0.85rem;font-weight:700;cursor:pointer;">⬇ Download Excel</button>
+    </div>
+  </div>
+</div>
+
 <div class="debug-bar"><span>Firebase:</span><span id="debugMsg">Initializing…</span></div>
 
+<script>
+// Login functions must be global (not inside module)
+const _LOGIN_PASS = 'mcshop2024';
+function doLogin(){
+  const val = document.getElementById('loginPass').value;
+  if(val === _LOGIN_PASS){
+    document.getElementById('loginOverlay').style.display = 'none';
+    sessionStorage.setItem('mcShopAuth','1');
+  } else {
+    const err = document.getElementById('loginErr');
+    err.textContent = '❌ Wrong password. Try again.';
+    document.getElementById('loginPass').value = '';
+    setTimeout(()=>{err.textContent='';},2500);
+  }
+}
+function doLogout(){
+  sessionStorage.removeItem('mcShopAuth');
+  document.getElementById('loginOverlay').style.display='flex';
+  document.getElementById('loginPass').value='';
+  document.getElementById('loginErr').textContent='';
+}
+// Auto-login if session exists
+if(sessionStorage.getItem('mcShopAuth')==='1'){
+  document.addEventListener('DOMContentLoaded',function(){
+    document.getElementById('loginOverlay').style.display='none';
+  });
+}
+</script>
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getFirestore, doc, setDoc, deleteDoc, collection, query, where, getDocs }
@@ -1141,6 +1218,19 @@ window.updateDETotals=function(){
   const dv=parseInt(document.getElementById('dis-count').value)||0;
   document.getElementById('rec-total').textContent=rv;document.getElementById('dis-total').textContent=dv;
 };
+window.deArrowAdjust=function(e,el){
+  if(e.key==='ArrowUp'){
+    e.preventDefault();
+    const cur=parseInt(el.value)||0;
+    el.value=cur+1;
+    el.dispatchEvent(new Event('input',{bubbles:true}));
+  }else if(e.key==='ArrowDown'){
+    e.preventDefault();
+    const cur=parseInt(el.value)||0;
+    el.value=Math.max(0,cur-1);
+    el.dispatchEvent(new Event('input',{bubbles:true}));
+  }
+};
 function deLoadFormForDate(){
   const dd=deData[deSelectedDate]&&deData[deSelectedDate][deCurrentSeries];
   document.getElementById('rec-count').value=dd?dd.rec||'':'';
@@ -1211,25 +1301,81 @@ function deRenderChart(){
     plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1d27',titleColor:'#fff',bodyColor:'#b0b7cc',padding:12,callbacks:{title:items=>`${items[0].label} ${MONTH_SHORT[deCalMonth]} ${deCalYear}`,label:item=>`${item.dataset.label}: ${item.raw}`}}},
     scales:{x:{grid:{color:'#f0f2f8'},border:{color:'#c8cfe0'},ticks:{color:'#7a8099',font:{size:10},maxRotation:0}},y:{grid:{color:'#f0f2f8'},border:{color:'#c8cfe0'},ticks:{color:'#7a8099',font:{size:11},stepSize:1},beginAtZero:true,min:0,suggestedMax:maxVal+2}}}});
 }
-window.downloadDEExcel=function(){
-  const monthName=`${MONTH_FULL[deCalMonth]} ${deCalYear}`;const dates=Object.keys(deData).sort();
-  const header=['Date','H-Series Received','H-Series Dismantled','A-Series Received','A-Series Dismantled','P15-Series Received','P15-Series Dismantled','ZD30-Series Received','ZD30-Series Dismantled','Total Received','Total Dismantled'];
-  const rows=[header];let grandRec=0,grandDis=0;
-  dates.forEach(dk=>{
-    const dd=deData[dk]||{};
-    const hR=dd['H-Series']?dd['H-Series'].rec||0:0,hD=dd['H-Series']?dd['H-Series'].dis||0:0;
-    const aR=dd['A-Series']?dd['A-Series'].rec||0:0,aD=dd['A-Series']?dd['A-Series'].dis||0:0;
-    const pR=dd['P15-Series']?dd['P15-Series'].rec||0:0,pD=dd['P15-Series']?dd['P15-Series'].dis||0:0;
-    const zR=dd['ZD30-Series']?dd['ZD30-Series'].rec||0:0,zD=dd['ZD30-Series']?dd['ZD30-Series'].dis||0:0;
-    const tR=hR+aR+pR+zR,tD=hD+aD+pD+zD;grandRec+=tR;grandDis+=tD;
-    rows.push([formatDisplay(dk),hR,hD,aR,aD,pR,pD,zR,zD,tR,tD]);
-  });
-  rows.push([],['Monthly Total','','','','','','','','',grandRec,grandDis]);
-  const wb=XLSX.utils.book_new();const ws=XLSX.utils.aoa_to_sheet(rows);
-  ws['!cols']=[{wch:16},{wch:16},{wch:18},{wch:16},{wch:18},{wch:18},{wch:20},{wch:18},{wch:20},{wch:14},{wch:16}];
-  XLSX.utils.book_append_sheet(wb,ws,monthName);
-  XLSX.writeFile(wb,`DailyEntryRegister_${deCalYear}_${String(deCalMonth+1).padStart(2,'0')}.xlsx`);
+// ── DE MONTH PICKER FOR EXCEL ──────────────────────────────────
+let deMsYear = todayObj.getFullYear();
+let deMsSelected = new Set();
+
+window.openDEMonthModal = function(){
+  deMsYear = deCalYear;
+  deMsSelected.clear();
+  deMsSelected.add(`${deMsYear}-${String(deCalMonth+1).padStart(2,'0')}`);
+  renderDEMsGrid();
+  document.getElementById('deMonthSelectModal').classList.remove('hidden');
 };
+window.closeDEMonthModal = function(){
+  document.getElementById('deMonthSelectModal').classList.add('hidden');
+};
+window.deMsChangeYear = function(delta){
+  deMsYear += delta;
+  renderDEMsGrid();
+};
+window.deMsSelectAll = function(){
+  for(let m=1;m<=12;m++) deMsSelected.add(`${deMsYear}-${String(m).padStart(2,'0')}`);
+  renderDEMsGrid();
+};
+window.deMsSelectNone = function(){
+  for(let m=1;m<=12;m++) deMsSelected.delete(`${deMsYear}-${String(m).padStart(2,'0')}`);
+  renderDEMsGrid();
+};
+window.deMsToggle = function(mk){
+  if(deMsSelected.has(mk)) deMsSelected.delete(mk);
+  else deMsSelected.add(mk);
+  renderDEMsGrid();
+};
+function renderDEMsGrid(){
+  document.getElementById('deMsYearLabel').textContent = deMsYear;
+  const grid = document.getElementById('deMsMonthGrid');
+  grid.innerHTML = MONTH_FULL.map((name,i)=>{
+    const mk=`${deMsYear}-${String(i+1).padStart(2,'0')}`;
+    const sel=deMsSelected.has(mk);
+    return `<button onclick="deMsToggle('${mk}')" style="padding:10px 6px;border-radius:8px;border:1.5px solid ${sel?'var(--accent2)':'var(--border)'};background:${sel?'var(--accent2)':'#fff'};color:${sel?'#fff':'var(--text)'};font-size:0.82rem;font-weight:${sel?'700':'500'};cursor:pointer;transition:all .13s;">${name.substring(0,3)} ${deMsYear}</button>`;
+  }).join('');
+}
+window.downloadDEWithSelectedMonths = function(){
+  if(deMsSelected.size===0){alert('Minimum oru month select pannunga');return;}
+  const sortedMks=[...deMsSelected].sort();
+  document.getElementById('deMonthSelectModal').classList.add('hidden');
+  const merged={...deYearData};
+  Object.keys(deData).forEach(dk=>{if(!merged[dk])merged[dk]={};Object.assign(merged[dk],deData[dk]);});
+  const wb=XLSX.utils.book_new();
+  const header=['Date','H-Series Rec','H-Series Dis','A-Series Rec','A-Series Dis','P15-Series Rec','P15-Series Dis','ZD30-Series Rec','ZD30-Series Dis','Total Rec','Total Dis'];
+  for(const mk of sortedMks){
+    const [y,m]=mk.split('-');
+    const monthName=`${MONTH_SHORT[+m-1]} ${y}`;
+    const rows=[header];let mRec=0,mDis=0;
+    const dates=Object.keys(merged).filter(dk=>dk.startsWith(mk)).sort();
+    dates.forEach(dk=>{
+      const dd=merged[dk]||{};
+      const hR=dd['H-Series']?dd['H-Series'].rec||0:0,hD=dd['H-Series']?dd['H-Series'].dis||0:0;
+      const aR=dd['A-Series']?dd['A-Series'].rec||0:0,aD=dd['A-Series']?dd['A-Series'].dis||0:0;
+      const pR=dd['P15-Series']?dd['P15-Series'].rec||0:0,pD=dd['P15-Series']?dd['P15-Series'].dis||0:0;
+      const zR=dd['ZD30-Series']?dd['ZD30-Series'].rec||0:0,zD=dd['ZD30-Series']?dd['ZD30-Series'].dis||0:0;
+      const tR=hR+aR+pR+zR,tD=hD+aD+pD+zD;mRec+=tR;mDis+=tD;
+      rows.push([formatDisplay(dk),hR,hD,aR,aD,pR,pD,zR,zD,tR,tD]);
+    });
+    if(!dates.length)rows.push(['No data','','','','','','','','','','']);
+    rows.push([],[`${monthName} Total`,'','','','','','','','',mRec,mDis]);
+    const ws=XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols']=[{wch:16},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14},{wch:12},{wch:12}];
+    XLSX.utils.book_append_sheet(wb,ws,monthName);
+  }
+  const fname=sortedMks.length===1
+    ?`Daily_Entry_${sortedMks[0]}.xlsx`
+    :`Daily_Entry_${sortedMks[0]}_to_${sortedMks[sortedMks.length-1]}.xlsx`;
+  XLSX.writeFile(wb,fname);
+  dbg(`DE Excel: ${fname}`);
+};
+window.downloadDEExcel=window.downloadDEWithSelectedMonths;
 
 // ── DE YEAR CUMULATIVE ──
 let deViewYear=todayObj.getFullYear();let deYearData={};
@@ -1436,28 +1582,7 @@ window.downloadMasterExcel=function(){
 
 // ── LOGIN ──────────────────────────────────────────────────────
 const LOGIN_PASS = 'mcshop2024';
-window.doLogin = function(){
-  const val = document.getElementById('loginPass').value;
-  if(val === LOGIN_PASS){
-    document.getElementById('loginOverlay').style.display = 'none';
-    sessionStorage.setItem('mcShopAuth','1');
-  } else {
-    const err = document.getElementById('loginErr');
-    err.textContent = '❌ Wrong password. Try again.';
-    document.getElementById('loginPass').value = '';
-    setTimeout(()=>{err.textContent='';},2500);
-  }
-};
-// Check if already logged in this session
-if(sessionStorage.getItem('mcShopAuth')==='1'){
-  document.getElementById('loginOverlay').style.display='none';
-}
-window.doLogout = function(){
-  sessionStorage.removeItem('mcShopAuth');
-  document.getElementById('loginOverlay').style.display='flex';
-  document.getElementById('loginPass').value='';
-  document.getElementById('loginErr').textContent='';
-};
+// Note: doLogin/doLogout defined in inline script below for global access
 
 // ── PART DETAIL MODAL ──────────────────────────────────────────
 window.openPartModal = function(partId){
@@ -1570,6 +1695,203 @@ document.addEventListener('keydown', function(e){
     allInputs[next].scrollIntoView({block:'nearest',inline:'nearest'});
   }
 });
+
+// ── MONTH SELECT MODAL ────────────────────────────────────────
+let msYear = todayObj.getFullYear();
+let msSelected = new Set(); // 'YYYY-MM' strings
+
+window.openMonthModal = function(){
+  msYear = todayObj.getFullYear();
+  // Pre-select current month
+  if(msSelected.size === 0){
+    msSelected.add(`${msYear}-${String(todayObj.getMonth()+1).padStart(2,'0')}`);
+  }
+  renderMsGrid();
+  document.getElementById('monthSelectModal').classList.remove('hidden');
+};
+window.closeMonthModal = function(){
+  document.getElementById('monthSelectModal').classList.add('hidden');
+};
+window.msChangeYear = function(delta){
+  msYear += delta;
+  renderMsGrid();
+};
+window.msSelectAll = function(){
+  for(let m=1;m<=12;m++) msSelected.add(`${msYear}-${String(m).padStart(2,'0')}`);
+  renderMsGrid();
+};
+window.msSelectNone = function(){
+  for(let m=1;m<=12;m++) msSelected.delete(`${msYear}-${String(m).padStart(2,'0')}`);
+  renderMsGrid();
+};
+function renderMsGrid(){
+  document.getElementById('msYearLabel').textContent = msYear;
+  const grid = document.getElementById('msMonthGrid');
+  grid.innerHTML = MONTH_FULL.map((name,i)=>{
+    const mk = `${msYear}-${String(i+1).padStart(2,'0')}`;
+    const sel = msSelected.has(mk);
+    return `<button onclick="msToggle('${mk}')" style="padding:10px 6px;border-radius:8px;border:1.5px solid ${sel?'var(--accent)':'var(--border)'};background:${sel?'var(--accent)':'#fff'};color:${sel?'#fff':'var(--text)'};font-size:0.82rem;font-weight:${sel?'700':'500'};cursor:pointer;transition:all .13s;">${name.substring(0,3)} ${msYear}</button>`;
+  }).join('');
+}
+window.msToggle = function(mk){
+  if(msSelected.has(mk)) msSelected.delete(mk);
+  else msSelected.add(mk);
+  renderMsGrid();
+};
+
+window.downloadWithSelectedMonths = async function(){
+  if(msSelected.size === 0){ alert('Please select at least one month!'); return; }
+  closeMonthModal();
+
+  // Sort selected months
+  const sortedMonths = [...msSelected].sort();
+
+  // Load data for all selected months if not already loaded
+  document.getElementById('loadingOverlay').style.display='flex';
+  document.getElementById('loadingText').textContent='Preparing Excel data…';
+
+  // Gather all daily entry data for selected months
+  const allDeExport = {};
+  for(const mk of sortedMonths){
+    const [yr, mo] = mk.split('-');
+    try{
+      const {getDocs, query, collection, where} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      const q = query(collection(db,'entries'), where('uid','==',SHARED_UID), where('month','==',mk));
+      const snap = await getDocs(q);
+      snap.forEach(d=>{const e=d.data();if(!allDeExport[e.date])allDeExport[e.date]={};allDeExport[e.date][e.series]={rec:e.rec||0,dis:e.dis||0};});
+    }catch(err){ dbg(`Load error ${mk}: ${err.message}`); }
+  }
+
+  document.getElementById('loadingOverlay').style.display='none';
+
+  // Build Excel
+  try{
+    const wb = XLSX.utils.book_new();
+
+    // Sheets 1 & 2: Parts Recon (current view)
+    ['H-Series','P15-Series'].forEach(series=>{
+      const isH=series==='H-Series'; const list=reconParts[series]; if(!list.length)return;
+      let dateList,srcEntries;
+      if(reconState.currentView==='month'){
+        const nDays=daysInMonth(reconState.calYear,reconState.calMonth); dateList=[];
+        for(let d=1;d<=nDays;d++) dateList.push(toDateStr(reconState.calYear,reconState.calMonth,d));
+        srcEntries=reconEntries[series];
+      }else{ srcEntries=reconYearEntries[series]; }
+      const rows=[];
+      if(reconState.currentView==='month'){
+        const h1=isH?['Sl No','Part No','Model','Date']:['Sl No','Part No','Date'];
+        dateList.forEach(ds=>{const d=parseInt(ds.split('-')[2]);h1.push(ddmmyyyy(reconState.calYear,reconState.calMonth,d),'','');});
+        h1.push('Overall Cumulative','',''); rows.push(h1);
+        const h2=isH?['','','','']:['','',''];
+        dateList.forEach(()=>{h2.push('Received','Ok','Not Ok');}); h2.push('Received','Ok','Not Ok'); rows.push(h2);
+        list.forEach((p,idx)=>{
+          const pe=srcEntries[p.id]||{}; let cR=0,cO=0,cN=0;
+          const row=isH?[idx+1,p.partNo||'',p.model||'',p.partName||'']:[idx+1,p.partNo||'',p.partName||''];
+          dateList.forEach(ds=>{const d=pe[ds];const r=d?d.rec||0:'',o=d?d.ok||0:'',n=d?d.notok||0:'';row.push(r===0?'':r,o===0?'':o,n===0?'':n);if(d){cR+=d.rec||0;cO+=d.ok||0;cN+=d.notok||0;}});
+          row.push(cR||0,cO||0,cN||0); rows.push(row);
+        });
+        const tr=isH?['','','','GRAND TOTAL']:['','','GRAND TOTAL']; let gR=0,gO=0,gN=0;
+        dateList.forEach(ds=>{let dR=0,dO=0,dN=0;list.forEach(p=>{const d=(srcEntries[p.id]||{})[ds];if(d){dR+=d.rec||0;dO+=d.ok||0;dN+=d.notok||0;}});tr.push(dR||'',dO||'',dN||'');gR+=dR;gO+=dO;gN+=dN;});
+        tr.push(gR,gO,gN); rows.push(tr);
+      }else{
+        const h1=isH?['Sl No','Part No','Model','Part Name']:['Sl No','Part No','Part Name'];
+        MONTH_SHORT.forEach(m=>{h1.push(`${m} ${reconState.viewYear}`,'','');}); h1.push('Year Cumulative','',''); rows.push(h1);
+        const h2=isH?['','','','']:['','',''];
+        MONTH_SHORT.forEach(()=>{h2.push('Received','Ok','Not Ok');}); h2.push('Received','Ok','Not Ok'); rows.push(h2);
+        list.forEach((p,idx)=>{
+          const pe=srcEntries[p.id]||{}; const mAgg=Array.from({length:12},()=>({rec:0,ok:0,notok:0}));
+          Object.keys(pe).forEach(ds=>{const mIdx=parseInt(ds.split('-')[1])-1;const d=pe[ds];mAgg[mIdx].rec+=d.rec||0;mAgg[mIdx].ok+=d.ok||0;mAgg[mIdx].notok+=d.notok||0;});
+          const row=isH?[idx+1,p.partNo||'',p.model||'',p.partName||'']:[idx+1,p.partNo||'',p.partName||''];
+          let yR=0,yO=0,yN=0; mAgg.forEach(m=>{row.push(m.rec||'',m.ok||'',m.notok||'');yR+=m.rec;yO+=m.ok;yN+=m.notok;});
+          row.push(yR,yO,yN); rows.push(row);
+        });
+        const tr=isH?['','','','GRAND TOTAL']:['','','GRAND TOTAL'];
+        const grand=Array.from({length:12},()=>({rec:0,ok:0,notok:0}));
+        list.forEach(p=>{const pe=srcEntries[p.id]||{};Object.keys(pe).forEach(ds=>{const mIdx=parseInt(ds.split('-')[1])-1;const d=pe[ds];grand[mIdx].rec+=d.rec||0;grand[mIdx].ok+=d.ok||0;grand[mIdx].notok+=d.notok||0;});});
+        let gR=0,gO=0,gN=0; grand.forEach(m=>{tr.push(m.rec||'',m.ok||'',m.notok||'');gR+=m.rec;gO+=m.ok;gN+=m.notok;}); tr.push(gR,gO,gN); rows.push(tr);
+      }
+      const ws=XLSX.utils.aoa_to_sheet(rows);
+      const leadCols=isH?4:3; const merges=[];
+      for(let c=0;c<leadCols;c++) merges.push({s:{r:0,c:c},e:{r:1,c:c}});
+      const gc=reconState.currentView==='month'?(dateList?dateList.length:0)+1:13;
+      for(let g=0;g<gc;g++){const sc=leadCols+g*3;merges.push({s:{r:0,c:sc},e:{r:0,c:sc+2}});}
+      ws['!merges']=merges;
+      const cw=[];for(let c=0;c<leadCols;c++)cw.push({wch:c===leadCols-1?20:12});for(let g=0;g<gc;g++)cw.push({wch:9},{wch:7},{wch:9});ws['!cols']=cw;
+      XLSX.utils.book_append_sheet(wb,ws,`Recon ${series}`);
+    });
+
+    // Sheet 3: Daily Entry — Selected Months Only
+    const deHeader=['Date','H-Series Rec','H-Series Dis','A-Series Rec','A-Series Dis','P15-Series Rec','P15-Series Dis','ZD30-Series Rec','ZD30-Series Dis','Total Rec','Total Dis'];
+    const deRows=[deHeader]; let grandRec=0,grandDis=0;
+    let prevMonth=''; let mRec=0,mDis=0;
+    const allDates=Object.keys(allDeExport).sort();
+    allDates.forEach(dk=>{
+      const curMonth=dk.substring(0,7);
+      if(!sortedMonths.includes(curMonth))return;
+      if(prevMonth&&curMonth!==prevMonth){
+        const [py,pm]=prevMonth.split('-');
+        const subtotalRow=Array(11).fill('');
+        subtotalRow[0]=`${MONTH_SHORT[+pm-1]} ${py} Total`;
+        subtotalRow[9]=mRec; subtotalRow[10]=mDis;
+        deRows.push(subtotalRow); deRows.push(Array(11).fill(''));
+        mRec=0; mDis=0;
+      }
+      prevMonth=curMonth;
+      const dd=allDeExport[dk]||{};
+      const hR=dd['H-Series']?dd['H-Series'].rec||0:0,hD=dd['H-Series']?dd['H-Series'].dis||0:0;
+      const aR=dd['A-Series']?dd['A-Series'].rec||0:0,aD=dd['A-Series']?dd['A-Series'].dis||0:0;
+      const pR=dd['P15-Series']?dd['P15-Series'].rec||0:0,pD=dd['P15-Series']?dd['P15-Series'].dis||0:0;
+      const zR=dd['ZD30-Series']?dd['ZD30-Series'].rec||0:0,zD=dd['ZD30-Series']?dd['ZD30-Series'].dis||0:0;
+      const tR=hR+aR+pR+zR, tD=hD+aD+pD+zD;
+      grandRec+=tR; grandDis+=tD; mRec+=tR; mDis+=tD;
+      deRows.push([formatDisplay(dk),hR,hD,aR,aD,pR,pD,zR,zD,tR,tD]);
+    });
+    // Last month subtotal
+    if(prevMonth){
+      const [py,pm]=prevMonth.split('-');
+      const subtotalRow=Array(11).fill('');
+      subtotalRow[0]=`${MONTH_SHORT[+pm-1]} ${py} Total`;
+      subtotalRow[9]=mRec; subtotalRow[10]=mDis;
+      deRows.push(subtotalRow);
+    }
+    deRows.push(Array(11).fill(''));
+    const yearTotalRow=Array(11).fill('');
+    yearTotalRow[0]='YEAR TOTAL'; yearTotalRow[9]=grandRec; yearTotalRow[10]=grandDis;
+    deRows.push(yearTotalRow);
+    const deWs=XLSX.utils.aoa_to_sheet(deRows);
+    deWs['!cols']=[{wch:18},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14},{wch:14},{wch:12},{wch:12}];
+    XLSX.utils.book_append_sheet(wb,deWs,'Daily Entry');
+
+    // Sheets 4 & 5: Component Master
+    ['H-Series','P15-Series'].forEach(series=>{
+      const mList=masterComponents[series]; if(!mList||!mList.length)return;
+      const byMat={'Aluminium':0,'Cast iron':0,'Steel':0};
+      mList.forEach(c=>{const e=masterEntries[series][c.id]||{};const t=(e.reuseQty||0)*(e.costPerPart||0);byMat[c.material]=(byMat[c.material]||0)+t;});
+      const mRows=[['Sl No','Component','Material','Reuse Qty','Cost per part (Rs)','Monthly Turnover (Rs)']];
+      mList.forEach((c,idx)=>{
+        const e=masterEntries[series][c.id]||{reuseQty:0,costPerPart:0};
+        const t=(e.reuseQty||0)*(e.costPerPart||0);
+        mRows.push([idx+1,c.name,c.material,e.reuseQty||0,e.costPerPart||0,t||0]);
+      });
+      const totalT=mList.reduce((a,c)=>{const e=masterEntries[series][c.id]||{};return a+((e.reuseQty||0)*(e.costPerPart||0));},0);
+      mRows.push([]); mRows.push(['','','','','GRAND TOTAL (Rs)',totalT]);
+      mRows.push([]); mRows.push(['Material','Components','Turnover (Rs)']);
+      ['Aluminium','Cast iron','Steel'].forEach(m=>{mRows.push([m,mList.filter(c=>c.material===m).length,byMat[m]||0]);});
+      const mWs=XLSX.utils.aoa_to_sheet(mRows);
+      mWs['!cols']=[{wch:7},{wch:28},{wch:13},{wch:11},{wch:20},{wch:20}];
+      XLSX.utils.book_append_sheet(wb,mWs,`Master ${series}`);
+    });
+
+    const selectedLabel = sortedMonths.length===1
+      ? `${MONTH_SHORT[+sortedMonths[0].split('-')[1]-1]}_${sortedMonths[0].split('-')[0]}`
+      : `${sortedMonths.length}months_${sortedMonths[0].split('-')[0]}`;
+    XLSX.writeFile(wb,`MC_Shop_${selectedLabel}.xlsx`);
+    dbg(`Excel downloaded: ${sortedMonths.length} months`);
+  }catch(err){
+    console.error(err);
+    alert('Excel export failed: '+err.message);
+  }
+};
 
 // ── BOOT ──
 async function init(){
