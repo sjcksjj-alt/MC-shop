@@ -75,7 +75,7 @@ table.reg-table tbody tr:hover td.sticky-col,table.reg-table tbody tr:hover td.s
 .part-no{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:0.73rem;}
 .part-model{font-size:0.67rem;color:var(--muted);}
 .part-name{font-weight:600;font-size:0.75rem;}
-.cell-input{width:36px;border:1px solid transparent;border-radius:4px;padding:3px 2px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.73rem;background:transparent;}
+.cell-input{width:52px;min-width:52px;max-width:90px;border:1px solid transparent;border-radius:4px;padding:3px 4px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.73rem;background:transparent;}
 .cell-input:hover{border-color:var(--border2);}
 .cell-input:focus{outline:none;border-color:var(--accent);background:#fff;box-shadow:0 0 0 2px rgba(79,124,255,.15);}
 .cell-input.rec-input{color:var(--rec-col);}
@@ -807,6 +807,14 @@ window.deletePart=async function(partId,partName){
 window.handleCellInput=function(series,partId,dateStr,field,val){
   const num=parseInt(val)||0;saveReconEntryDebounced(series,partId,dateStr,field,num);refreshCumCells();
 };
+// Auto-resize cell inputs as user types
+document.addEventListener('input',function(e){
+  const el=e.target;
+  if(!el.classList.contains('cell-input'))return;
+  const len=Math.max((el.value||'').length,1);
+  const newW=Math.max(52,len*11+16);
+  el.style.width=newW+'px';
+});
 
 // ── KEYBOARD NAVIGATION for recon table ──────────────────────
 // Tab/Enter = next cell | Shift+Tab = prev | ↑/↓ = value+1/-1 + row nav | ←/→ = cell nav
@@ -1537,8 +1545,8 @@ function masterRenderTable(){
       <td class="sticky-col col-num" style="left:0;width:30px;">${idx+1}</td>
       <td class="sticky-col2 col-name" style="left:30px;min-width:170px;"><span class="part-name">${c.name}</span></td>
       <td><select class="material-select" data-mat="${c.material}" onchange="masterChangeMaterial('${c.id}',this.value);this.dataset.mat=this.value;">${MATERIALS.map(m=>`<option value="${m}" ${m===c.material?'selected':''}>${m}</option>`).join('')}</select></td>
-      <td><input class="cell-input rec-input" style="width:60px;" type="number" min="0" value="${e.reuseQty||''}" placeholder="0" oninput="masterHandleInput('${c.id}','reuseQty',this.value)"></td>
-      <td><input class="cell-input" style="width:80px;color:var(--accent);" type="number" min="0" value="${e.costPerPart||''}" placeholder="0" oninput="masterHandleInput('${c.id}','costPerPart',this.value)"></td>
+      <td><input class="cell-input rec-input" style="width:65px;" type="number" min="0" value="${e.reuseQty||''}" placeholder="0" oninput="masterHandleInput('${c.id}','reuseQty',this.value)"></td>
+      <td><input class="cell-input" style="width:90px;color:var(--accent);" type="number" min="0" value="${e.costPerPart||''}" placeholder="0" oninput="masterHandleInput('${c.id}','costPerPart',this.value)"></td>
       <td class="cum-cell rec mt-cell">${turnover?turnover.toLocaleString('en-IN'):'0'}</td>
       <td><button class="del-row-btn" onclick="masterDeleteComponent('${c.id}','${c.name.replace(/'/g,"\\'")}')">✕</button></td>
     </tr>`;
