@@ -837,19 +837,25 @@ document.addEventListener('keydown',function(e){
     e.preventDefault();next=idx+1;if(next>=allInputs.length)next=0;
   }else if(e.key==='ArrowUp'){
     e.preventDefault();
-    // increase value
-    const cur=parseInt(active.value)||0;
-    active.value=cur+1;
-    active.dispatchEvent(new Event('input',{bubbles:true}));
+    // increase value only if cell already has a value
+    const rawVal=active.value.trim();
+    if(rawVal!==''){
+      const cur=parseInt(rawVal)||0;
+      active.value=cur+1;
+      active.dispatchEvent(new Event('input',{bubbles:true}));
+    }
     // move to same column, previous row
     const prevRow=idx-colsPerRow;
     if(prevRow>=0)next=prevRow;
   }else if(e.key==='ArrowDown'){
     e.preventDefault();
-    // decrease value
-    const cur=parseInt(active.value)||0;
-    active.value=Math.max(0,cur-1);
-    active.dispatchEvent(new Event('input',{bubbles:true}));
+    // decrease value only if cell already has a value
+    const rawVal=active.value.trim();
+    if(rawVal!==''){
+      const cur=parseInt(rawVal)||0;
+      active.value=Math.max(0,cur-1);
+      active.dispatchEvent(new Event('input',{bubbles:true}));
+    }
     // move to same column, next row
     const nextRow=idx+colsPerRow;
     if(nextRow<allInputs.length)next=nextRow;
@@ -1231,12 +1237,15 @@ window.updateDETotals=function(){
 window.deArrowAdjust=function(e,el){
   if(e.key==='ArrowUp'){
     e.preventDefault();
-    const cur=parseInt(el.value)||0;
+    const rawVal=el.value.trim();
+    const cur=rawVal===''?0:parseInt(rawVal)||0;
     el.value=cur+1;
     el.dispatchEvent(new Event('input',{bubbles:true}));
   }else if(e.key==='ArrowDown'){
     e.preventDefault();
-    const cur=parseInt(el.value)||0;
+    const rawVal=el.value.trim();
+    if(rawVal==='')return;
+    const cur=parseInt(rawVal)||0;
     el.value=Math.max(0,cur-1);
     el.dispatchEvent(new Event('input',{bubbles:true}));
   }
@@ -1556,7 +1565,31 @@ function masterRefreshSummary(){
   const series=masterState.currentSeries;const list=masterComponents[series];
   const byMat={'Aluminium':0,'Cast iron':0,'Steel':0};let totalTurnover=0,totalQty=0;
   list.forEach(c=>{const t=masterTurnover(c.id);byMat[c.material]=(byMat[c.material]||0)+t;totalTurnover+=t;const e=masterEntries[series][c.id];if(e)totalQty+=e.reuseQty||0;});
-  document.getElementById('masterStatsBar').innerHTML=`<div class="stat-card parts"><div class="stat-label">Components</div><div class="stat-val">${list.length}</div></div><div class="stat-card rec"><div class="stat-label">Total Reuse Qty</div><div class="stat-val">${totalQty}</div></div><div class="stat-card ok"><div class="stat-label">Total Monthly Turnover</div><div class="stat-val">₹${totalTurnover.toLocaleString('en-IN')}</div></div>`;
+
+  // Get dismantled total from Core Engine Tracker (deData) for current master month
+  const masterMk=masterMonthKey();
+  let totalDismantled=0;
+  // Use deYearData + deData merged for the master month
+  const mergedDe={...deYearData};
+  Object.keys(deData).forEach(dk=>{if(!mergedDe[dk])mergedDe[dk]={};Object.assign(mergedDe[dk],deData[dk]);});
+  Object.keys(mergedDe).filter(dk=>dk.startsWith(masterMk)).forEach(dk=>{
+    const dayObj=mergedDe[dk]||{};
+    DE_SERIES.forEach(s=>{if(dayObj[s])totalDismantled+=dayObj[s].dis||0;});
+  });
+
+  const reusePercent = totalDismantled>0 ? ((totalQty/totalDismantled)*100).toFixed(1) : '—';
+  const percentDisplay = totalDismantled>0 ? `${reusePercent}%` : '—';
+  const percentColor = totalDismantled>0 ? (parseFloat(reusePercent)>=70?'var(--ok-col)':parseFloat(reusePercent)>=40?'var(--p15-series)':'var(--warn)') : 'var(--muted)';
+
+  document.getElementById('masterStatsBar').innerHTML=`
+    <div class="stat-card parts"><div class="stat-label">Components</div><div class="stat-val">${list.length}</div></div>
+    <div class="stat-card rec"><div class="stat-label">Total Reuse Qty</div><div class="stat-val">${totalQty}</div></div>
+    <div class="stat-card" style="border:1.5px solid var(--border);border-radius:10px;padding:10px 16px;min-width:180px;background:#fff;">
+      <div class="stat-label">Reuse % vs Dismantling</div>
+      <div class="stat-val" style="color:${percentColor};">${percentDisplay}</div>
+      <div style="font-size:0.65rem;color:var(--muted);margin-top:2px;">${totalQty} reused / ${totalDismantled} dismantled</div>
+    </div>
+    <div class="stat-card ok"><div class="stat-label">Total Monthly Turnover</div><div class="stat-val">₹${totalTurnover.toLocaleString('en-IN')}</div></div>`;
   const matClassMap={'Aluminium':'Aluminium','Cast iron':'CastIron','Steel':'Steel'};
   document.getElementById('masterMaterialCards').innerHTML=MATERIALS.map(m=>{
     const cnt=list.filter(c=>c.material===m).length;
@@ -1683,15 +1716,21 @@ document.addEventListener('keydown', function(e){
     e.preventDefault();next=idx+1;if(next>=allInputs.length)next=0;
   }else if(e.key==='ArrowUp'){
     e.preventDefault();
-    const cur=parseFloat(active.value)||0;
-    active.value=cur+1;
-    active.dispatchEvent(new Event('input',{bubbles:true}));
+    const rawVal=active.value.trim();
+    if(rawVal!==''){
+      const cur=parseFloat(rawVal)||0;
+      active.value=cur+1;
+      active.dispatchEvent(new Event('input',{bubbles:true}));
+    }
     return;
   }else if(e.key==='ArrowDown'){
     e.preventDefault();
-    const cur=parseFloat(active.value)||0;
-    active.value=Math.max(0,cur-1);
-    active.dispatchEvent(new Event('input',{bubbles:true}));
+    const rawVal=active.value.trim();
+    if(rawVal!==''){
+      const cur=parseFloat(rawVal)||0;
+      active.value=Math.max(0,cur-1);
+      active.dispatchEvent(new Event('input',{bubbles:true}));
+    }
     return;
   }else if(e.key==='ArrowRight'){
     e.preventDefault();next=Math.min(idx+1,allInputs.length-1);
