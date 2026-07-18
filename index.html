@@ -837,26 +837,10 @@ document.addEventListener('keydown',function(e){
     e.preventDefault();next=idx+1;if(next>=allInputs.length)next=0;
   }else if(e.key==='ArrowUp'){
     e.preventDefault();
-    // increase value only if cell already has a value
-    const rawVal=active.value.trim();
-    if(rawVal!==''){
-      const cur=parseInt(rawVal)||0;
-      active.value=cur+1;
-      active.dispatchEvent(new Event('input',{bubbles:true}));
-    }
-    // move to same column, previous row
     const prevRow=idx-colsPerRow;
     if(prevRow>=0)next=prevRow;
   }else if(e.key==='ArrowDown'){
     e.preventDefault();
-    // decrease value only if cell already has a value
-    const rawVal=active.value.trim();
-    if(rawVal!==''){
-      const cur=parseInt(rawVal)||0;
-      active.value=Math.max(0,cur-1);
-      active.dispatchEvent(new Event('input',{bubbles:true}));
-    }
-    // move to same column, next row
     const nextRow=idx+colsPerRow;
     if(nextRow<allInputs.length)next=nextRow;
   }else if(e.key==='ArrowRight'){
@@ -1235,19 +1219,8 @@ window.updateDETotals=function(){
   document.getElementById('rec-total').textContent=rv;document.getElementById('dis-total').textContent=dv;
 };
 window.deArrowAdjust=function(e,el){
-  if(e.key==='ArrowUp'){
+  if(e.key==='ArrowUp'||e.key==='ArrowDown'){
     e.preventDefault();
-    const rawVal=el.value.trim();
-    const cur=rawVal===''?0:parseInt(rawVal)||0;
-    el.value=cur+1;
-    el.dispatchEvent(new Event('input',{bubbles:true}));
-  }else if(e.key==='ArrowDown'){
-    e.preventDefault();
-    const rawVal=el.value.trim();
-    if(rawVal==='')return;
-    const cur=parseInt(rawVal)||0;
-    el.value=Math.max(0,cur-1);
-    el.dispatchEvent(new Event('input',{bubbles:true}));
   }
 };
 function deLoadFormForDate(){
@@ -1716,21 +1689,23 @@ document.addEventListener('keydown', function(e){
     e.preventDefault();next=idx+1;if(next>=allInputs.length)next=0;
   }else if(e.key==='ArrowUp'){
     e.preventDefault();
-    const rawVal=active.value.trim();
-    if(rawVal!==''){
-      const cur=parseFloat(rawVal)||0;
-      active.value=cur+1;
-      active.dispatchEvent(new Event('input',{bubbles:true}));
-    }
+    const allMInputs=Array.from(document.querySelectorAll('#masterTbody .cell-input'));
+    const mIdx=allMInputs.indexOf(active);
+    const mtbody=document.getElementById('masterTbody');
+    const mRow=mtbody&&mtbody.querySelector('tr');
+    const mCols=mRow?mRow.querySelectorAll('.cell-input').length:2;
+    const mPrev=mIdx-mCols;
+    if(mPrev>=0){allMInputs[mPrev].focus();allMInputs[mPrev].select();allMInputs[mPrev].scrollIntoView({block:'nearest',inline:'nearest'});}
     return;
   }else if(e.key==='ArrowDown'){
     e.preventDefault();
-    const rawVal=active.value.trim();
-    if(rawVal!==''){
-      const cur=parseFloat(rawVal)||0;
-      active.value=Math.max(0,cur-1);
-      active.dispatchEvent(new Event('input',{bubbles:true}));
-    }
+    const allMInputs=Array.from(document.querySelectorAll('#masterTbody .cell-input'));
+    const mIdx=allMInputs.indexOf(active);
+    const mtbody=document.getElementById('masterTbody');
+    const mRow=mtbody&&mtbody.querySelector('tr');
+    const mCols=mRow?mRow.querySelectorAll('.cell-input').length:2;
+    const mNext=mIdx+mCols;
+    if(mNext<allMInputs.length){allMInputs[mNext].focus();allMInputs[mNext].select();allMInputs[mNext].scrollIntoView({block:'nearest',inline:'nearest'});}
     return;
   }else if(e.key==='ArrowRight'){
     e.preventDefault();next=Math.min(idx+1,allInputs.length-1);
