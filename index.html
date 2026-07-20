@@ -906,7 +906,43 @@ function computeReconTotals(){
 function reconRenderStats(){
   const t=computeReconTotals();
   const lbl=reconState.currentView==='month'?`${MONTH_FULL[reconState.calMonth]} ${reconState.calYear}`:`Year ${reconState.viewYear}`;
-  document.getElementById('statsBar').innerHTML=`<div class="stat-card parts"><div class="stat-label">Total Parts</div><div class="stat-val">${t.partsCount}</div></div><div class="stat-card rec"><div class="stat-label">${lbl} — Received</div><div class="stat-val">${t.totRec}</div></div><div class="stat-card ok"><div class="stat-label">${lbl} — Ok</div><div class="stat-val">${t.totOk}</div></div><div class="stat-card notok"><div class="stat-label">${lbl} — Not Ok</div><div class="stat-val">${t.totNotOk}</div></div>`;
+
+  // Get dismantled engines count from Core Engine Tracker for same month/year
+  const mk=reconState.currentView==='month'
+    ?`${reconState.calYear}-${String(reconState.calMonth+1).padStart(2,'0')}`
+    :null;
+  let totalDismantled=0;
+  const mergedDe={...deYearData};
+  Object.keys(deData).forEach(dk=>{if(!mergedDe[dk])mergedDe[dk]={};Object.assign(mergedDe[dk],deData[dk]);});
+  Object.keys(mergedDe).forEach(dk=>{
+    if(mk&&!dk.startsWith(mk))return;
+    if(!mk&&!dk.startsWith(String(reconState.viewYear)))return;
+    const dayObj=mergedDe[dk]||{};
+    DE_SERIES.forEach(s=>{if(dayObj[s])totalDismantled+=dayObj[s].dis||0;});
+  });
+
+  // Ok% vs Dismantled
+  const okPct = totalDismantled>0 ? ((t.totOk/totalDismantled)*100).toFixed(1) : '—';
+  const notOkPct = totalDismantled>0 ? ((t.totNotOk/totalDismantled)*100).toFixed(1) : '—';
+  const pctColor = totalDismantled>0
+    ? (parseFloat(okPct)>=70?'var(--ok-col)':parseFloat(okPct)>=40?'var(--p15-series)':'var(--warn)')
+    : 'var(--muted)';
+
+  document.getElementById('statsBar').innerHTML=`
+    <div class="stat-card parts"><div class="stat-label">Total Parts</div><div class="stat-val">${t.partsCount}</div></div>
+    <div class="stat-card rec"><div class="stat-label">${lbl} — Received</div><div class="stat-val">${t.totRec}</div></div>
+    <div class="stat-card ok"><div class="stat-label">${lbl} — Ok</div><div class="stat-val">${t.totOk}</div></div>
+    <div class="stat-card notok"><div class="stat-label">${lbl} — Not Ok</div><div class="stat-val">${t.totNotOk}</div></div>
+    <div class="stat-card" style="min-width:180px;border:1.5px solid var(--border);border-radius:10px;padding:10px 16px;background:#fff;border-left:4px solid ${pctColor};">
+      <div class="stat-label">Ok % vs Engines Dismantled</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:1.25rem;font-weight:700;color:${pctColor};">${okPct==='—'?'—':okPct+'%'}</div>
+      <div style="font-size:0.64rem;color:var(--muted);margin-top:3px;">${t.totOk} ok parts / ${totalDismantled} engines dismantled</div>
+    </div>
+    <div class="stat-card" style="min-width:180px;border:1.5px solid var(--border);border-radius:10px;padding:10px 16px;background:#fff;border-left:4px solid var(--notok-col);">
+      <div class="stat-label">Not Ok % vs Engines Dismantled</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-size:1.25rem;font-weight:700;color:var(--notok-col);">${notOkPct==='—'?'—':notOkPct+'%'}</div>
+      <div style="font-size:0.64rem;color:var(--muted);margin-top:3px;">${t.totNotOk} not ok parts / ${totalDismantled} engines dismantled</div>
+    </div>`;
 }
 function reconRenderMonthTable(){
   document.getElementById('monthLabel').textContent=`${MONTH_FULL[reconState.calMonth]} ${reconState.calYear}`;
