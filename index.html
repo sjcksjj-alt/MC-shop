@@ -60,21 +60,25 @@ body{font-family:'Inter',sans-serif;background:#fff;color:var(--text);min-height
 .stat-card.parts .stat-val{color:var(--text);}
 .table-scroll{overflow:auto;max-height:calc(100vh - 290px);border:1px solid var(--border);margin:0 24px 20px;border-radius:10px;}
 table.reg-table{border-collapse:separate;border-spacing:0;font-size:0.77rem;white-space:nowrap;width:max-content;min-width:100%;}
-table.reg-table thead th{position:sticky;top:0;background:var(--faint);z-index:5;border-bottom:1.5px solid var(--border);border-right:1px solid var(--border);padding:7px 9px;font-weight:700;color:var(--muted);text-transform:uppercase;font-size:0.63rem;letter-spacing:.04em;}
-table.reg-table thead tr.date-row th{background:#fff;color:var(--text);font-size:0.71rem;text-align:center;border-bottom:none;}
-table.reg-table thead tr.sub-row th{font-size:0.61rem;padding:5px 7px;text-align:center;}
+table.reg-table thead th{position:sticky;top:0;background:var(--faint);z-index:5;border-bottom:1.5px solid #bfbfbf;border-right:1px solid #bfbfbf;padding:7px 9px;font-weight:700;color:var(--muted);text-transform:uppercase;font-size:0.63rem;letter-spacing:.04em;}
+table.reg-table thead tr.date-row th{background:#e2efda;color:#375623;font-size:0.71rem;text-align:center;border-bottom:none;font-weight:700;}
+table.reg-table thead tr.sub-row th{font-size:0.61rem;padding:5px 7px;text-align:center;font-weight:700;}
 table.reg-table thead tr.sub-row th.rec-h{color:var(--rec-col);background:#eef2ff;}
 table.reg-table thead tr.sub-row th.ok-h{color:var(--ok-col);background:#e8faf5;}
 table.reg-table thead tr.sub-row th.notok-h{color:var(--notok-col);background:#fdeaea;}
 table.reg-table th.sticky-col,table.reg-table td.sticky-col{position:sticky;left:0;background:#fff;z-index:3;border-right:2px solid var(--border2);}
 table.reg-table th.sticky-col2,table.reg-table td.sticky-col2{position:sticky;background:#fff;z-index:3;}
-table.reg-table thead th.sticky-col,table.reg-table thead th.sticky-col2{z-index:6;}
-table.reg-table td{padding:4px 5px;border-bottom:1px solid var(--border);border-right:1px solid var(--border);text-align:center;}
-table.reg-table tbody tr:hover td{background:#fafbff;}
-table.reg-table tbody tr:hover td.sticky-col,table.reg-table tbody tr:hover td.sticky-col2{background:#f5f7ff;}
-.part-no{font-family:'JetBrains Mono',monospace;font-weight:600;font-size:0.73rem;}
+table.reg-table thead th.sticky-col,table.reg-table thead th.sticky-col2{z-index:6;background:#fff2cc!important;color:#7d6608!important;}
+table.reg-table td{padding:5px 5px;border-bottom:1px solid #bfbfbf;border-right:1px solid #bfbfbf;text-align:center;}
+table.reg-table tbody tr:nth-child(even) td{background:#f5f5f5;}
+table.reg-table tbody tr:nth-child(odd) td{background:#ffffff;}
+table.reg-table tbody tr:hover td{background:#ddeeff!important;}
+table.reg-table tbody tr:nth-child(even) td.sticky-col,table.reg-table tbody tr:nth-child(even) td.sticky-col2{background:#f5f5f5;}
+table.reg-table tbody tr:nth-child(odd) td.sticky-col,table.reg-table tbody tr:nth-child(odd) td.sticky-col2{background:#ffffff;}
+table.reg-table tbody tr:hover td.sticky-col,table.reg-table tbody tr:hover td.sticky-col2{background:#ddeeff!important;}
+.part-no{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:0.73rem;color:#c00000;}
 .part-model{font-size:0.67rem;color:var(--muted);}
-.part-name{font-weight:600;font-size:0.75rem;}
+.part-name{font-weight:700;font-size:0.78rem;text-transform:uppercase;letter-spacing:.02em;}
 .cell-input{width:52px;min-width:52px;max-width:90px;border:1px solid transparent;border-radius:4px;padding:3px 4px;text-align:center;font-family:'JetBrains Mono',monospace;font-size:0.73rem;background:transparent;}
 .cell-input:hover{border-color:var(--border2);}
 .cell-input:focus{outline:none;border-color:var(--accent);background:#fff;box-shadow:0 0 0 2px rgba(79,124,255,.15);}
@@ -151,8 +155,8 @@ td.cum-cell.notok{color:var(--notok-col);}
 .entry-card-body{padding:14px 18px;display:flex;flex-direction:row;align-items:center;gap:16px;}
 .entry-card-body .entry-card-left{display:flex;flex-direction:column;gap:4px;flex:1;}
 .entry-card-body .entry-total{flex-shrink:0;min-width:130px;}
-.count-label{font-size:0.73rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:600;}
-.count-input{background:#fff;border:1.5px solid var(--border2);border-radius:8px;padding:9px 12px;font-family:'JetBrains Mono',monospace;font-size:1.5rem;font-weight:700;color:var(--accent2);width:120px;outline:none;text-align:center;transition:border-color .15s,box-shadow .15s;-moz-appearance:textfield;}
+.count-label{font-size:0.65rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:600;}
+.count-input{background:#fff;border:2px solid var(--border2);border-radius:7px;padding:6px 8px;font-family:'JetBrains Mono',monospace;font-size:1rem;font-weight:700;color:var(--accent2);width:80px;outline:none;text-align:center;transition:border-color .15s,box-shadow .15s;-moz-appearance:textfield;box-shadow:0 1px 3px rgba(0,0,0,.08);}
 .count-input.dis-input{color:var(--warn);}
 .count-input::-webkit-inner-spin-button,.count-input::-webkit-outer-spin-button{-webkit-appearance:none;}
 .count-input:focus{border-color:var(--accent2);box-shadow:0 0 0 3px rgba(0,168,132,.12);}
@@ -364,6 +368,7 @@ td.cum-cell.notok{color:var(--notok-col);}
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/><path d="M14 2v6h6" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/></svg>
       Download Excel
     </button>
+
   </div>
   <div class="stats-bar" id="statsBar"></div>
   <div id="tableContainer"></div>
@@ -432,60 +437,96 @@ td.cum-cell.notok{color:var(--notok-col);}
     </div>
     <div class="de-main">
       <div>
-        <div class="section-title">Series Type</div>
-        <div class="series-tabs" id="seriesTabs">
-          <button class="series-tab active" data-series="H-Series">H-Series</button>
-          <button class="series-tab" data-series="A-Series">A-Series</button>
-          <button class="series-tab" data-series="P15-Series">P15-Series</button>
-          <button class="series-tab" data-series="ZD30-Series">ZD30-Series</button>
-        </div>
-      </div>
-      <div>
-        <div class="section-title">Daily Entry — <span id="entryLabel" style="color:var(--accent);text-transform:none;letter-spacing:0;">H-Series</span></div>
-        <div class="entry-grid">
-          <div class="entry-card">
-            <div class="entry-card-header received">
-              <svg width="17" height="17" viewBox="0 0 16 16" fill="none"><path d="M8 2v8M4 7l4 4 4-4" stroke="#00a884" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 13h12" stroke="#00a884" stroke-width="1.8" stroke-linecap="round"/></svg>
-              <h2>RECEIVED</h2>
+        <div class="section-title">Daily Entry — <span id="entryLabel" style="color:var(--accent);text-transform:none;letter-spacing:0;">All Series</span></div>
+        <div id="allSeriesGrid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <!-- H-Series -->
+          <div style="border:2px solid var(--h-series);border-radius:10px;overflow:hidden;">
+            <div style="background:var(--h-series);padding:5px 10px;display:flex;align-items:center;justify-content:space-between;">
+              <span style="color:#fff;font-weight:700;font-size:0.78rem;">H-Series</span>
+              <span id="de-date-label-h" style="color:rgba(255,255,255,0.85);font-size:0.68rem;font-weight:600;"></span>
             </div>
-            <div class="entry-card-body">
-              <div class="entry-card-left">
-                <div class="count-label">Enter Count</div>
-                <input class="count-input" id="rec-count" type="number" min="0" placeholder="0" oninput="updateDETotals()" onkeydown="deArrowAdjust(event,this)">
-                <div class="count-hint">Items received today</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
+              <div style="padding:6px 8px;border-right:1px solid var(--border);">
+                <div style="font-size:0.62rem;color:var(--accent2);font-weight:700;letter-spacing:.04em;margin-bottom:3px;">▼ REC</div>
+                <input class="count-input" id="rec-count-h" data-series="H-Series" type="number" min="0" placeholder="0" oninput="updateDETotal('H-Series')" onkeydown="deArrowAdjust(event,this)" style="width:100%;font-size:0.95rem;padding:4px 6px;">
+                <div style="margin-top:2px;font-size:0.62rem;color:var(--muted);">Total: <strong class="s-rec" id="rec-total-h">0</strong></div>
               </div>
-              <div class="entry-total"><span class="t-label">Total Received</span><span class="total-val s-rec" id="rec-total">0</span></div>
+              <div style="padding:6px 8px;">
+                <div style="font-size:0.62rem;color:var(--warn);font-weight:700;letter-spacing:.04em;margin-bottom:3px;">✕ DIS</div>
+                <input class="count-input dis-input" id="dis-count-h" data-series="H-Series" type="number" min="0" placeholder="0" oninput="updateDETotal('H-Series')" onkeydown="deArrowAdjust(event,this)" style="width:100%;font-size:0.95rem;padding:4px 6px;">
+                <div style="margin-top:2px;font-size:0.62rem;color:var(--muted);">Total: <strong class="s-dis" id="dis-total-h">0</strong></div>
+              </div>
             </div>
           </div>
-          <div class="entry-card">
-            <div class="entry-card-header dismantled">
-              <svg width="17" height="17" viewBox="0 0 16 16" fill="none"><path d="M4 4l8 8M12 4l-8 8" stroke="#e03e3e" stroke-width="1.8" stroke-linecap="round"/></svg>
-              <h2>DISMANTLED</h2>
+          <!-- A-Series -->
+          <div style="border:2px solid var(--a-series);border-radius:10px;overflow:hidden;">
+            <div style="background:var(--a-series);padding:5px 10px;display:flex;align-items:center;justify-content:space-between;">
+              <span style="color:#fff;font-weight:700;font-size:0.78rem;">A-Series</span>
+              <span id="de-date-label-a" style="color:rgba(255,255,255,0.85);font-size:0.68rem;font-weight:600;"></span>
             </div>
-            <div class="entry-card-body">
-              <div class="entry-card-left">
-                <div class="count-label">Enter Count</div>
-                <input class="count-input dis-input" id="dis-count" type="number" min="0" placeholder="0" oninput="updateDETotals()" onkeydown="deArrowAdjust(event,this)">
-                <div class="count-hint">Items dismantled today</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
+              <div style="padding:6px 8px;border-right:1px solid var(--border);">
+                <div style="font-size:0.62rem;color:var(--accent2);font-weight:700;letter-spacing:.04em;margin-bottom:3px;">▼ REC</div>
+                <input class="count-input" id="rec-count-a" data-series="A-Series" type="number" min="0" placeholder="0" oninput="updateDETotal('A-Series')" onkeydown="deArrowAdjust(event,this)" style="width:100%;font-size:0.95rem;padding:4px 6px;">
+                <div style="margin-top:2px;font-size:0.62rem;color:var(--muted);">Total: <strong class="s-rec" id="rec-total-a">0</strong></div>
               </div>
-              <div class="entry-total"><span class="t-label">Total Dismantled</span><span class="total-val s-dis" id="dis-total">0</span></div>
+              <div style="padding:6px 8px;">
+                <div style="font-size:0.62rem;color:var(--warn);font-weight:700;letter-spacing:.04em;margin-bottom:3px;">✕ DIS</div>
+                <input class="count-input dis-input" id="dis-count-a" data-series="A-Series" type="number" min="0" placeholder="0" oninput="updateDETotal('A-Series')" onkeydown="deArrowAdjust(event,this)" style="width:100%;font-size:0.95rem;padding:4px 6px;">
+                <div style="margin-top:2px;font-size:0.62rem;color:var(--muted);">Total: <strong class="s-dis" id="dis-total-a">0</strong></div>
+              </div>
+            </div>
+          </div>
+          <!-- P15-Series -->
+          <div style="border:2px solid var(--p15-series);border-radius:10px;overflow:hidden;">
+            <div style="background:var(--p15-series);padding:5px 10px;display:flex;align-items:center;justify-content:space-between;">
+              <span style="color:#fff;font-weight:700;font-size:0.78rem;">P15-Series</span>
+              <span id="de-date-label-p15" style="color:rgba(255,255,255,0.85);font-size:0.68rem;font-weight:600;"></span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
+              <div style="padding:6px 8px;border-right:1px solid var(--border);">
+                <div style="font-size:0.62rem;color:var(--accent2);font-weight:700;letter-spacing:.04em;margin-bottom:3px;">▼ REC</div>
+                <input class="count-input" id="rec-count-p15" data-series="P15-Series" type="number" min="0" placeholder="0" oninput="updateDETotal('P15-Series')" onkeydown="deArrowAdjust(event,this)" style="width:100%;font-size:0.95rem;padding:4px 6px;">
+                <div style="margin-top:2px;font-size:0.62rem;color:var(--muted);">Total: <strong class="s-rec" id="rec-total-p15">0</strong></div>
+              </div>
+              <div style="padding:6px 8px;">
+                <div style="font-size:0.62rem;color:var(--warn);font-weight:700;letter-spacing:.04em;margin-bottom:3px;">✕ DIS</div>
+                <input class="count-input dis-input" id="dis-count-p15" data-series="P15-Series" type="number" min="0" placeholder="0" oninput="updateDETotal('P15-Series')" onkeydown="deArrowAdjust(event,this)" style="width:100%;font-size:0.95rem;padding:4px 6px;">
+                <div style="margin-top:2px;font-size:0.62rem;color:var(--muted);">Total: <strong class="s-dis" id="dis-total-p15">0</strong></div>
+              </div>
+            </div>
+          </div>
+          <!-- ZD30-Series -->
+          <div style="border:2px solid var(--zd30-series);border-radius:10px;overflow:hidden;">
+            <div style="background:var(--zd30-series);padding:5px 10px;display:flex;align-items:center;justify-content:space-between;">
+              <span style="color:#fff;font-weight:700;font-size:0.78rem;">ZD30-Series</span>
+              <span id="de-date-label-zd30" style="color:rgba(255,255,255,0.85);font-size:0.68rem;font-weight:600;"></span>
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0;">
+              <div style="padding:6px 8px;border-right:1px solid var(--border);">
+                <div style="font-size:0.62rem;color:var(--accent2);font-weight:700;letter-spacing:.04em;margin-bottom:3px;">▼ REC</div>
+                <input class="count-input" id="rec-count-zd30" data-series="ZD30-Series" type="number" min="0" placeholder="0" oninput="updateDETotal('ZD30-Series')" onkeydown="deArrowAdjust(event,this)" style="width:100%;font-size:0.95rem;padding:4px 6px;">
+                <div style="margin-top:2px;font-size:0.62rem;color:var(--muted);">Total: <strong class="s-rec" id="rec-total-zd30">0</strong></div>
+              </div>
+              <div style="padding:6px 8px;">
+                <div style="font-size:0.62rem;color:var(--warn);font-weight:700;letter-spacing:.04em;margin-bottom:3px;">✕ DIS</div>
+                <input class="count-input dis-input" id="dis-count-zd30" data-series="ZD30-Series" type="number" min="0" placeholder="0" oninput="updateDETotal('ZD30-Series')" onkeydown="deArrowAdjust(event,this)" style="width:100%;font-size:0.95rem;padding:4px 6px;">
+                <div style="margin-top:2px;font-size:0.62rem;color:var(--muted);">Total: <strong class="s-dis" id="dis-total-zd30">0</strong></div>
+              </div>
             </div>
           </div>
         </div>
       </div>
       <div class="save-bar">
-        <button class="btn-save" id="saveBtn" onclick="saveEntry()">Save Entry</button>
-        <button class="btn-clear" onclick="clearForm()">Clear</button>
+        <button class="btn-save" id="saveBtn" onclick="saveAllEntries()">Save All Entries</button>
+        <button class="btn-clear" onclick="clearAllForms()">Clear</button>
         <button class="btn-de-excel" onclick="openDEMonthModal()">⬇ Excel</button>
         <span class="save-msg" id="saveMsg"></span>
       </div>
       <div class="chart-wrap">
         <div class="chart-header">
           <div class="chart-title">Monthly Trend</div>
-          <div class="chart-legend">
-            <div class="legend-item"><div class="legend-dot" style="background:var(--accent2)"></div>Received</div>
-            <div class="legend-item"><div class="legend-dot" style="background:var(--warn)"></div>Dismantled</div>
-          </div>
+
         </div>
         <div class="chart-series-tabs" id="chartSeriesTabs">
           <button class="chart-series-tab active" data-series="All">All Series</button>
@@ -895,7 +936,7 @@ function reconRenderMonthTable(){
       html+=`<td><input class="cell-input ok-input" type="number" min="0" value="${d.ok||''}" oninput="handleCellInput('${reconState.currentSeries}','${p.id}','${ds}','ok',this.value)"></td>`;
       html+=`<td><input class="cell-input notok-input" type="number" min="0" value="${d.notok||''}" oninput="handleCellInput('${reconState.currentSeries}','${p.id}','${ds}','notok',this.value)"></td>`;
     });
-    html+=`<td class="cum-cell rec" data-cumtype="rec" data-part="${p.id}">${cumRec||0}</td><td class="cum-cell ok" data-cumtype="ok" data-part="${p.id}">${cumOk||0}</td><td class="cum-cell notok" data-cumtype="notok" data-part="${p.id}">${cumNotOk||0}</td>`;
+    html+=`<td class="cum-cell rec" data-cumtype="rec" data-part="${p.id}">${cumRec||''}</td><td class="cum-cell ok" data-cumtype="ok" data-part="${p.id}">${cumOk||''}</td><td class="cum-cell notok" data-cumtype="notok" data-part="${p.id}">${cumNotOk||''}</td>`;
     html+=`<td><button class="del-row-btn" onclick="deletePart('${p.id}','${(p.partName||'').replace(/'/g,"\\'")}')">✕</button></td></tr>`;
   });
   html+=`</tbody></table></div>`;
@@ -911,7 +952,7 @@ function refreshCumCells(){
     const rc=document.querySelector(`td.cum-cell.rec[data-part="${p.id}"]`);
     const oc=document.querySelector(`td.cum-cell.ok[data-part="${p.id}"]`);
     const nc=document.querySelector(`td.cum-cell.notok[data-part="${p.id}"]`);
-    if(rc)rc.textContent=cumRec||0;if(oc)oc.textContent=cumOk||0;if(nc)nc.textContent=cumNotOk||0;
+    if(rc)rc.textContent=cumRec||'';if(oc)oc.textContent=cumOk||'';if(nc)nc.textContent=cumNotOk||'';
   });reconRenderStats();
 }
 function reconRenderYearTable(){
@@ -1202,21 +1243,27 @@ document.addEventListener('click', function(e){
 });
 document.getElementById('calPrev').onclick=async()=>{deCalMonth--;if(deCalMonth<0){deCalMonth=11;deCalYear--;}setSync('ing');await deLoadMonthData();deRenderCalendar();deRenderCumTable();deRenderChart();};
 document.getElementById('calNext').onclick=async()=>{deCalMonth++;if(deCalMonth>11){deCalMonth=0;deCalYear++;}setSync('ing');await deLoadMonthData();deRenderCalendar();deRenderCumTable();deRenderChart();};
-document.getElementById('seriesTabs').addEventListener('click',e=>{
-  const tab=e.target.closest('.series-tab');if(!tab)return;
-  document.querySelectorAll('#seriesTabs .series-tab').forEach(t=>t.classList.remove('active'));
-  tab.classList.add('active');deCurrentSeries=tab.dataset.series;
-  document.getElementById('entryLabel').textContent=deCurrentSeries;deLoadFormForDate();
+// All series shown at once — no tab switching needed
+document.getElementById('chartSeriesTabs').addEventListener('click',e=>{
+  const tab=e.target.closest('.chart-series-tab');if(!tab)return;
+  document.querySelectorAll('.chart-series-tab').forEach(t=>t.classList.remove('active'));
+  tab.classList.add('active');deChartSeries=tab.dataset.series;deRenderChart();
 });
 document.getElementById('chartSeriesTabs').addEventListener('click',e=>{
   const tab=e.target.closest('.chart-series-tab');if(!tab)return;
   document.querySelectorAll('.chart-series-tab').forEach(t=>t.classList.remove('active'));
   tab.classList.add('active');deChartSeries=tab.dataset.series;deRenderChart();
 });
-window.updateDETotals=function(){
-  const rv=parseInt(document.getElementById('rec-count').value)||0;
-  const dv=parseInt(document.getElementById('dis-count').value)||0;
-  document.getElementById('rec-total').textContent=rv;document.getElementById('dis-total').textContent=dv;
+window.updateDETotals=function(){};  // legacy stub
+window.updateDETotal=function(series){
+  const sid={'H-Series':'h','A-Series':'a','P15-Series':'p15','ZD30-Series':'zd30'}[series];
+  // Month totals from deData
+  let mRec=0,mDis=0;
+  Object.values(deData).forEach(dayObj=>{if(dayObj[series]){mRec+=dayObj[series].rec||0;mDis+=dayObj[series].dis||0;}});
+  const recEl=document.getElementById('rec-total-'+sid);
+  const disEl=document.getElementById('dis-total-'+sid);
+  if(recEl)recEl.textContent=mRec;
+  if(disEl)disEl.textContent=mDis;
 };
 window.deArrowAdjust=function(e,el){
   if(e.key==='ArrowUp'||e.key==='ArrowDown'){
@@ -1224,39 +1271,73 @@ window.deArrowAdjust=function(e,el){
   }
 };
 function deLoadFormForDate(){
-  const dd=deData[deSelectedDate]&&deData[deSelectedDate][deCurrentSeries];
-  document.getElementById('rec-count').value=dd?dd.rec||'':'';
-  document.getElementById('dis-count').value=dd?dd.dis||'':'';updateDETotals();
+  const sid={'H-Series':'h','A-Series':'a','P15-Series':'p15','ZD30-Series':'zd30'};
+  const dateLabel=formatDisplay(deSelectedDate);
+  DE_SERIES.forEach(s=>{
+    const id=sid[s];
+    const dd=deData[deSelectedDate]&&deData[deSelectedDate][s];
+    const recEl=document.getElementById('rec-count-'+id);
+    const disEl=document.getElementById('dis-count-'+id);
+    if(recEl)recEl.value=dd?dd.rec||'':'';
+    if(disEl)disEl.value=dd?dd.dis||'':'';
+    // update date label in header
+    const dlEl=document.getElementById('de-date-label-'+id);
+    if(dlEl)dlEl.textContent=dateLabel;
+    updateDETotal(s);
+  });
 }
-window.saveEntry=async function(){
+window.saveAllEntries=async function(){
   const btn=document.getElementById('saveBtn');const msg=document.getElementById('saveMsg');
-  const rv=parseInt(document.getElementById('rec-count').value)||0;
-  const dv=parseInt(document.getElementById('dis-count').value)||0;
   btn.disabled=true;btn.textContent='Saving...';msg.className='save-msg';msg.textContent='';
+  const sid={'H-Series':'h','A-Series':'a','P15-Series':'p15','ZD30-Series':'zd30'};
+  let savedCount=0;
   try{
     setSync('ing');
-    const id=`${SHARED_UID}_${deSelectedDate}_${deCurrentSeries.replace(/\s/g,'-')}`;
-    await setDoc(doc(db,'entries',id),{uid:SHARED_UID,date:deSelectedDate,month:deSelectedDate.substring(0,7),year:deSelectedDate.substring(0,4),series:deCurrentSeries,rec:rv,dis:dv,updatedAt:new Date().toISOString()});
+    for(const series of DE_SERIES){
+      const id=sid[series];
+      const recEl=document.getElementById('rec-count-'+id);
+      const disEl=document.getElementById('dis-count-'+id);
+      const rv=parseInt(recEl?recEl.value:0)||0;
+      const dv=parseInt(disEl?disEl.value:0)||0;
+      if(rv===0&&dv===0)continue;
+      const docId=`${SHARED_UID}_${deSelectedDate}_${series.replace(/\s/g,'-')}`;
+      await setDoc(doc(db,'entries',docId),{uid:SHARED_UID,date:deSelectedDate,month:deSelectedDate.substring(0,7),year:deSelectedDate.substring(0,4),series,rec:rv,dis:dv,updatedAt:new Date().toISOString()});
+      if(!deData[deSelectedDate])deData[deSelectedDate]={};
+      deData[deSelectedDate][series]={rec:rv,dis:dv};
+      savedCount++;
+    }
     setSync('ok');
-    if(!deData[deSelectedDate])deData[deSelectedDate]={};
-    deData[deSelectedDate][deCurrentSeries]={rec:rv,dis:dv};
     deRenderCalendar();deRenderCumTable();deRenderChart();
-    msg.textContent='✓ Saved to Firebase';msg.classList.add('show','ok');
+    DE_SERIES.forEach(s=>updateDETotal(s));
+    msg.textContent=savedCount>0?`✓ ${savedCount} series saved`:'✓ No changes to save';
+    msg.classList.add('show','ok');
   }catch(e){
     setSync('err');
-    if(!deData[deSelectedDate])deData[deSelectedDate]={};
-    deData[deSelectedDate][deCurrentSeries]={rec:rv,dis:dv};
-    deRenderCalendar();deRenderCumTable();deRenderChart();
-    msg.textContent='✓ Saved locally';msg.classList.add('show','ok');
+    msg.textContent='✗ Save failed';msg.classList.add('show','err');
   }
   setTimeout(()=>msg.classList.remove('show','ok','err'),3000);
-  btn.disabled=false;btn.textContent='Save Entry';
+  btn.disabled=false;btn.textContent='Save All Entries';
 };
-window.clearForm=function(){document.getElementById('rec-count').value='';document.getElementById('dis-count').value='';updateDETotals();};
+window.saveEntry=window.saveAllEntries;
+window.clearAllForms=function(){
+  const sid={'H-Series':'h','A-Series':'a','P15-Series':'p15','ZD30-Series':'zd30'};
+  DE_SERIES.forEach(s=>{
+    const id=sid[s];
+    const r=document.getElementById('rec-count-'+id);
+    const d=document.getElementById('dis-count-'+id);
+    if(r)r.value='';if(d)d.value='';
+  });
+};
+window.clearForm=window.clearAllForms;;
 function deUpdateMonthlyCum(){
   const cum={};DE_SERIES.forEach(s=>{cum[s]={rec:0,dis:0};});
   Object.values(deData).forEach(dayObj=>{DE_SERIES.forEach(s=>{if(dayObj[s]){cum[s].rec+=dayObj[s].rec||0;cum[s].dis+=dayObj[s].dis||0;}});});
-  DE_SERIES.forEach(s=>{document.getElementById(`cum-${CUM_ID[s]}-rec`).textContent=cum[s].rec;document.getElementById(`cum-${CUM_ID[s]}-dis`).textContent=cum[s].dis;});
+  DE_SERIES.forEach(s=>{
+    document.getElementById(`cum-${CUM_ID[s]}-rec`).textContent=cum[s].rec;
+    document.getElementById(`cum-${CUM_ID[s]}-dis`).textContent=cum[s].dis;
+    // also update month totals in new entry cards
+    updateDETotal(s);
+  });
   document.getElementById('cum-total-rec').textContent=DE_SERIES.reduce((a,s)=>a+cum[s].rec,0);
   document.getElementById('cum-total-dis').textContent=DE_SERIES.reduce((a,s)=>a+cum[s].dis,0);
 }
@@ -1283,15 +1364,43 @@ function deRenderChart(){
   const nDays=new Date(deCalYear,deCalMonth+1,0).getDate();const allDays=[];
   for(let d=1;d<=nDays;d++)allDays.push(`${deCalYear}-${String(deCalMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`);
   const labels=allDays.map(d=>String(parseInt(d.split('-')[2])));
-  const recData=allDays.map(d=>{const dayObj=deData[d]||{};return deChartSeries==='All'?DE_SERIES.reduce((a,s)=>a+(dayObj[s]?dayObj[s].rec||0:0),0):(dayObj[deChartSeries]?dayObj[deChartSeries].rec||0:0);});
-  const disData=allDays.map(d=>{const dayObj=deData[d]||{};return deChartSeries==='All'?DE_SERIES.reduce((a,s)=>a+(dayObj[s]?dayObj[s].dis||0:0),0):(dayObj[deChartSeries]?dayObj[deChartSeries].dis||0:0);});
+
+  const activeSeries=deChartSeries==='All'?DE_SERIES:[deChartSeries];
+  const recData=allDays.map(d=>{const o=deData[d]||{};return activeSeries.reduce((a,s)=>a+(o[s]?o[s].rec||0:0),0);});
+  const disData=allDays.map(d=>{const o=deData[d]||{};return activeSeries.reduce((a,s)=>a+(o[s]?o[s].dis||0:0),0);});
+
+  const datasets=[
+    {label:'Received',data:recData,backgroundColor:'rgba(0,168,132,0.75)',borderColor:'#00a884',borderWidth:1.5,borderRadius:4},
+    {label:'Dismantled',data:disData,backgroundColor:'rgba(224,62,62,0.65)',borderColor:'#e03e3e',borderWidth:1.5,borderRadius:4}
+  ];
+
   const maxVal=Math.max(...recData,...disData,5);
-  deLineChart=new Chart(ctx,{type:'bar',data:{labels,datasets:[
-    {label:'Received',data:recData,backgroundColor:'rgba(0,168,132,.75)',borderColor:'#00a884',borderWidth:1.5,borderRadius:4},
-    {label:'Dismantled',data:disData,backgroundColor:'rgba(224,62,62,.65)',borderColor:'#e03e3e',borderWidth:1.5,borderRadius:4}
-  ]},options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
-    plugins:{legend:{display:false},tooltip:{backgroundColor:'#1a1d27',titleColor:'#fff',bodyColor:'#b0b7cc',padding:12,callbacks:{title:items=>`${items[0].label} ${MONTH_SHORT[deCalMonth]} ${deCalYear}`,label:item=>`${item.dataset.label}: ${item.raw}`}}},
-    scales:{x:{grid:{color:'#f0f2f8'},border:{color:'#c8cfe0'},ticks:{color:'#7a8099',font:{size:10},maxRotation:0}},y:{grid:{color:'#f0f2f8'},border:{color:'#c8cfe0'},ticks:{color:'#7a8099',font:{size:11},stepSize:1},beginAtZero:true,min:0,suggestedMax:maxVal+2}}}});
+  deLineChart=new Chart(ctx,{type:'bar',data:{labels,datasets},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{
+          display:true,
+          position:'bottom',
+          labels:{
+            boxWidth:14,boxHeight:10,padding:16,
+            font:{size:11,weight:'600'},
+            color:'#1a1d27',
+            usePointStyle:false
+          }
+        },
+        tooltip:{backgroundColor:'#1a1d27',titleColor:'#fff',bodyColor:'#b0b7cc',padding:10,
+          callbacks:{
+            title:items=>`${items[0].label} ${MONTH_SHORT[deCalMonth]} ${deCalYear}`,
+            label:item=>`${item.dataset.label}: ${item.raw}`
+          }
+        }
+      },
+      scales:{
+        x:{grid:{color:'#f0f2f8'},border:{color:'#c8cfe0'},ticks:{color:'#7a8099',font:{size:10},maxRotation:0}},
+        y:{grid:{color:'#f0f2f8'},border:{color:'#c8cfe0'},ticks:{color:'#7a8099',font:{size:11},stepSize:1},beginAtZero:true,min:0,suggestedMax:maxVal+2}
+      }
+    }
+  });
 }
 // ── DE MONTH PICKER FOR EXCEL ──────────────────────────────────
 let deMsYear = todayObj.getFullYear();
@@ -1914,6 +2023,123 @@ window.downloadWithSelectedMonths = async function(){
   }catch(err){
     console.error(err);
     alert('Excel export failed: '+err.message);
+  }
+};
+
+// ── COPY TABLE TO CLIPBOARD (Excel-compatible) ──────────────
+window.copyTableToClipboard = async function(){
+  const btn = document.getElementById('copyTableBtn');
+  const tableEl = document.querySelector('#tableContainer table');
+  if(!tableEl){ alert('Table இல்லை — முதல்ல data load ஆகணும்'); return; }
+
+  // Build TSV for plain text paste
+  const rows = tableEl.querySelectorAll('tr');
+  const tsvLines = [];
+  rows.forEach(row=>{
+    const cells = row.querySelectorAll('th,td');
+    const vals = [];
+    cells.forEach(cell=>{
+      const input = cell.querySelector('input');
+      const val = input ? (input.value||'') : cell.textContent.trim();
+      vals.push(val.replace(/\t/g,' '));
+    });
+    tsvLines.push(vals.join('\t'));
+  });
+  const tsvText = tsvLines.join('\n');
+
+  // Build Excel-compatible HTML table
+  const style = `
+    <style>
+      table{border-collapse:collapse;font-family:Calibri,sans-serif;font-size:11pt;}
+      th,td{border:1px solid #bfbfbf;padding:4px 8px;text-align:center;white-space:nowrap;}
+      .sh{background:#fff2cc;font-weight:bold;color:#7d6608;}
+      .dh{background:#e2efda;font-weight:bold;color:#375623;}
+      .rh{background:#eef2ff;font-weight:bold;color:#4f7cff;}
+      .oh{background:#e8faf5;font-weight:bold;color:#00a884;}
+      .nh{background:#fdeaea;font-weight:bold;color:#e03e3e;}
+      .rv{color:#4f7cff;font-weight:bold;}
+      .ov{color:#00a884;font-weight:bold;}
+      .nv{color:#e03e3e;font-weight:bold;}
+      .cv{color:#4f7cff;font-weight:bold;background:#f0f2f8;}
+      tr:nth-child(even) td{background:#f5f5f5;}
+      tr:nth-child(odd) td{background:#ffffff;}
+      .pn{font-weight:bold;text-transform:uppercase;}
+      .pno{color:#c00000;font-weight:bold;}
+    </style>`;
+
+  // Reconstruct table with proper Excel classes
+  const series = reconState.currentSeries;
+  const isH = series==='H-Series';
+  const list = reconParts[series];
+  const yr = reconState.calYear, mo = reconState.calMonth;
+  const nDays = daysInMonth(yr, mo);
+  const dateList = [];
+  for(let d=1;d<=nDays;d++) dateList.push(toDateStr(yr,mo,d));
+  const numW=50, partNoW=90, modelW=isH?90:0;
+
+  let tbl = `<table>`;
+  // Header row 1 - date headers
+  tbl += `<tr>`;
+  tbl += `<th class="sh" rowspan="2">#</th>`;
+  tbl += `<th class="sh" rowspan="2">Part No</th>`;
+  if(isH) tbl += `<th class="sh" rowspan="2">Model</th>`;
+  tbl += `<th class="sh" rowspan="2">Part Name</th>`;
+  dateList.forEach(ds=>{
+    const d=parseInt(ds.split('-')[2]);
+    tbl += `<th class="dh" colspan="3">${ddmmyyyy(yr,mo,d)}</th>`;
+  });
+  tbl += `<th class="dh" colspan="3">Monthly Cumulative</th>`;
+  tbl += `</tr>`;
+  // Header row 2 - Rec/Ok/NotOk
+  tbl += `<tr>`;
+  dateList.forEach(()=>{
+    tbl += `<th class="rh">Rec</th><th class="oh">Ok</th><th class="nh">NotOk</th>`;
+  });
+  tbl += `<th class="rh">Rec</th><th class="oh">Ok</th><th class="nh">NotOk</th>`;
+  tbl += `</tr>`;
+  // Data rows
+  list.forEach((p,idx)=>{
+    const pe = reconEntries[series][p.id]||{};
+    let cumRec=0,cumOk=0,cumNotOk=0;
+    dateList.forEach(ds=>{const d=pe[ds];if(d){cumRec+=d.rec||0;cumOk+=d.ok||0;cumNotOk+=d.notok||0;}});
+    tbl += `<tr>`;
+    tbl += `<td>${idx+1}</td>`;
+    tbl += `<td class="pno">${p.partNo||''}</td>`;
+    if(isH) tbl += `<td style="color:#7a8099;font-size:10pt;">${p.model||''}</td>`;
+    tbl += `<td class="pn" style="text-align:left;">${p.partName||''}</td>`;
+    dateList.forEach(ds=>{
+      const d=pe[ds];
+      tbl += `<td class="rv">${d&&d.rec?d.rec:''}</td>`;
+      tbl += `<td class="ov">${d&&d.ok?d.ok:''}</td>`;
+      tbl += `<td class="nv">${d&&d.notok?d.notok:''}</td>`;
+    });
+    tbl += `<td class="cv">${cumRec||''}</td><td class="cv">${cumOk||''}</td><td class="cv">${cumNotOk||''}</td>`;
+    tbl += `</tr>`;
+  });
+  tbl += `</table>`;
+
+  const htmlContent = `<html><head><meta charset="utf-8">${style}</head><body>${tbl}</body></html>`;
+
+  try{
+    await navigator.clipboard.write([
+      new ClipboardItem({
+        'text/html': new Blob([htmlContent],{type:'text/html'}),
+        'text/plain': new Blob([tsvText],{type:'text/plain'})
+      })
+    ]);
+    btn.textContent='✓ Copied!';
+    btn.style.background='#00a884';
+    setTimeout(()=>{btn.textContent='📋 Copy Table';btn.style.background='#217346';},2000);
+    dbg('Table copied to clipboard');
+  }catch(err){
+    // Fallback — copy TSV only
+    try{
+      await navigator.clipboard.writeText(tsvText);
+      btn.textContent='✓ Copied (TSV)';
+      setTimeout(()=>{btn.textContent='📋 Copy Table';},2000);
+    }catch(e){
+      alert('Copy பண்ண முடியல — Download Excel use பண்ணுங்க');
+    }
   }
 };
 
