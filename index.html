@@ -380,6 +380,7 @@ td.cum-cell.notok{color:var(--notok-col);}
     <input class="partno-in" id="newPartNo" placeholder="Part No">
     <input class="model-in" id="newModel" placeholder="Model">
     <input class="name-in" id="newPartName" placeholder="Part Name">
+    <input style="width:80px;border:1.5px solid var(--border2);border-radius:7px;padding:7px 11px;font-size:0.81rem;" id="newOffTake" type="number" min="0.5" step="0.5" placeholder="Off Take" value="1" title="Qty used per engine">
     <button class="btn-add" onclick="addPart()">+ Add Part</button>
   </div>
 </div>
@@ -744,7 +745,7 @@ async function loadParts(series){
     dbg(`Loading parts: ${series}…`);
     const q=query(collection(db,'parts'),where('uid','==',SHARED_UID),where('series','==',series));
     const snap=await getDocs(q);const list=[];
-    snap.forEach(d=>{const v=d.data();list.push({id:d.id,partNo:v.partNo||'',model:v.model||'',partName:v.partName||'',order:v.order||0});});
+    snap.forEach(d=>{const v=d.data();list.push({id:d.id,partNo:v.partNo||'',model:v.model||'',partName:v.partName||'',order:v.order||0,offTake:v.offTake||1});});
     list.sort((a,b)=>a.order-b.order);reconParts[series]=list;dbg(`Parts loaded: ${list.length}`);setSync('ok');
   }catch(err){dbg(`❌ Parts: ${err.message}`);setSync('err');}
 }
@@ -774,7 +775,7 @@ async function loadYearEntries(series,yr){
 }
 async function addPartToFirestore(series,partNo,model,partName,order){
   const docId=`${SHARED_UID}_${series}_${partNo||'noPN'}_${Date.now()}`;
-  await setDoc(doc(db,'parts',docId),{uid:SHARED_UID,series,partNo,model,partName,order,createdAt:new Date().toISOString()});
+  await setDoc(doc(db,'parts',docId),{uid:SHARED_UID,series,partNo,model,partName,order,offTake:1,createdAt:new Date().toISOString()});
   return docId;
 }
 async function deletePartFromFirestore(partId){await deleteDoc(doc(db,'parts',partId));}
@@ -829,13 +830,16 @@ window.addPart=async function(){
   const model=document.getElementById('newModel').value.trim();
   const pname=document.getElementById('newPartName').value.trim();
   if(!pname){alert('Part Name venum');return;}
+  const offTakeEl=document.getElementById('newOffTake');
+  const offTake=parseFloat(offTakeEl?offTakeEl.value:1)||1;
   const order=reconParts[reconState.currentSeries].length;
   try{
     setSync('ing');
     const id=await addPartToFirestore(reconState.currentSeries,pno,model,pname,order);
-    reconParts[reconState.currentSeries].push({id,partNo:pno,model,partName:pname,order});
+    await setDoc(doc(db,'parts',id),{offTake},{merge:true});
+    reconParts[reconState.currentSeries].push({id,partNo:pno,model,partName:pname,order,offTake});
     setSync('ok');
-    document.getElementById('newPartNo').value='';document.getElementById('newModel').value='';document.getElementById('newPartName').value='';
+    document.getElementById('newPartNo').value='';document.getElementById('newModel').value='';document.getElementById('newPartName').value='';if(document.getElementById('newOffTake'))document.getElementById('newOffTake').value='1';
     reconRenderAll();
   }catch(err){setSync('err');alert('Add failed: '+(err.code||err.message));}
 };
@@ -908,15 +912,17 @@ function computeReconTotals(){
 }
 function reconRenderStats(){
   const t=computeReconTotals();
-  const lbl=reconState.currentView==='month'?`${MONTH_FULL[reconState.calMonth]} ${reconState.calYear}`:`Year ${reconState.viewYear}`;
+  const lbl=reconState.currentView==='month'
+    ?`${MONTH_FULL[reconState.calMonth]} ${reconState.calYear}`
+    :`Year ${reconState.viewYear}`;
 
-  // Get dismantled engines count from Core Engine Tracker for same month/year
+  // Get dismantled count from Core Engine Tracker
   const mk=reconState.currentView==='month'
     ?`${reconState.calYear}-${String(reconState.calMonth+1).padStart(2,'0')}`
     :null;
-  let totalDismantled=0;
   const mergedDe={...deYearData};
   Object.keys(deData).forEach(dk=>{if(!mergedDe[dk])mergedDe[dk]={};Object.assign(mergedDe[dk],deData[dk]);});
+  let totalDismantled=0;
   Object.keys(mergedDe).forEach(dk=>{
     if(mk&&!dk.startsWith(mk))return;
     if(!mk&&!dk.startsWith(String(reconState.viewYear)))return;
@@ -924,30 +930,41 @@ function reconRenderStats(){
     DE_SERIES.forEach(s=>{if(dayObj[s])totalDismantled+=dayObj[s].dis||0;});
   });
 
-  // Ok% and NotOk% — always within 100% (Ok+NotOk = total inspected)
-  const totalInspected = t.totOk + t.totNotOk;
-  const okPct = totalInspected>0 ? Math.min(100,((t.totOk/totalInspected)*100)).toFixed(1) : '—';
-  const notOkPct = totalInspected>0 ? Math.min(100,((t.totNotOk/totalInspected)*100)).toFixed(1) : '—';
-  const pctColor = totalInspected>0
-    ? (parseFloat(okPct)>=70?'var(--ok-col)':parseFloat(okPct)>=40?'var(--p15-series)':'var(--warn)')
-    : 'var(--muted)';
+  // Simple formula: Ok% = total ok / total dismantled × 100
+  const okPct = totalDismantled>0 ? Math.min(100,((t.totOk/totalDismantled)*100)).toFixed(1) : '—';
+  const notOkPct = totalDismantled>0 ? Math.min(100,((t.totNotOk/totalDismantled)*100)).toFixed(1) : '—';
+  const pctColor = okPct==='—'?'var(--muted)'
+    :(parseFloat(okPct)>=70?'var(--ok-col)':parseFloat(okPct)>=40?'var(--p15-series)':'var(--warn)');
 
   document.getElementById('statsBar').innerHTML=`
     <div class="stat-card parts"><div class="stat-label">Total Parts</div><div class="stat-val">${t.partsCount}</div></div>
-    <div class="stat-card" style="min-width:180px;border:1.5px solid var(--border);border-radius:10px;padding:10px 16px;background:#fff;border-left:4px solid ${pctColor};">
+    <div class="stat-card ok"><div class="stat-label">${lbl} — Ok</div><div class="stat-val">${t.totOk}</div></div>
+    <div class="stat-card notok"><div class="stat-label">${lbl} — Not Ok</div><div class="stat-val">${t.totNotOk}</div></div>
+    <div class="stat-card" style="min-width:170px;border:1.5px solid var(--border);border-radius:10px;padding:10px 16px;background:#fff;border-left:4px solid ${pctColor};">
       <div class="stat-label">Ok % vs Engines Dismantled</div>
       <div style="font-family:'JetBrains Mono',monospace;font-size:1.25rem;font-weight:700;color:${pctColor};">${okPct==='—'?'—':okPct+'%'}</div>
-      <div style="font-size:0.64rem;color:var(--muted);margin-top:3px;">${t.totOk} ok parts / ${totalInspected} engines dismantled</div>
+      <div style="font-size:0.64rem;color:var(--muted);margin-top:3px;">${t.totOk} ok / ${totalDismantled} dismantled</div>
     </div>
-    <div class="stat-card" style="min-width:180px;border:1.5px solid var(--border);border-radius:10px;padding:10px 16px;background:#fff;border-left:4px solid var(--notok-col);">
+    <div class="stat-card" style="min-width:170px;border:1.5px solid var(--border);border-radius:10px;padding:10px 16px;background:#fff;border-left:4px solid var(--notok-col);">
       <div class="stat-label">Not Ok % vs Engines Dismantled</div>
       <div style="font-family:'JetBrains Mono',monospace;font-size:1.25rem;font-weight:700;color:var(--notok-col);">${notOkPct==='—'?'—':notOkPct+'%'}</div>
-      <div style="font-size:0.64rem;color:var(--muted);margin-top:3px;">${t.totNotOk} not ok parts / ${totalInspected} engines dismantled</div>
+      <div style="font-size:0.64rem;color:var(--muted);margin-top:3px;">${t.totNotOk} not ok / ${totalDismantled} dismantled</div>
     </div>`;
 }
 function reconRenderMonthTable(){
   document.getElementById('monthLabel').textContent=`${MONTH_FULL[reconState.calMonth]} ${reconState.calYear}`;
   const list=reconParts[reconState.currentSeries];const isH=reconState.currentSeries==='H-Series';
+
+  // Calculate dismantled engines for this month from Core Engine Tracker
+  const _mk=`${reconState.calYear}-${String(reconState.calMonth+1).padStart(2,'0')}`;
+  const mergedDeForRecon={};
+  Object.keys(deYearData).forEach(dk=>{mergedDeForRecon[dk]=deYearData[dk];});
+  Object.keys(deData).forEach(dk=>{if(!mergedDeForRecon[dk])mergedDeForRecon[dk]={};Object.assign(mergedDeForRecon[dk],deData[dk]);});
+  let _reconDismantled=0;
+  Object.keys(mergedDeForRecon).filter(dk=>dk.startsWith(_mk)).forEach(dk=>{
+    const dayObj=mergedDeForRecon[dk]||{};
+    DE_SERIES.forEach(s=>{if(dayObj[s])_reconDismantled+=dayObj[s].dis||0;});
+  });
   const nDays=daysInMonth(reconState.calYear,reconState.calMonth);const dateList=[];
   for(let d=1;d<=nDays;d++)dateList.push(toDateStr(reconState.calYear,reconState.calMonth,d));
   if(!list.length){document.getElementById('tableContainer').innerHTML=`<div class="empty-state">No parts added yet for ${reconState.currentSeries}. Add a part below to start.</div>`;return;}
@@ -956,6 +973,7 @@ function reconRenderMonthTable(){
   html+=`<tr class="date-row"><th class="sticky-col" style="left:0;width:${numW}px;" rowspan="2">#</th><th class="sticky-col2" style="left:${numW}px;width:${partNoW}px;" rowspan="2">Part No</th>`;
   if(isH)html+=`<th class="sticky-col2" style="left:${numW+partNoW}px;width:${modelW}px;" rowspan="2">Model</th>`;
   html+=`<th class="sticky-col2" style="left:${numW+partNoW+modelW}px;min-width:135px;" rowspan="2">Part Name</th>`;
+  html+=`<th style="min-width:80px;background:#f5f0ff;color:#5b52e0;" rowspan="2">Off Take %</th>`;
   dateList.forEach(ds=>{const d=parseInt(ds.split('-')[2]);html+=`<th colspan="3">${ddmmyyyy(reconState.calYear,reconState.calMonth,d)}</th>`;});
   html+=`<th colspan="3" style="background:#eef0ff;">Monthly Cumulative</th><th rowspan="2" style="width:38px;">Del</th></tr>`;
   html+=`<tr class="sub-row">`;
@@ -967,6 +985,16 @@ function reconRenderMonthTable(){
     html+=`<tr data-part="${p.id}"><td class="sticky-col col-num" style="left:0;width:${numW}px;">${idx+1}</td><td class="sticky-col2 col-partno" style="left:${numW}px;width:${partNoW}px;"><span class="part-no">${p.partNo||'—'}</span></td>`;
     if(isH)html+=`<td class="sticky-col2 col-model" style="left:${numW+partNoW}px;width:${modelW}px;"><span class="part-model">${p.model||'—'}</span></td>`;
     html+=`<td class="sticky-col2 col-name" style="left:${numW+partNoW+modelW}px;min-width:135px;"><span class="part-name part-name-link" onclick="openPartModal('${p.id}')" title="Click to view history">${p.partName||'—'}</span></td>`;
+    // Calculate off take % for this part
+    const _expected=_reconDismantled*(p.offTake||1);
+    let _partOk=0;
+    dateList.forEach(ds=>{const d=pe[ds];if(d)_partOk+=d.ok||0;});
+    const _pct=_expected>0?Math.min(100,((_partOk/_expected)*100)).toFixed(1):'—';
+    const _pctColor=_pct==='—'?'var(--muted)':parseFloat(_pct)>=70?'var(--ok-col)':parseFloat(_pct)>=40?'var(--p15-series)':'var(--warn)';
+    html+=`<td style="background:#faf8ff;text-align:center;">
+      <div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:0.78rem;color:${_pctColor};">${_pct==='—'?'—':_pct+'%'}</div>
+      <div style="font-size:0.6rem;color:var(--muted);margin-top:1px;">${_partOk}/${_expected>0?Math.round(_expected):'?'}</div>
+    </td>`;
     dateList.forEach(ds=>{
       const d=pe[ds]||{rec:'',ok:'',notok:''};
       html+=`<td><input class="cell-input rec-input" type="number" min="0" value="${d.rec||''}" oninput="handleCellInput('${reconState.currentSeries}','${p.id}','${ds}','rec',this.value)"></td>`;
@@ -1000,6 +1028,7 @@ function reconRenderYearTable(){
   let html=`<div class="table-scroll"><table class="reg-table"><thead><tr class="date-row"><th class="sticky-col" style="left:0;width:${numW}px;" rowspan="2">#</th><th class="sticky-col2" style="left:${numW}px;width:${partNoW}px;" rowspan="2">Part No</th>`;
   if(isH)html+=`<th class="sticky-col2" style="left:${numW+partNoW}px;width:${modelW}px;" rowspan="2">Model</th>`;
   html+=`<th class="sticky-col2" style="left:${numW+partNoW+modelW}px;min-width:135px;" rowspan="2">Part Name</th>`;
+  html+=`<th style="min-width:80px;background:#f5f0ff;color:#5b52e0;" rowspan="2">Off Take %</th>`;
   MONTH_SHORT.forEach(m=>{html+=`<th colspan="3">${m} ${reconState.viewYear}</th>`;});
   html+=`<th colspan="3" style="background:#eef0ff;">Year Cumulative</th></tr><tr class="sub-row">`;
   MONTH_SHORT.forEach(()=>{html+=`<th class="rec-h">Rec</th><th class="ok-h">Ok</th><th class="notok-h">NotOk</th>`;});
@@ -1012,6 +1041,7 @@ function reconRenderYearTable(){
     html+=`<tr><td class="sticky-col col-num" style="left:0;width:${numW}px;">${idx+1}</td><td class="sticky-col2 col-partno" style="left:${numW}px;width:${partNoW}px;"><span class="part-no">${p.partNo||'—'}</span></td>`;
     if(isH)html+=`<td class="sticky-col2 col-model" style="left:${numW+partNoW}px;width:${modelW}px;"><span class="part-model">${p.model||'—'}</span></td>`;
     html+=`<td class="sticky-col2 col-name" style="left:${numW+partNoW+modelW}px;min-width:135px;"><span class="part-name">${p.partName||'—'}</span></td>`;
+    html+=`<td style="background:#faf8ff;text-align:center;font-weight:700;color:#5b52e0;font-family:'JetBrains Mono',monospace;font-size:0.78rem;">${p.offTake||1}</td>`;
     mAgg.forEach(m=>{html+=`<td class="cum-cell rec" style="background:transparent;font-weight:600;">${m.rec||''}</td><td class="cum-cell ok" style="background:transparent;font-weight:600;">${m.ok||''}</td><td class="cum-cell notok" style="background:transparent;font-weight:600;">${m.notok||''}</td>`;});
     html+=`<td class="cum-cell rec">${yt.rec||0}</td><td class="cum-cell ok">${yt.ok||0}</td><td class="cum-cell notok">${yt.notok||0}</td></tr>`;
   });
@@ -2178,6 +2208,24 @@ window.copyTableToClipboard = async function(){
       alert('Copy பண்ண முடியல — Download Excel use பண்ணுங்க');
     }
   }
+};
+
+// ── OFF TAKE SAVE ──────────────────────────────────────────
+let offTakeSaveTimers={};
+window.handleOffTakeInput=function(partId,val){
+  const num=parseFloat(val)||1;
+  const series=reconState.currentSeries;
+  const part=reconParts[series].find(p=>p.id===partId);
+  if(part)part.offTake=num;
+  const key=`offtake_${partId}`;
+  clearTimeout(offTakeSaveTimers[key]);
+  offTakeSaveTimers[key]=setTimeout(async()=>{
+    try{
+      setSync('ing');
+      await setDoc(doc(db,'parts',partId),{offTake:num},{merge:true});
+      setSync('ok');dbg(`Off Take saved: ${partId}`);
+    }catch(err){dbg(`❌ OffTake: ${err.message}`);setSync('err');}
+  },600);
 };
 
 // ── BOOT ──
