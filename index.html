@@ -1023,6 +1023,16 @@ function refreshCumCells(){
 function reconRenderYearTable(){
   document.getElementById('yearLabel').textContent=`${reconState.viewYear}`;
   const list=reconParts[reconState.currentSeries];const isH=reconState.currentSeries==='H-Series';
+
+  // Calculate dismantled engines for this year from Core Engine Tracker
+  const _yearMk=String(reconState.viewYear);
+  const _mergedDeYear={...deYearData};
+  Object.keys(deData).forEach(dk=>{if(!_mergedDeYear[dk])_mergedDeYear[dk]={};Object.assign(_mergedDeYear[dk],deData[dk]);});
+  let _yearDismantled=0;
+  Object.keys(_mergedDeYear).filter(dk=>dk.startsWith(_yearMk)).forEach(dk=>{
+    const dayObj=_mergedDeYear[dk]||{};
+    DE_SERIES.forEach(s=>{if(dayObj[s])_yearDismantled+=dayObj[s].dis||0;});
+  });
   if(!list.length){document.getElementById('tableContainer').innerHTML=`<div class="empty-state">No parts for ${reconState.currentSeries}.</div>`;return;}
   const numW=30,partNoW=90,modelW=isH?90:0;
   let html=`<div class="table-scroll"><table class="reg-table"><thead><tr class="date-row"><th class="sticky-col" style="left:0;width:${numW}px;" rowspan="2">#</th><th class="sticky-col2" style="left:${numW}px;width:${partNoW}px;" rowspan="2">Part No</th>`;
@@ -1041,7 +1051,16 @@ function reconRenderYearTable(){
     html+=`<tr><td class="sticky-col col-num" style="left:0;width:${numW}px;">${idx+1}</td><td class="sticky-col2 col-partno" style="left:${numW}px;width:${partNoW}px;"><span class="part-no">${p.partNo||'—'}</span></td>`;
     if(isH)html+=`<td class="sticky-col2 col-model" style="left:${numW+partNoW}px;width:${modelW}px;"><span class="part-model">${p.model||'—'}</span></td>`;
     html+=`<td class="sticky-col2 col-name" style="left:${numW+partNoW+modelW}px;min-width:135px;"><span class="part-name">${p.partName||'—'}</span></td>`;
-    html+=`<td style="background:#faf8ff;text-align:center;font-weight:700;color:#5b52e0;font-family:'JetBrains Mono',monospace;font-size:0.78rem;">${p.offTake||1}</td>`;
+    // Calculate off take % for year view
+    let _yearOk=0;
+    Object.keys(pe).forEach(ds=>{const d=pe[ds];if(d)_yearOk+=d.ok||0;});
+    const _yearExpected=_yearDismantled*(p.offTake||1);
+    const _yearPct=_yearExpected>0?Math.min(100,((_yearOk/_yearExpected)*100)).toFixed(1):'—';
+    const _yearPctColor=_yearPct==='—'?'var(--muted)':parseFloat(_yearPct)>=70?'var(--ok-col)':parseFloat(_yearPct)>=40?'var(--p15-series)':'var(--warn)';
+    html+=`<td style="background:#faf8ff;text-align:center;">
+      <div style="font-family:'JetBrains Mono',monospace;font-weight:700;font-size:0.78rem;color:${_yearPctColor};">${_yearPct==='—'?'—':_yearPct+'%'}</div>
+      <div style="font-size:0.6rem;color:var(--muted);margin-top:1px;">${_yearOk}/${_yearExpected>0?Math.round(_yearExpected):'?'}</div>
+    </td>`;
     mAgg.forEach(m=>{html+=`<td class="cum-cell rec" style="background:transparent;font-weight:600;">${m.rec||''}</td><td class="cum-cell ok" style="background:transparent;font-weight:600;">${m.ok||''}</td><td class="cum-cell notok" style="background:transparent;font-weight:600;">${m.notok||''}</td>`;});
     html+=`<td class="cum-cell rec">${yt.rec||0}</td><td class="cum-cell ok">${yt.ok||0}</td><td class="cum-cell notok">${yt.notok||0}</td></tr>`;
   });
